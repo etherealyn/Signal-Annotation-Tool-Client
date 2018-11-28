@@ -1,0 +1,45 @@
+<!--alert begin-->
+<div class="alert alert-app-level">
+  <!--<div>alert example</div>-->
+</div>
+<!--alert end-->
+
+<clr-header class="header-6">
+  <div class="branding" style="cursor: pointer;">
+    <a class="nav-link" routerLink="/">
+      <clr-icon shape="cloud"></clr-icon>
+      <span class="title">Signal Annotation Tool</span>
+    </a>
+  </div>
+  <div class="header-nav">
+    <a class="active nav-link nav-text" routerLink="/projects">
+      Projects
+    </a>
+    <!--<a class="nav-link nav-icon" routerLink="/projects">-->
+      <!--<clr-icon shape="folder"></clr-icon>-->
+    <!--</a>-->
+    <!--<a class=" nav-link nav-icon" routerLink="/settings">-->
+      <!--<clr-icon shape="cog"></clr-icon>-->
+    <!--</a>-->
+  </div>
+  <form class="search">
+    <label for="search_input">
+      <input id="search_input" type="text" placeholder="Search for projects...">
+    </label>
+  </form>
+  <div class="header-actions">
+    <clr-dropdown class="dropdown bottom-right">
+      <button class="nav-icon" clrDropdownToggle>
+        <clr-icon shape="user"></clr-icon>
+        <clr-icon shape="caret down"></clr-icon>
+      </button>
+      <div class="dropdown-menu">
+        <a clrDropdownItem>About</a>
+        <a clrDropdownItem>Preferences</a>
+        <a clrDropdownItem>Log out</a>
+      </div>
+    </clr-dropdown>
+  </div>
+</clr-header>
+
+<ng-content></ng-content>
