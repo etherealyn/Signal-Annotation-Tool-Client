@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { Project } from './models/Project';
+import { Project } from '../models/Project';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +23,7 @@ export class ProjectsService {
   }
 
   updateProject(project: Project): Observable<void> {
-    return this.http.put<void>('http://localhost:8080/api/projects/' + project.name, project);
+    return this.http.put<void>('http://localhost:8080/api/projects/' + project.title, project);
   }
 
   deleteProject(name: string) {
