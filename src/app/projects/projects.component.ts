@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ProjectsService} from '../services/projects.service';
 import {Project} from '../models/Project';
 
+
 @Component({
   selector: 'app-projects',
   templateUrl: './projects.component.html',
@@ -18,7 +19,7 @@ export class ProjectsComponent implements OnInit {
   }
 
   getProjects(): any {
-    this.projectsService.getAllProjects()
+    this.projectsService.getProjects()
       .subscribe(projects => {
         this.projects = projects;
       });

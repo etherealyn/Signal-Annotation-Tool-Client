@@ -7,12 +7,12 @@
       <clr-dg-column>Last Modification</clr-dg-column>
 
       <clr-dg-row *ngFor="let project of projects">
-        <clr-dg-cell>{{project.title}}</clr-dg-cell>
+        <clr-dg-cell><a routerLink="/editor/{{project.id}}">{{project.title}}</a></clr-dg-cell>
         <clr-dg-cell>{{project.modified | date}}</clr-dg-cell>
       </clr-dg-row>
 
       <clr-dg-footer>{{projects.length}} project{{projects.length === 1 ? "" : "s"}}</clr-dg-footer>
     </clr-datagrid>
   </div>
-  <app-sidebar class="sidenav"></app-sidebar>
+  <!--<app-sidebar class="sidenav"></app-sidebar>-->
 </div>

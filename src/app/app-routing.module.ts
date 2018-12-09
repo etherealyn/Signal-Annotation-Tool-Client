@@ -8,13 +8,15 @@ import {EditorComponent} from './editor/editor.component';
 const appRoutes: Routes = [
   {path: '', redirectTo: '/projects', pathMatch: 'full'},
   {path: 'projects', component: ProjectsComponent},
-  {path: 'editor', component: EditorComponent},
+  {path: 'editor/:id', component: EditorComponent},
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(
     appRoutes,
-    {enableTracing: true}
+    {
+      enableTracing: true // todo: remove
+    }
   )],
   exports: [RouterModule]
 })
