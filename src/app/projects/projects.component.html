@@ -3,13 +3,11 @@
     <app-project-form></app-project-form>
 
     <clr-datagrid>
-      <clr-dg-column>ID</clr-dg-column>
       <clr-dg-column>Title</clr-dg-column>
       <clr-dg-column>Last Modification</clr-dg-column>
 
       <clr-dg-row *ngFor="let project of projects">
-        <clr-dg-cell>{{project.id}}</clr-dg-cell>
-        <clr-dg-cell>{{project.name}}</clr-dg-cell>
+        <clr-dg-cell>{{project.title}}</clr-dg-cell>
         <clr-dg-cell>{{project.modified | date}}</clr-dg-cell>
       </clr-dg-row>
 

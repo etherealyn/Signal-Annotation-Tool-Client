@@ -8,8 +8,7 @@ import {Project} from '../models/Project';
   styles: []
 })
 export class ProjectsComponent implements OnInit {
-  projects: Project[];
-
+  projects: Project[] = [];
 
   constructor(private projectsService: ProjectsService) {
   }
@@ -19,6 +18,9 @@ export class ProjectsComponent implements OnInit {
   }
 
   getProjects(): any {
-    this.projects = [];
+    this.projectsService.getAllProjects()
+      .subscribe(projects => {
+        this.projects = projects;
+      });
   }
 }

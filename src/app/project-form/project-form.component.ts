@@ -3,6 +3,7 @@ import {Component, OnInit} from '@angular/core';
 import {Project} from '../models/Project';
 import {ProjectsService} from '../services/projects.service';
 import {FormGroup} from '@angular/forms';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-project-form',
@@ -10,12 +11,14 @@ import {FormGroup} from '@angular/forms';
   styleUrls: ['./project-form.component.css']
 })
 export class ProjectFormComponent implements OnInit {
-  model = new Project(42, 'Jump Detection', '', new Date());
+  model = new Project('', 'Jump Detection', new Date());
 
-  modalOpen = true;
+  modalOpen = false;
   submitted = false;
 
-  constructor(private projectsService: ProjectsService) {
+  constructor(
+    private projectsService: ProjectsService,
+    private router: Router) {
   }
 
   ngOnInit() {
@@ -24,17 +27,16 @@ export class ProjectFormComponent implements OnInit {
   onSubmit(form: FormGroup) {
     this.submitted = true;
     this.modalOpen = false;
-    console.log('onSubmit()');
-    console.log(this.disagnostic);
     // todo: send new project to the backend
     this.projectsService.insertProject(this.model);
+    // todo: get unique id for this project
     form.reset();
     // todo: redirect the user to a new project page
+    this.router.navigate(['/editor']);
   }
 
   // TODO: Remove this when done
   get disagnostic() {
     return JSON.stringify(this.model);
   }
-
 }
