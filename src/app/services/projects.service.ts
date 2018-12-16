@@ -17,7 +17,7 @@ export class ProjectsService {
   getProjects(): Observable<Project[]> {
     return this.http.get<Project[]>(`${this.projectsUrl}`)
       .pipe(
-        tap(_ => this.log('fetched projects')),
+        tap(_ => ProjectsService.log('fetched projects')), // todo: remove
         catchError(this.handleError('getProjects', []))
       );
   }
@@ -25,13 +25,17 @@ export class ProjectsService {
   getProject(id: string): Observable<Project> {
     const url = `${this.projectsUrl}/${id}`;
     return this.http.get<Project>(url).pipe(
-      tap(p => this.log(`fetched project id=${p.id}`)),
+      tap(p => ProjectsService.log(`fetched project id=${p.id}`)), // todo: remove
       catchError(this.handleError<Project>(`getProject id=${id}`))
     );
   }
 
   insertProject(project: Project): Observable<Project> {
-    return this.http.post<Project>(`${this.projectsUrl}/`, project);
+    return this.http.post<Project>(`${this.projectsUrl}/`, project)
+      .pipe(
+        tap(_ => ProjectsService.log('inserted project')),        // todo: remove
+        catchError(this.handleError<Project>(`insertProject ${JSON.stringify(project)}`))
+      );
   }
 
   updateProject(project: Project): Observable<void> {
@@ -62,7 +66,7 @@ export class ProjectsService {
     };
   }
 
-  private log(m: string) {
+  private static log(m: string) {
     console.log(m);
   }
 }

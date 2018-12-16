@@ -15,7 +15,7 @@ const appRoutes: Routes = [
   imports: [RouterModule.forRoot(
     appRoutes,
     {
-      enableTracing: true // todo: remove
+      enableTracing: false // todo: remove
     }
   )],
   exports: [RouterModule]

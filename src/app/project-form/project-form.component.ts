@@ -11,7 +11,7 @@ import {Router} from '@angular/router';
   styleUrls: ['./project-form.component.css']
 })
 export class ProjectFormComponent implements OnInit {
-  model = new Project('', 'Jump Detection', new Date());
+  model = new Project('', 'My Title', new Date());
 
   modalOpen = false;
   submitted = false;
@@ -28,11 +28,14 @@ export class ProjectFormComponent implements OnInit {
     this.submitted = true;
     this.modalOpen = false;
     // todo: send new project to the backend
-    this.projectsService.insertProject(this.model);
+    this.projectsService.insertProject(this.model)
+      .subscribe(project => {
+        console.log(JSON.stringify(project))
+      });
     // todo: get unique id for this project
     form.reset();
     // todo: redirect the user to a new project page
-    this.router.navigate(['/editor']);
+    // this.router.navigate(['/editor']);
   }
 
   // TODO: Remove this when done
