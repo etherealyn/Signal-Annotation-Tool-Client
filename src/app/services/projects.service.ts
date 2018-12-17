@@ -9,7 +9,7 @@ import {catchError, map, tap} from 'rxjs/operators';
 })
 export class ProjectsService {
 
-  private projectsUrl = `http://localhost:8000/api/projects`;
+  private projectsUrl = `http://localhost:8080/api/projects`;
 
   constructor(private http: HttpClient) {
   }

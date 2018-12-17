@@ -1,0 +1,36 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: sat-web
+spec:
+  selector:
+    app: sat-client-deployment
+  ports:
+    - port: 80
+      targetPort: 80
+  type: NodePort
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sat-client-deployment
+  labels:
+    app: sat-client-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sat-client-deployment
+  template:
+    metadata:
+      labels:
+        app: sat-client-deployment
+    spec:
+      containers:
+        - name: sat-web
+          image: eth/sat-web:0.0.1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
