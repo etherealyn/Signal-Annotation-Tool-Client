@@ -10,14 +10,14 @@ import {AppRoutingModule} from './app-routing.module';
 import {ProjectsComponent} from './projects/projects.component';
 import {LayoutModule} from './layout/layout.module';
 import {EditorComponent} from './editor/editor.component';
-import {ProjectFormComponent} from './project-form/project-form.component';
+import {ProjectModalComponent} from './projects/project-modal/project-modal.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ProjectsComponent,
     EditorComponent,
-    ProjectFormComponent
+    ProjectModalComponent
   ],
   imports: [
     BrowserModule,

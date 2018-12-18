@@ -1,16 +1,16 @@
 import {Component, OnInit} from '@angular/core';
 
-import {Project} from '../models/Project';
-import {ProjectsService} from '../services/projects.service';
+import {Project} from '../../models/Project';
+import {ProjectsService} from '../projects.service';
 import {FormGroup} from '@angular/forms';
 import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-project-form',
-  templateUrl: './project-form.component.html',
-  styleUrls: ['./project-form.component.css']
+  templateUrl: './project-modal.component.html',
+  styleUrls: ['./project-modal.component.css']
 })
-export class ProjectFormComponent implements OnInit {
+export class ProjectModalComponent implements OnInit {
   model = new Project('', 'My Title', new Date());
 
   modalOpen = false;
@@ -27,14 +27,18 @@ export class ProjectFormComponent implements OnInit {
   onSubmit(form: FormGroup) {
     this.submitted = true;
     this.modalOpen = false;
-    // todo: send new project to the backend
+
     this.projectsService.insertProject(this.model)
-      .subscribe(project => {
-        console.log(JSON.stringify(project))
+      .subscribe(response => {
+
+        if (response.result.ok === 1) {
+          this.router.navigate([`/editor/${response.id}`]);
+        } else {
+          // todo: show error
+          console.error(JSON.stringify(response));
+        }
       });
-    // todo: get unique id for this project
-    form.reset();
-    // todo: redirect the user to a new project page
+    // form.reset();
     // this.router.navigate(['/editor']);
   }
 

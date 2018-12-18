@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {Location} from '@angular/common';
 
-import {ProjectsService} from '../services/projects.service';
+import {ProjectsService} from '../projects/projects.service';
 import {Project} from '../models/Project';
 
 @Component({
@@ -24,6 +24,7 @@ export class EditorComponent implements OnInit {
 
   private getProject() {
     const id = this.route.snapshot.paramMap.get('id');
+    console.log(id);
     this.projectService.getProject(id)
       .subscribe(project => {
         this.project = project;

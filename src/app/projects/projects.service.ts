@@ -30,11 +30,11 @@ export class ProjectsService {
     );
   }
 
-  insertProject(project: Project): Observable<Project> {
+  insertProject(project: Project): Observable<any> {
     return this.http.post<Project>(`${this.projectsUrl}/`, project)
       .pipe(
         tap(_ => ProjectsService.log('inserted project')),        // todo: remove
-        catchError(this.handleError<Project>(`insertProject ${JSON.stringify(project)}`))
+        catchError(this.handleError<any>(`insertProject ${JSON.stringify(project)}`))
       );
   }
 
