@@ -1,9 +1,9 @@
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
-import {Location} from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 
-import {ProjectsService} from '../projects/projects.service';
-import {Project} from '../models/Project';
+import { ProjectsService } from '../projects/projects.service';
+import { ProjectModel } from '../projects/project.model';
 
 @Component({
   selector: 'app-editor',
@@ -11,7 +11,7 @@ import {Project} from '../models/Project';
   styles: []
 })
 export class EditorComponent implements OnInit {
-  private project: Project;
+  private project: ProjectModel;
 
   constructor(private route: ActivatedRoute,
               private projectService: ProjectsService,

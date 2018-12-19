@@ -1,8 +1,8 @@
-<button class="btn btn-primary" (click)="modalOpen = true">New Project</button>
+<button class="btn btn-primary" (click)="modalOpen = true">New ProjectModel</button>
 
 <clr-modal [(clrModalOpen)]="modalOpen">
   {{disagnostic}}
-  <h3 class="modal-title">New Project</h3>
+  <h3 class="modal-title">New ProjectModel</h3>
 
   <div class="modal-body">
     <form (ngSubmit)="onSubmit()" #projectForm="ngForm" class="compact">

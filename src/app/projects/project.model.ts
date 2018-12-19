@@ -1,4 +1,4 @@
-export class Project {
+export class ProjectModel {
   constructor(
     public id: string,
     public title: string,

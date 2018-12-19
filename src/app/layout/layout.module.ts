@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HeaderComponent } from './header/header.component';
+import { AppRoutingModule } from '../app-routing.module';
 import { ClarityModule } from '@clr/angular';
 
-import { AppRoutingModule } from '../app-routing.module';
+import { HeaderComponent } from './header/header.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { LayoutComponent } from './layout/layout.component';
 import { SubbarComponent } from './subbar/subbar.component';
@@ -18,7 +18,11 @@ import { SubbarComponent } from './subbar/subbar.component';
     LayoutComponent,
     SidebarComponent
   ],
-  declarations: [HeaderComponent, SidebarComponent, LayoutComponent, SubbarComponent]
+  declarations: [ HeaderComponent,
+    SidebarComponent,
+    LayoutComponent,
+    SubbarComponent
+  ]
 })
 export class LayoutModule {
 }

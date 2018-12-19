@@ -1,6 +1,6 @@
-import {Component, OnInit} from '@angular/core';
-import {ProjectsService} from './projects.service';
-import {Project} from '../models/Project';
+import { Component, OnInit } from '@angular/core';
+import { ProjectsService } from './projects.service';
+import { ProjectModel } from './project.model';
 
 
 @Component({
@@ -9,7 +9,7 @@ import {Project} from '../models/Project';
   styles: []
 })
 export class ProjectsComponent implements OnInit {
-  projects: Project[] = [];
+  projects: ProjectModel[] = [];
 
   constructor(private projectsService: ProjectsService) {
   }

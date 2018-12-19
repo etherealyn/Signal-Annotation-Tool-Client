@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 
-import {Project} from '../../models/Project';
+import {ProjectModel} from '../project.model';
 import {ProjectsService} from '../projects.service';
 import {FormGroup} from '@angular/forms';
 import {Router} from '@angular/router';
@@ -11,7 +11,7 @@ import {Router} from '@angular/router';
   styleUrls: ['./project-modal.component.css']
 })
 export class ProjectModalComponent implements OnInit {
-  model = new Project('', 'My Title', new Date());
+  model = new ProjectModel('', 'My Title', new Date());
 
   modalOpen = false;
   submitted = false;
