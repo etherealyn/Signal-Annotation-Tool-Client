@@ -1,14 +1,15 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 
-import {ProjectModel} from '../project.model';
-import {ProjectsService} from '../projects.service';
-import {FormGroup} from '@angular/forms';
-import {Router} from '@angular/router';
+import { ProjectModel } from '../project.model';
+import { ProjectsService } from '../projects.service';
+
 
 @Component({
   selector: 'app-project-form',
   templateUrl: './project-modal.component.html',
-  styleUrls: ['./project-modal.component.css']
+  styleUrls: [ './project-modal.component.css' ]
 })
 export class ProjectModalComponent implements OnInit {
   model = new ProjectModel('', 'My Title', new Date());
@@ -32,18 +33,11 @@ export class ProjectModalComponent implements OnInit {
       .subscribe(response => {
 
         if (response.result.ok === 1) {
-          this.router.navigate([`/editor/${response.id}`]);
+          this.router.navigate([ `/editor/${response.id}` ]);
         } else {
           // todo: show error
           console.error(JSON.stringify(response));
         }
       });
-    // form.reset();
-    // this.router.navigate(['/editor']);
-  }
-
-  // TODO: Remove this when done
-  get disagnostic() {
-    return JSON.stringify(this.model);
   }
 }
