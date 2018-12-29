@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Location } from '@angular/common';
 
 import { ProjectsService } from '../projects/projects.service';
 import { ProjectModel } from '../projects/project.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-editor',
@@ -14,8 +14,7 @@ export class EditorComponent implements OnInit {
   private project: ProjectModel;
 
   constructor(private route: ActivatedRoute,
-              private projectService: ProjectsService,
-              private location: Location) {
+              private projectService: ProjectsService) {
   }
 
   ngOnInit() {
@@ -24,14 +23,9 @@ export class EditorComponent implements OnInit {
 
   private getProject() {
     const id = this.route.snapshot.paramMap.get('id');
-    console.log(id);
     this.projectService.getProject(id)
       .subscribe(project => {
         this.project = project;
       });
-  }
-
-  get diagnostic() {
-    return JSON.stringify(this.project);
   }
 }

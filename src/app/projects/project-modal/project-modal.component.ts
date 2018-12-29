@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { ProjectModel } from '../project.model';
 import { ProjectsService } from '../projects.service';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -12,10 +13,10 @@ import { ProjectsService } from '../projects.service';
   styleUrls: [ './project-modal.component.css' ]
 })
 export class ProjectModalComponent implements OnInit {
-  model = new ProjectModel('', 'My Title', new Date());
+  private model = new ProjectModel('', 'My Title', new Date());
 
-  modalOpen = false;
-  submitted = false;
+  private modalOpen = false;
+  private submitted = false;
 
   constructor(
     private projectsService: ProjectsService,

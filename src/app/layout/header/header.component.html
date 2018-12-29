@@ -34,9 +34,10 @@
         <clr-icon shape="caret down"></clr-icon>
       </button>
       <div class="dropdown-menu">
+        <hr>
         <a clrDropdownItem>About</a>
         <a clrDropdownItem>Preferences</a>
-        <a clrDropdownItem>Log out</a>
+        <a clrDropdownItem (click)="onLogout()">Log out</a>
       </div>
     </clr-dropdown>
   </div>
