@@ -17,7 +17,7 @@ export class LayoutComponent implements OnInit {
   ngOnInit() {
     this.authService.currentSession.subscribe(
       x => {
-        if (x.user) {
+        if (x && x.user) {
           this.user = x.user;
         }
         this.hidden = !x;

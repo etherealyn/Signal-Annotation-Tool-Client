@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ClarityModule } from '@clr/angular';
-import { AppRoutingModule } from '../app-routing.module';
+import { AppRouting } from '../app.routing';
 
 import { EditorComponent } from './editor.component';
 
@@ -9,7 +9,7 @@ import { EditorComponent } from './editor.component';
   declarations: [ EditorComponent ],
   imports: [
     CommonModule,
-    AppRoutingModule,
+    AppRouting,
     ClarityModule
   ]
 })

@@ -1,9 +1,8 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { ProjectsService } from '../projects/projects.service';
 import { ProjectModel } from '../projects/project.model';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-editor',
@@ -25,7 +24,12 @@ export class EditorComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     this.projectService.getProject(id)
       .subscribe(project => {
+        console.log(project);
         this.project = project;
       });
+  }
+
+  get diagnostic() {
+    return JSON.stringify(this.project);
   }
 }

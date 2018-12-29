@@ -18,13 +18,15 @@ export class ProjectsService {
 
   getProjects(): Observable<ProjectModel[]> {
     return this.http.get<ProjectModel[]>(`${this.projectsUrl}`)
-      .pipe(catchError(this.handleError('getProjects', [])));
+      .pipe(
+        catchError(this.handleError('getProjects', []))
+      );
   }
 
   getProject(id: string): Observable<ProjectModel> {
     const url = `${this.projectsUrl}/${id}`;
-    return this.http.get<ProjectModel>(url).pipe(catchError(this.handleError<ProjectModel>(`getProject id=${id}`))
-    );
+    return this.http.get<ProjectModel>(url)
+      .pipe(catchError(this.handleError<ProjectModel>(`getProject id=${id}`)));
   }
 
   insertProject(project: ProjectModel): Observable<any> {

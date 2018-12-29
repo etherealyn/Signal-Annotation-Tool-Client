@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ClarityModule } from '@clr/angular';
 import { HttpClientModule } from '@angular/common/http';
 
-import { AppRoutingModule } from '../app-routing.module';
+import { AppRouting } from '../app.routing';
 
 import { ProjectsComponent } from './projects.component';
 import { ProjectModalComponent } from './project-modal/project-modal.component';
@@ -17,7 +17,7 @@ import { ProjectModalComponent } from './project-modal/project-modal.component';
   ],
   imports: [
     CommonModule,
-    AppRoutingModule,
+    AppRouting,
     FormsModule,
     ClarityModule,
     HttpClientModule,

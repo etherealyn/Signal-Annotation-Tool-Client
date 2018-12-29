@@ -4,7 +4,7 @@ import { ClarityModule } from '@clr/angular';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
-import { LoginComponent } from './login.component';
+import { LoginComponent } from './login/login.component';
 
 @NgModule({
   declarations: [ LoginComponent ],

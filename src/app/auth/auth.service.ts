@@ -1,16 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, map  } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 
 import { environment } from '../../environments/environment';
-import { User } from './user.model';
-
-class Session {
-  accessToken: string;
-  expiresIn: number;
-  user: User;
-}
+import { Session } from './session.model';
 
 
 @Injectable({
@@ -31,15 +25,13 @@ export class AuthService {
   login(username: string, password: string) {
     return this.http.post<any>(this.authUrl, { username, password })
       .pipe(map(session => {
-          if (session.user && session.accessToken) {
+          if (session && session.user && session.accessToken) {
             localStorage.setItem('currentSession', JSON.stringify(session));
             this.currentSessionSubject.next(session);
           }
           return session;
         }),
-        catchError(
-          this.handleError('login')
-        )
+        catchError(this.handleError('login', null))
       );
   }
 
