@@ -5,6 +5,7 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 import { Session } from './session.model';
+import { User } from './user.model';
 
 
 @Injectable({
@@ -20,6 +21,10 @@ export class AuthService {
   constructor(private http: HttpClient) {
     this.currentSessionSubject = new BehaviorSubject<Session>(JSON.parse(localStorage.getItem('currentSession')));
     this.currentSession = this.currentSessionSubject.asObservable();
+  }
+
+  public get currentSessionValue(): Session {
+    return this.currentSessionSubject.value;
   }
 
   login(username: string, password: string) {
