@@ -27,6 +27,12 @@ export class AuthService {
     return this.currentSessionSubject.value;
   }
 
+  public get currentUserValue(): User {
+    if (this.currentSessionSubject.value) {
+      return this.currentSessionSubject.value.user;
+    }
+  }
+
   login(username: string, password: string) {
     return this.http.post<any>(this.authUrl, { username, password })
       .pipe(map(session => {

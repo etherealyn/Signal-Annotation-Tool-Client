@@ -1,10 +1,10 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { ProjectModel } from '../project.model';
 import { ProjectsService } from '../projects.service';
-import { Subscription } from 'rxjs';
+import { AuthService } from '../../auth/auth.service';
 
 
 @Component({
@@ -13,17 +13,20 @@ import { Subscription } from 'rxjs';
   styleUrls: [ './project-modal.component.css' ]
 })
 export class ProjectModalComponent implements OnInit {
-  private model = new ProjectModel('', 'My Title', new Date());
+  private model;
 
   private modalOpen = false;
   private submitted = false;
 
   constructor(
     private projectsService: ProjectsService,
-    private router: Router) {
+    private router: Router,
+    private authService: AuthService) {
   }
 
   ngOnInit() {
+    const currentUserId = this.authService.currentUserValue.id;
+    this.model = new ProjectModel('', '', new Date(), [ currentUserId ]);
   }
 
   onSubmit(form: FormGroup) {
