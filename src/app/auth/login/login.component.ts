@@ -1,20 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 
 import { AuthModel } from '../auth.model';
 import { AuthService } from '../auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, first } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-auth',
   templateUrl: './login.component.html',
   styleUrls: [ './login.component.css' ]
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
   authModel = new AuthModel('', '', true);
   returnUrl: string;
   loading = false;
   error = false;
+
+  private subscription: Subscription;
 
   constructor(private authService: AuthService,
               private route: ActivatedRoute,
@@ -35,7 +37,7 @@ export class LoginComponent implements OnInit {
     // this.loading = true;
     this.error = false;
 
-    this.authService.login(this.authModel.username, this.authModel.password)
+    this.subscription = this.authService.login(this.authModel.username, this.authModel.password)
       .subscribe(
         data => {
           if (data) {
@@ -44,5 +46,9 @@ export class LoginComponent implements OnInit {
             this.error = true;
           }
         });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 }

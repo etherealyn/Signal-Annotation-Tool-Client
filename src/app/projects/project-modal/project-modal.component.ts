@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { ProjectModel } from '../project.model';
 import { ProjectsService } from '../projects.service';
 import { AuthService } from '../../auth/auth.service';
+import { first } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -12,11 +14,12 @@ import { AuthService } from '../../auth/auth.service';
   templateUrl: './project-modal.component.html',
   styleUrls: [ './project-modal.component.css' ]
 })
-export class ProjectModalComponent implements OnInit {
+export class ProjectModalComponent implements OnInit, OnDestroy {
   private model;
 
   private modalOpen = false;
   private submitted = false;
+  private subscription: Subscription;
 
   constructor(
     private projectsService: ProjectsService,
@@ -25,17 +28,15 @@ export class ProjectModalComponent implements OnInit {
   }
 
   ngOnInit() {
-    const currentUserId = this.authService.currentUserValue.id;
-    this.model = new ProjectModel('', '', new Date(), [ currentUserId ]);
+    this.model = new ProjectModel('', '', new Date());
   }
 
   onSubmit(form: FormGroup) {
     this.submitted = true;
     this.modalOpen = false;
 
-    this.projectsService.insertProject(this.model)
+    this.subscription = this.projectsService.insertProject(this.model)
       .subscribe(response => {
-
         if (response.result.ok === 1) {
           this.router.navigate([ `/editor/${response.id}` ]);
         } else {
@@ -43,5 +44,11 @@ export class ProjectModalComponent implements OnInit {
           console.error(JSON.stringify(response));
         }
       });
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 }

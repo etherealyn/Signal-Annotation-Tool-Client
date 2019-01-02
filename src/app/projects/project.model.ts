@@ -5,7 +5,7 @@ export class ProjectModel {
     public id: string,
     public title: string,
     public modified: Date,
-    public userIds: string[],
+    public ownerId?: string,
     public description?: string,
   ) {}
 }

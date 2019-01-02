@@ -1,25 +1,28 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterEvent } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { Session } from '../../auth/session.model';
 import { User } from '../../auth/user.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styles: []
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   private isProjectActive = true;
   private isEditorActive = false;
   private user: User;
+
+  private subscription: Subscription;
 
   constructor(private router: Router,
               private authService: AuthService) {
   }
 
   ngOnInit() {
-    this.router.events.subscribe((event: RouterEvent) => {
+    this.subscription = this.router.events.subscribe((event: RouterEvent) => {
       const url: string = event.url;
       if (url) {
         if (url.startsWith('/project')) {
@@ -32,12 +35,18 @@ export class HeaderComponent implements OnInit {
       }
     });
 
-    this.authService.currentSession.subscribe((x: Session) => {
+    this.subscription.add(
+      this.authService.currentSession.subscribe((x: Session) => {
       if (x && x.user) {
         this.user = x.user;
       }
-    });
+    }));
   }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
+
 
   onLogout() {
     this.authService.logout();
