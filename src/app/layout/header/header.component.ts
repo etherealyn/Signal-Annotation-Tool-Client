@@ -13,8 +13,9 @@ import { Subscription } from 'rxjs';
 export class HeaderComponent implements OnInit, OnDestroy {
   private isProjectActive = true;
   private isEditorActive = false;
-  private user: User;
+  private isHeaderVisible = false;
 
+  private user: User;
   private subscription: Subscription;
 
   constructor(private router: Router,
@@ -37,9 +38,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     this.subscription.add(
       this.authService.currentSession.subscribe((x: Session) => {
-      if (x && x.user) {
-        this.user = x.user;
-      }
+        if (x && x.user) {
+          this.user = x.user;
+        }
+        this.isHeaderVisible = !x;
     }));
   }
 

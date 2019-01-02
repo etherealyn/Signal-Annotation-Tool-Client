@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AuthService } from '../../auth/auth.service';
-import { User } from '../../auth/user.model';
+import { Router, RouterEvent } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -9,26 +8,93 @@ import { Subscription } from 'rxjs';
   styles: []
 })
 export class LayoutComponent implements OnInit, OnDestroy {
-  private hidden = false;
-  private user: User;
+
+  verticalNavCollapsed = false;
+  verticalNavVisible = false;
+  rootDirectory: any[] = [
+    {
+      name: 'Applications',
+      icon: 'folder',
+      expanded: true,
+      files: [
+        {
+          icon: 'calendar',
+          name: 'Calendar',
+          active: true
+        },
+        {
+          icon: 'line-chart',
+          name: 'Charts',
+          active: false
+        },
+        {
+          icon: 'dashboard',
+          name: 'Dashboard',
+          active: false
+        },
+        {
+          icon: 'map',
+          name: 'Maps',
+          active: false
+        },
+      ]
+    },
+    {
+      name: 'Files',
+      icon: 'folder',
+      expanded: false,
+      files: [
+        {
+          icon: 'file',
+          name: 'Cover Letter.doc',
+          active: false
+        },
+      ]
+    },
+    {
+      name: 'Images',
+      icon: 'folder',
+      expanded: false,
+      files: [
+        {
+          icon: 'image',
+          name: 'Screenshot.png',
+          active: false
+        },
+      ]
+    }
+  ];
 
   private subscription: Subscription;
 
-  constructor(private authService: AuthService) {
+  constructor(private router: Router) {
+  }
+
+  openFile(directoryName: string, fileName: string) {
+    console.log(directoryName, fileName);
   }
 
   ngOnInit() {
-    this.subscription = this.authService.currentSession.subscribe(
-      x => {
-        if (x && x.user) {
-          this.user = x.user;
+    this.subscription = this.router.events.subscribe(
+      (e: RouterEvent) => {
+        const url = e.url;
+        if (url) {
+          this.verticalNavVisible = url.startsWith('/editor');
         }
-        this.hidden = !x;
       }
     );
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+  }
+
+  getWidth() {
+    return {};
+    // return this.verticalNavCollapsed ? {} : { width: '14rem' };
+  }
+
+  getRootDirectory() {
+    return this.verticalNavCollapsed ? [] : this.rootDirectory;
   }
 }

@@ -27,7 +27,6 @@ export class EditorComponent implements OnInit, OnDestroy {
     const id = this.route.snapshot.paramMap.get('id');
     this.subscription = this.projectService.getProject(id)
       .subscribe(project => {
-        console.log(project);
         this.project = project;
       });
   }
