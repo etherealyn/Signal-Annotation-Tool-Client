@@ -90,8 +90,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
   }
 
   getWidth() {
-    return {};
-    // return this.verticalNavCollapsed ? {} : { width: '14rem' };
+    return this.verticalNavCollapsed ? {} : { width: '13rem' };
   }
 
   getRootDirectory() {

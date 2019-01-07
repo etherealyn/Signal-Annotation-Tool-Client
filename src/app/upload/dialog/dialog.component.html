@@ -1,0 +1,35 @@
+<button class="btn btn-primary" (click)="openDialog()">Add Files</button>
+
+
+<input type="file" #file style="display: none" (change)="onFilesAdded()" multiple/>
+<clr-modal [(clrModalOpen)]="opened">
+  <h3 class="modal-title">Upload files</h3>
+  <div class="modal-body">
+
+    <div>
+      <button [disabled]="uploading || uploadSuccessful"
+              class="btn btn-primary-outline" (click)="addFiles()">Add files
+      </button>
+    </div>
+
+    <ul class="list-unstyled">
+      <li *ngFor="let file of files">
+        <h4>{{file.name}}</h4>
+        <div class="progress labeled" *ngIf="progress">
+          <progress max="100" [value]="progress[file.name].progress | async" data-displayval="100%"></progress>
+          <span></span>
+        </div>
+      </li>
+    </ul>
+
+
+  </div>
+  <div class="modal-footer">
+    <button *ngIf="showCancelButton" class="btn btn-info" (click)="onCancel()">Cancel</button>
+    <button type="button" class="btn btn-primary" [disabled]="!canBeClosed"
+            (click)="closeDialog()">{{primaryButtonText}}</button>
+  </div>
+</clr-modal>
+
+
+

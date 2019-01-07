@@ -4,13 +4,15 @@ import { ClarityModule } from '@clr/angular';
 import { AppRouting } from '../app.routing';
 
 import { EditorComponent } from './editor.component';
+import { UploadModule } from '../upload/upload.module';
 
 @NgModule({
   declarations: [ EditorComponent ],
   imports: [
     CommonModule,
     AppRouting,
-    ClarityModule
+    ClarityModule,
+    UploadModule
   ]
 })
 export class EditorModule {
