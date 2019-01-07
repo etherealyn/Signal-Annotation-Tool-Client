@@ -53,7 +53,7 @@ export class DialogComponent implements OnInit {
     }
 
     this.uploading = true;
-    this.progress = this.uploadService.upload(this.files);
+    this.progress = this.uploadService.uploadToProject(this.files);
 
     const allProgressObservables = [];
     for (const key in this.progress) {

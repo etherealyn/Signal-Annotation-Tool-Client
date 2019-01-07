@@ -1,17 +1,19 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpEventType, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UploadService {
-  // url = 'http://localhost:8080/api/projects/upload';
-  //
+
+  baseUrl = `${environment.apiUrl}`;
+
   constructor(private http: HttpClient) {
   }
 
-  public upload(files: Set<File>): { [key: string]: Observable<number> } {
+  public uploadToProject(id: string, files: Set<File>): { [key: string]: Observable<number> } {
     /* the resulting map*/
     const status = {};
 
@@ -20,10 +22,11 @@ export class UploadService {
       const formData: FormData = new FormData();
       formData.append('file', file, file.name);
 
-      /* create a http-post request and pass the form, report the upload progress */
-      const req = new HttpRequest('POST', 'http://localhost:8080/api/projects/upload', formData, {
-        reportProgress: true
-      });
+      /* create a http-post request and pass the form, report the uploadToProject progress */
+      const req = new HttpRequest('POST',
+        `${this.baseUrl}/projects/projectFilesUpload/${id}`, formData, {
+          reportProgress: true
+        });
 
       /* create a new progress subject for every file*/
       const progress = new Subject<number>();
@@ -35,7 +38,7 @@ export class UploadService {
           // pass the percentage into the progress-stream
           progress.next(percentDone);
         } else if (event instanceof HttpResponse) {
-          // the upload is complete if we gen an answer from the API
+          // the uploadToProject is complete if we gen an answer from the API
           progress.complete();
         }
       });
