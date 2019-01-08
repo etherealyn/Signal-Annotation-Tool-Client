@@ -10,21 +10,20 @@ export class UploadService {
 
   baseUrl = `${environment.apiUrl}`;
 
-  constructor(private http: HttpClient) {
-  }
+  constructor(private http: HttpClient) {}
 
-  public uploadToProject(id: string, files: Set<File>): { [key: string]: Observable<number> } {
+  public uploadToProject(id: string, files: Set<File>) {
     /* the resulting map*/
-    const status = {};
+    const status = new Map<string, Observable<number>>();
 
     files.forEach(file => {
       /* create a multipart-form*/
       const formData: FormData = new FormData();
       formData.append('file', file, file.name);
 
-      /* create a http-post request and pass the form, report the uploadToProject progress */
+      /* create a http-post request and pass the form, report the upload progress */
       const req = new HttpRequest('POST',
-        `${this.baseUrl}/projects/projectFilesUpload/${id}`, formData, {
+        `${this.baseUrl}/projects/upload/${id}`, formData, {
           reportProgress: true
         });
 

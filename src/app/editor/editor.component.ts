@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { ProjectsService } from '../projects/projects.service';
 import { ProjectModel } from '../projects/project.model';
@@ -16,6 +16,7 @@ export class EditorComponent implements OnInit, OnDestroy {
   private subscription: Subscription;
 
   constructor(private route: ActivatedRoute,
+              private router: Router,
               private projectService: ProjectsService) {
   }
 
@@ -27,12 +28,13 @@ export class EditorComponent implements OnInit, OnDestroy {
     const id = this.route.snapshot.paramMap.get('id');
     this.subscription = this.projectService.getProject(id)
       .subscribe(project => {
+        if (this.project === null) {
+          console.log('project not found');
+          this.router.navigate(['/']);
+        }
         this.project = project;
+        console.log(project);
       });
-  }
-
-  get diagnostic() {
-    return JSON.stringify(this.project);
   }
 
   ngOnDestroy(): void {

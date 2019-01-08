@@ -1,6 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { UploadService } from '../upload.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
+import { ProjectModel } from '../../projects/project.model';
 
 @Component({
   selector: 'app-dialog',
@@ -8,10 +9,12 @@ import { forkJoin } from 'rxjs';
   styleUrls: [ './dialog.component.css' ]
 })
 export class DialogComponent implements OnInit {
+  @Input() currentProject: ProjectModel;
+
   @ViewChild('file') file;
   public files: Set<File> = new Set();
   opened: boolean;
-  progress;
+  progress: Map<string, Observable<number>>;
   canBeClosed = true;
   primaryButtonText = 'Upload';
   showCancelButton = true;
@@ -53,7 +56,7 @@ export class DialogComponent implements OnInit {
     }
 
     this.uploading = true;
-    this.progress = this.uploadService.uploadToProject(this.files);
+    this.progress = this.uploadService.uploadToProject(this.currentProject.id, this.files);
 
     const allProgressObservables = [];
     for (const key in this.progress) {
