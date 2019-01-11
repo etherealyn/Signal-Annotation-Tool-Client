@@ -5,9 +5,10 @@ import { AppRouting } from '../app.routing';
 
 import { EditorComponent } from './editor.component';
 import { UploadModule } from '../upload/upload.module';
+import { VideoComponent } from './video/video.component';
 
 @NgModule({
-  declarations: [ EditorComponent ],
+  declarations: [ EditorComponent, VideoComponent ],
   imports: [
     CommonModule,
     AppRouting,

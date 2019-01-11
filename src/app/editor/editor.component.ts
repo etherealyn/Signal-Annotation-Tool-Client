@@ -10,7 +10,7 @@ import { EditorService } from './editor.service';
   styles: []
 })
 export class EditorComponent implements OnInit {
-  private project: ProjectModel;
+  project: ProjectModel;
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -19,9 +19,9 @@ export class EditorComponent implements OnInit {
 
   ngOnInit() {
     const projectId = this.route.snapshot.paramMap.get('id');
-    this.editorService.getCurrentProject$().subscribe(value => {
-      if (value && value.id === projectId) {
-        this.project = value;
+    this.editorService.getCurrentProject$().subscribe(project => {
+      if (project && project.id === projectId) {
+        this.project = project;
       }
     });
     this.editorService.loadProject(projectId);
