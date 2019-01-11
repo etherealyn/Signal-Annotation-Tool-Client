@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { UploadService } from '../upload.service';
 import { forkJoin, Observable } from 'rxjs';
-import { ProjectModel } from '../../projects/project.model';
+import { ProjectModel } from '../../models/project.model';
 
 @Component({
   selector: 'app-dialog',
@@ -72,7 +72,6 @@ export class DialogComponent implements OnInit {
     forkJoin(allProgressObservables).subscribe(() => {
       this.canBeClosed = true;
       this.showCancelButton = false;
-      // this.opened = false;
 
       this.uploadSuccessful = true;
       this.uploading = false;

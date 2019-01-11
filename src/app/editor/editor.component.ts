@@ -1,43 +1,29 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { ProjectsService } from '../projects/projects.service';
-import { ProjectModel } from '../projects/project.model';
-import { Subscription } from 'rxjs';
+import { ProjectModel } from '../models/project.model';
+import { EditorService } from './editor.service';
 
 @Component({
   selector: 'app-editor',
   templateUrl: './editor.component.html',
   styles: []
 })
-export class EditorComponent implements OnInit, OnDestroy {
+export class EditorComponent implements OnInit {
   private project: ProjectModel;
-
-  private subscription: Subscription;
 
   constructor(private route: ActivatedRoute,
               private router: Router,
-              private projectService: ProjectsService) {
+              private editorService: EditorService) {
   }
 
   ngOnInit() {
-    this.getProject();
-  }
-
-  private getProject() {
-    const id = this.route.snapshot.paramMap.get('id');
-    this.subscription = this.projectService.getProject(id)
-      .subscribe(project => {
-        if (this.project === null) {
-          console.log('project not found');
-          this.router.navigate(['/']);
-        }
-        this.project = project;
-        console.log(project);
-      });
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    const projectId = this.route.snapshot.paramMap.get('id');
+    this.editorService.getCurrentProject$().subscribe(value => {
+      if (value && value.id === projectId) {
+        this.project = value;
+      }
+    });
+    this.editorService.loadProject(projectId);
   }
 }

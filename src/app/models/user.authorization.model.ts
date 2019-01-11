@@ -1,4 +1,6 @@
-export class AuthModel {
+
+
+export class UserAuthorization {
 
   constructor(
     public username: string,

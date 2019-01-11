@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { ProjectModel } from '../project.model';
+import { ProjectModel } from '../../models/project.model';
 import { ProjectsService } from '../projects.service';
 import { AuthService } from '../../auth/auth.service';
 import { first } from 'rxjs/operators';

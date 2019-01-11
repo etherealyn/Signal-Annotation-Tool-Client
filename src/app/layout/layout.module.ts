@@ -6,6 +6,7 @@ import { ClarityModule } from '@clr/angular';
 import { HeaderComponent } from './header/header.component';
 
 import { LayoutComponent } from './layout/layout.component';
+import { FiletreeComponent } from './filetree/filetree.component';
 
 
 @NgModule({
@@ -19,6 +20,7 @@ import { LayoutComponent } from './layout/layout.component';
   ],
   declarations: [ HeaderComponent,
     LayoutComponent,
+    FiletreeComponent,
   ]
 })
 export class LayoutModule {

@@ -1,4 +1,4 @@
-import { User } from '../auth/user.model';
+import { DirectoryModel } from './directory.model';
 
 export class ProjectModel {
   constructor(
@@ -7,5 +7,6 @@ export class ProjectModel {
     public modified: Date,
     public ownerId?: string,
     public description?: string,
+    public fileTree?: DirectoryModel
   ) {}
 }

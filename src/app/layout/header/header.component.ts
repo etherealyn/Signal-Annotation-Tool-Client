@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterEvent } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
-import { Session } from '../../auth/session.model';
-import { User } from '../../auth/user.model';
+import { Session } from '../../models/session.model';
+import { User } from '../../models/user.model';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -37,7 +37,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     });
 
     this.subscription.add(
-      this.authService.currentSession.subscribe((x: Session) => {
+      this.authService.currentSession$.subscribe((x: Session) => {
         if (x && x.user) {
           this.user = x.user;
         }

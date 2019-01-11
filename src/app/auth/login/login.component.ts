@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { AuthModel } from '../auth.model';
+import { UserAuthorization } from '../../models/user.authorization.model';
 import { AuthService } from '../auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -11,7 +11,7 @@ import { Subscription } from 'rxjs';
   styleUrls: [ './login.component.css' ]
 })
 export class LoginComponent implements OnInit, OnDestroy {
-  authModel = new AuthModel('', '', true);
+  authModel = new UserAuthorization('', '', true);
   returnUrl: string;
   loading = false;
   error = false;
@@ -49,6 +49,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 }

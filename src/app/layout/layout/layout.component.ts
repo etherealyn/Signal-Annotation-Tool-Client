@@ -5,73 +5,17 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-layout',
   templateUrl: './layout.component.html',
-  styles: []
+  styleUrls: [ './layout.component.css' ]
 })
 export class LayoutComponent implements OnInit, OnDestroy {
 
   verticalNavCollapsed = false;
   verticalNavVisible = false;
-  rootDirectory: any[] = [
-    {
-      name: 'Applications',
-      icon: 'folder',
-      expanded: true,
-      files: [
-        {
-          icon: 'calendar',
-          name: 'Calendar',
-          active: true
-        },
-        {
-          icon: 'line-chart',
-          name: 'Charts',
-          active: false
-        },
-        {
-          icon: 'dashboard',
-          name: 'Dashboard',
-          active: false
-        },
-        {
-          icon: 'map',
-          name: 'Maps',
-          active: false
-        },
-      ]
-    },
-    {
-      name: 'Files',
-      icon: 'folder',
-      expanded: false,
-      files: [
-        {
-          icon: 'file',
-          name: 'Cover Letter.doc',
-          active: false
-        },
-      ]
-    },
-    {
-      name: 'Images',
-      icon: 'folder',
-      expanded: false,
-      files: [
-        {
-          icon: 'image',
-          name: 'Screenshot.png',
-          active: false
-        },
-      ]
-    }
-  ];
+  verticalNavWidth = 13;
 
   private subscription: Subscription;
 
   constructor(private router: Router) {
-  }
-
-  openFile(directoryName: string, fileName: string) {
-    console.log(directoryName, fileName);
   }
 
   ngOnInit() {
@@ -90,10 +34,6 @@ export class LayoutComponent implements OnInit, OnDestroy {
   }
 
   getWidth() {
-    return this.verticalNavCollapsed ? {} : { width: '13rem' };
-  }
-
-  getRootDirectory() {
-    return this.verticalNavCollapsed ? [] : this.rootDirectory;
+    return this.verticalNavCollapsed ? {} : { width: this.verticalNavWidth + 'rem' };
   }
 }

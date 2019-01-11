@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { catchError } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
-import { ProjectModel } from './project.model';
+import { ProjectModel } from '../models/project.model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +13,13 @@ export class ProjectsService {
 
   private projectsUrl = `${environment.apiUrl}/projects`;
 
+  private projectsSubject: BehaviorSubject<ProjectModel[]>;
+  currentProjects$: Observable<ProjectModel[]>;
+
   constructor(private http: HttpClient) {
+    this.projectsSubject = new BehaviorSubject<ProjectModel[]>([]);
+    this.currentProjects$ = this.projectsSubject.asObservable();
+    this.getProjects().toPromise().then((value => this.projectsSubject.next(value)));
   }
 
   getProjects(): Observable<ProjectModel[]> {
