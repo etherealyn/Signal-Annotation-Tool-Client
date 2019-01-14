@@ -1,11 +1,33 @@
-<div style="text-align:center">
-  <button onclick="playPause()">Play/Pause</button>
-  <button onclick="makeBig()">Big</button>
-  <button onclick="makeSmall()">Small</button>
-  <button onclick="makeNormal()">Normal</button>
-  <br><br>
-  <video id="video1"  controls>
-    <source src="http://localhost:8080/api/projects/files/ec674f0ba0cd8785d51d18d5bb2a75b3" type="video/mp4">
-    Your browser does not support HTML5 video.
+<vg-player (onPlayerReady)="onPlayerReady($event)">
+  <vg-overlay-play></vg-overlay-play>
+  <vg-buffering></vg-buffering>
+
+  <vg-scrub-bar>
+    <vg-scrub-bar-current-time [vgSlider]="true"></vg-scrub-bar-current-time>
+    <vg-scrub-bar-buffering-time></vg-scrub-bar-buffering-time>
+  </vg-scrub-bar>
+
+  <vg-controls>
+    <vg-play-pause></vg-play-pause>
+    <vg-playback-button [playbackValues]="playbackValues"></vg-playback-button>
+
+    <vg-time-display vgProperty="current" vgFormat="mm:ss"></vg-time-display>
+
+    <vg-scrub-bar style="pointer-events: none;"></vg-scrub-bar>
+
+    <vg-time-display vgProperty="left" vgFormat="mm:ss"></vg-time-display>
+    <vg-time-display vgProperty="total" vgFormat="mm:ss"></vg-time-display>
+
+    <!--<vg-track-selector></vg-track-selector>-->
+    <vg-mute></vg-mute>
+    <vg-volume></vg-volume>
+
+    <vg-fullscreen></vg-fullscreen>
+  </vg-controls>
+
+
+  <video [vgMedia]="media" #media id="singleVideo" preload="auto">
+    <!--<source src="http://static.videogular.com/assets/videos/videogular.mp4" type="video/mp4">-->
+    <source src="http://localhost:8080/api/projects/files/01451aff1d7b50f39cadbc02b1ebe180" type="video/mp4">
   </video>
-</div>
+</vg-player>

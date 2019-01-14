@@ -6,7 +6,7 @@ import { ProjectModel } from '../../models/project.model';
 @Component({
   selector: 'app-dialog',
   templateUrl: './dialog.component.html',
-  styleUrls: [ './dialog.component.css' ]
+  styleUrls: [ './dialog.component.scss' ]
 })
 export class DialogComponent implements OnInit {
   @Input() currentProject: ProjectModel;

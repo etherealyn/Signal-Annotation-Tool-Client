@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-project-form',
   templateUrl: './project-modal.component.html',
-  styleUrls: [ './project-modal.component.css' ]
+  styleUrls: [ './project-modal.component.scss' ]
 })
 export class ProjectModalComponent implements OnInit, OnDestroy {
   private model;

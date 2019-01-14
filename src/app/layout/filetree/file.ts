@@ -1,4 +1,4 @@
-export interface File {
+export interface IFile {
   name: string;
   icon: string;
   active?: boolean;

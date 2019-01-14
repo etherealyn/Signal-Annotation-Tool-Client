@@ -3,20 +3,20 @@ import { EditorService } from '../../editor/editor.service';
 import { ProjectModel } from '../../models/project.model';
 import { Subscription } from 'rxjs';
 import { DirectoryModel } from '../../models/directory.model';
-import { File } from './file';
-import { Directory } from './directory';
+import { IFile } from './file';
+import { IDirectory } from './directory';
 
 @Component({
   selector: 'app-filetree',
   templateUrl: './filetree.component.html',
-  styleUrls: [ './filetree.component.css' ]
+  styleUrls: [ './filetree.component.scss' ]
 })
 export class FiletreeComponent implements OnInit, OnDestroy {
 
   private project: ProjectModel;
   private subscription: Subscription;
 
-  rootDirectory: Directory[] = [];
+  rootDirectory: IDirectory[] = [];
 
   constructor(private editorService: EditorService) {
   }
@@ -32,12 +32,12 @@ export class FiletreeComponent implements OnInit, OnDestroy {
       });
   }
 
-  buildFileTree(fileTree: DirectoryModel ): Directory[] {
+  buildFileTree(fileTree: DirectoryModel ): IDirectory[] {
     if (fileTree.children) {
       const files = [];
 
       fileTree.children.forEach(value => {
-        const file: File = {
+        const file: IFile = {
           name: value.name,
           icon: value.mimetype.startsWith('video') ? 'film-strip' : 'file',
           active: false,

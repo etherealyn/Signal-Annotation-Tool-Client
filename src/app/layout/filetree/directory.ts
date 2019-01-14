@@ -1,6 +1,6 @@
-import { File } from './file';
+import { IFile } from './file';
 
-export interface Directory extends File {
-  files: File[];
+export interface IDirectory extends IFile {
+  files: IFile[];
   expanded: boolean;
 }
