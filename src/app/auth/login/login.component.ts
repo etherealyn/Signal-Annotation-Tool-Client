@@ -1,14 +1,16 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 
-import { UserAuthorization } from '../../models/user.authorization.model';
-import { AuthService } from '../auth.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import {UserAuthorization} from '../../models/user.authorization.model';
+import {AuthService} from '../auth.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {Subscription} from 'rxjs';
+import {HttpErrorResponse} from '@angular/common/http';
+import {catchError} from 'rxjs/operators';
 
 @Component({
   selector: 'app-auth',
   templateUrl: './login.component.html',
-  styleUrls: [ './login.component.scss' ]
+  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit, OnDestroy {
   authModel = new UserAuthorization('', '', true);
@@ -17,6 +19,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   error = false;
 
   private subscription: Subscription;
+  private errorMessage: string;
 
   constructor(private authService: AuthService,
               private route: ActivatedRoute,
@@ -25,7 +28,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     if (this.authService.isLoggedIn()) {
-      this.router.navigate([ '/projects' ]);
+      this.router.navigate(['/projects']);
     }
 
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
@@ -34,16 +37,27 @@ export class LoginComponent implements OnInit, OnDestroy {
   onSubmit() {
     // todo: add form validation
 
-    // this.loading = true;
+    this.loading = true;
     this.error = false;
 
     this.subscription = this.authService.login(this.authModel.username, this.authModel.password)
       .subscribe(
         data => {
           if (data) {
-            this.router.navigate([ this.returnUrl ]);
+            this.loading = false;
+            this.router.navigate([this.returnUrl]);
           } else {
+            this.loading = false;
             this.error = true;
+          }
+        }, error => {
+          this.loading = false;
+          this.error = true;
+
+          if (error === 'Unknown Error') {
+            this.errorMessage = 'Oops! Something bad happened! :(';
+          } else if (error === 'Forbidden') {
+            this.errorMessage = 'Such username and password combination does not match any our records.';
           }
         });
   }

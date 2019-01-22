@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { catchError, map } from 'rxjs/operators';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {catchError, map} from 'rxjs/operators';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 
-import { environment } from '../../environments/environment';
-import { Session } from '../models/session.model';
-import { User } from '../models/user.model';
+import {environment} from '../../environments/environment';
+import {Session} from '../models/session.model';
+import {User} from '../models/user.model';
 
 
 @Injectable({
@@ -33,16 +33,15 @@ export class AuthService {
     }
   }
 
-  login(username: string, password: string) {
-    return this.http.post<any>(this.authUrl, { username, password })
+  login(username: string, password: string): Observable<any> {
+    return this.http.post<Session>(this.authUrl, {username, password})
       .pipe(map(session => {
           if (session && session.user && session.accessToken) {
             localStorage.setItem('currentSession$', JSON.stringify(session));
             this.currentSessionSubject.next(session);
           }
           return session;
-        }),
-        catchError(this.handleError('login', null))
+        })
       );
   }
 
