@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import { Router, RouterEvent } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { Session } from '../../models/session.model';
@@ -53,5 +53,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
   onLogout() {
     this.authService.logout();
     this.router.navigate([ '/auth' ]);
+  }
+
+  @HostListener('window:scroll', ['$event'])
+  onScroll(event) {
+    console.log(event);
+  }
+
+  onHide() {
+    // todo: improve appearance
+    this.isHeaderVisible = !this.isHeaderVisible;
   }
 }

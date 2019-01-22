@@ -36,4 +36,8 @@ export class LayoutComponent implements OnInit, OnDestroy {
   getWidth() {
     return this.verticalNavCollapsed ? {} : { width: this.verticalNavWidth + 'rem' };
   }
+
+  onClickVerticalBar(event: MouseEvent) {
+    console.log(event);
+  }
 }
