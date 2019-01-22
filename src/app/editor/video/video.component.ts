@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import { VgAPI } from 'videogular2/core';
 
 @Component({
@@ -7,13 +7,17 @@ import { VgAPI } from 'videogular2/core';
   styleUrls: [ './video.component.scss' ]
 })
 export class VideoComponent implements OnInit {
+  @Input() source: String;
+
   private api: VgAPI;
-  // playbackValues: string[] = [ '0.3', '0.5', '0.7', '1.0', '1.3', '1.7', '2.0', '3.0', '4.0' ];
+  playbackValues: string[] = [ '0.5', '1', '2' ];
+  url: String = 'http://localhost:8080/api/projects/files/';
 
   constructor() {
   }
 
   ngOnInit() {
+
   }
 
   onPlayerReady(api: VgAPI) {

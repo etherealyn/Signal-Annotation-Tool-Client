@@ -1,4 +1,4 @@
-<vg-player (onPlayerReady)="onPlayerReady($event)">
+<vg-player (onPlayerReady)="onPlayerReady($event)" *ngIf="source" style="width: 480px; height: 320px">
   <vg-overlay-play></vg-overlay-play>
   <vg-buffering></vg-buffering>
 
@@ -25,9 +25,7 @@
     <vg-fullscreen></vg-fullscreen>
   </vg-controls>
 
-
-  <video [vgMedia]="media" #media id="singleVideo" preload="auto">
-    <!--<source src="http://static.videogular.com/assets/videos/videogular.mp4" type="video/mp4">-->
-    <source src="http://localhost:8080/api/projects/files/01451aff1d7b50f39cadbc02b1ebe180" type="video/mp4">
+  <video [vgMedia]="media1" #media1 id="video2" preload="auto">
+    <source src='{{url+source}}' type="video/mp4">
   </video>
 </vg-player>

@@ -25,5 +25,9 @@ export class EditorComponent implements OnInit {
       }
     });
     this.editorService.loadProject(projectId);
+
+    this.editorService.getOpenFiles$().subscribe(files => {
+      console.log(files);
+    });
   }
 }
