@@ -1,14 +1,40 @@
 import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
-import { Router, RouterEvent } from '@angular/router';
-import { AuthService } from '../../auth/auth.service';
-import { Session } from '../../models/session.model';
-import { User } from '../../models/user.model';
-import { Subscription } from 'rxjs';
+import {Router, RouterEvent} from '@angular/router';
+import {AuthService} from '../../auth/auth.service';
+import {Session} from '../../models/session.model';
+import {User} from '../../models/user.model';
+import {Subscription} from 'rxjs';
+import {
+  trigger,
+  state,
+  style,
+  animate,
+  transition
+} from '@angular/animations';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
-  styles: []
+  styles: [],
+  animations: [
+    trigger('openClose',
+      [
+        state('open',
+          style({
+            height: '2.5rem'
+          })
+        ),
+        state('closed',
+          style({
+            height: '0rem'
+          })),
+        transition('open => closed',
+          [animate('0.2s')]),
+        transition('closed => open',
+          [animate('0.2s')])
+      ],
+    )
+  ]
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   private isProjectActive = true;
@@ -42,7 +68,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
           this.user = x.user;
         }
         this.isHeaderVisible = !x;
-    }));
+      }));
   }
 
   ngOnDestroy(): void {
@@ -52,7 +78,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   onLogout() {
     this.authService.logout();
-    this.router.navigate([ '/auth' ]);
+    this.router.navigate(['/auth']);
   }
 
   @HostListener('window:scroll', ['$event'])
@@ -64,4 +90,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     // todo: improve appearance
     this.isHeaderVisible = !this.isHeaderVisible;
   }
+
+
 }

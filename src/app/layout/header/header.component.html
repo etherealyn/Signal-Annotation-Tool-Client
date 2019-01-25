@@ -1,4 +1,4 @@
-<clr-header class="header-6" *ngIf="!isHeaderVisible">
+<clr-header class="header-6" [@openClose]="!isHeaderVisible ? 'open' : 'closed'">
   <div class="branding" style="cursor: pointer;">
     <a class="nav-link" routerLink="/">
       <clr-icon shape="cloud"></clr-icon>
