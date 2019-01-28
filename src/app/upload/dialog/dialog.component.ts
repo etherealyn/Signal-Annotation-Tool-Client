@@ -20,6 +20,7 @@ export class DialogComponent implements OnInit {
   showCancelButton = true;
   uploading = false;
   uploadSuccessful = false;
+  rawFiles: any;
 
   constructor(private uploadService: UploadService) {
   }
@@ -89,6 +90,7 @@ export class DialogComponent implements OnInit {
 
   private reset() {
     this.files.clear();
+    this.rawFiles = null;
     this.progress = null; // fixme: memory leak?
     this.uploadSuccessful = false;
   }
