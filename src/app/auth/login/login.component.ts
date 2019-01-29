@@ -19,7 +19,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   error = false;
 
   private subscription: Subscription;
-  private errorMessage: string;
+  errorMessage: string;
 
   constructor(private authService: AuthService,
               private route: ActivatedRoute,
