@@ -1,31 +1,30 @@
-<vg-player (onPlayerReady)="onPlayerReady($event)" *ngIf="source" style="width: 480px; height: 320px">
-  <vg-overlay-play></vg-overlay-play>
-  <vg-buffering></vg-buffering>
+<vg-player (onPlayerReady)="onPlayerReady$($event)" *ngIf="source">
+  <!--<vg-overlay-play></vg-overlay-play>-->
+  <!--<vg-buffering></vg-buffering>-->
 
-  <vg-scrub-bar>
-    <vg-scrub-bar-current-time [vgSlider]="true"></vg-scrub-bar-current-time>
-    <vg-scrub-bar-buffering-time></vg-scrub-bar-buffering-time>
-  </vg-scrub-bar>
+  <!--<vg-scrub-bar>-->
+    <!--<vg-scrub-bar-current-time [vgSlider]="true"></vg-scrub-bar-current-time>-->
+    <!--<vg-scrub-bar-buffering-time></vg-scrub-bar-buffering-time>-->
+  <!--</vg-scrub-bar>-->
 
-  <vg-controls>
-    <vg-play-pause></vg-play-pause>
-    <vg-playback-button [playbackValues]="playbackValues"></vg-playback-button>
+  <!--<vg-controls>-->
+    <!--<vg-play-pause></vg-play-pause>-->
+    <!--<vg-playback-button [playbackValues]="playbackValues"></vg-playback-button>-->
 
-    <vg-time-display vgProperty="current" vgFormat="mm:ss"></vg-time-display>
+    <!--<vg-time-display vgProperty="current" vgFormat="mm:ss"></vg-time-display>-->
 
-    <vg-scrub-bar style="pointer-events: none;"></vg-scrub-bar>
+    <!--<vg-scrub-bar style="pointer-events: none;"></vg-scrub-bar>-->
 
-    <vg-time-display vgProperty="left" vgFormat="mm:ss"></vg-time-display>
-    <vg-time-display vgProperty="total" vgFormat="mm:ss"></vg-time-display>
+    <!--<vg-time-display vgProperty="left" vgFormat="mm:ss"></vg-time-display>-->
+    <!--<vg-time-display vgProperty="total" vgFormat="mm:ss"></vg-time-display>-->
 
-    <!--<vg-track-selector></vg-track-selector>-->
-    <vg-mute></vg-mute>
-    <vg-volume></vg-volume>
+    <!--<vg-mute></vg-mute>-->
+    <!--<vg-volume></vg-volume>-->
 
-    <vg-fullscreen></vg-fullscreen>
-  </vg-controls>
+    <!--<vg-fullscreen></vg-fullscreen>-->
+  <!--</vg-controls>-->
 
-  <video [vgMedia]="media1" #media1 id="video2" preload="auto">
-    <source src='{{url+source}}' type="video/mp4">
+  <video [vgMedia]="master" #master [vgMaster]="true" preload="auto">
+    <source src='{{url}}/{{source}}' type="video/mp4">
   </video>
 </vg-player>

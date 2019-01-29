@@ -1,0 +1,42 @@
+<button (click)="onPlay()"> Play</button>
+<button (click)="onPause()">Pause</button>
+
+<form action="#">
+  Seek: <input #ramSelector name="Seek Time" type="range" min="0" max="100" [(ngModel)]="timeModel"
+               (ngModelChange)="setTime($event)" value="0">
+</form>
+
+<div (mouseleave)="onGlobalMouseLeave()">
+  <mat-grid-list cols="2" rowHeight="2:1">
+    <mat-grid-tile *ngFor="let video of videos">
+      <app-video source='{{video.source}}' (playerReady)="onPlayerReady($event)"></app-video>
+    </mat-grid-tile>
+  </mat-grid-list>
+</div>
+
+<!-- below is the old version of grid tile just for reference-->
+<!--<mat-grid-tile>-->
+<!--<vg-player (playerReady)="playerReady($event)" (mouseenter)="onMouseEnter(0)" (mouseleave)="onMouseLeave(0)">-->
+<!--<vg-scrub-bar>-->
+<!--<vg-scrub-bar-current-time [vgSlider]="true"></vg-scrub-bar-current-time>-->
+<!--<vg-scrub-bar-buffering-time></vg-scrub-bar-buffering-time>-->
+<!--</vg-scrub-bar>-->
+
+<!--<vg-controls>-->
+<!--<vg-time-display vgProperty="current" vgFormat="mm:ss"></vg-time-display>-->
+
+<!--<vg-scrub-bar style="pointer-events: none;"></vg-scrub-bar>-->
+
+<!--<vg-time-display vgProperty="left" vgFormat="mm:ss"></vg-time-display>-->
+<!--&lt;!&ndash;<vg-track-selector></vg-track-selector>&ndash;&gt;-->
+<!--<vg-mute></vg-mute>-->
+<!--<vg-volume></vg-volume>-->
+
+<!--<vg-fullscreen></vg-fullscreen>-->
+<!--</vg-controls>-->
+
+<!--<video [vgMedia]="item1" #item1 preload="auto">-->
+<!--<source src='http://localhost:8080/api/projects/files/191cf9c7446c3a62257ff046777e015b' type="video/mp4">-->
+<!--</video>-->
+<!--</vg-player>-->
+<!--</mat-grid-tile>-->

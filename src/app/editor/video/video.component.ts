@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import { VgAPI } from 'videogular2/core';
 
 @Component({
@@ -8,19 +8,24 @@ import { VgAPI } from 'videogular2/core';
 })
 export class VideoComponent implements OnInit {
   @Input() source: String;
+  @Output() playerReady: EventEmitter<any> = new EventEmitter();
 
   private api: VgAPI;
-  playbackValues: string[] = [ '0.5', '1', '2' ];
-  url: String = 'http://localhost:8080/api/projects/files/';
+  url: String = 'http://localhost:8080/api/projects/files';
 
   constructor() {
   }
 
   ngOnInit() {
-
   }
 
-  onPlayerReady(api: VgAPI) {
+  onPlayerReady$(api: VgAPI) {
     this.api = api;
+
+    this.api.getDefaultMedia().subscriptions.timeUpdate.subscribe(x => {
+      console.log(this.api.getDefaultMedia().currentTime, this.api.getDefaultMedia().duration);
+    });
+
+    this.playerReady.emit(api);
   }
 }
