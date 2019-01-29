@@ -1,3 +1,5 @@
+<app-dialog [currentProject]="project"></app-dialog>
+
 <clr-tree-node *ngFor="let directory of rootDirectory">
   <clr-icon [attr.shape]="directory.icon"></clr-icon>
   {{ directory.name }}

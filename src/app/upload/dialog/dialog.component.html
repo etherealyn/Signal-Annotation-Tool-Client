@@ -1,5 +1,5 @@
+<button class="btn btn-primary">New File</button>
 <button class="btn btn-primary" (click)="openDialog()">Add Files</button>
-
 
 <input type="file" #file style="display: none" (change)="onFilesAdded()" [(ngModel)]="rawFiles" multiple/>
 <clr-modal [(clrModalOpen)]="opened">

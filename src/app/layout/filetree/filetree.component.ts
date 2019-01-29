@@ -15,7 +15,7 @@ import { FileModel } from '../../models/file.model';
 })
 export class FiletreeComponent implements OnInit, OnDestroy {
 
-  private project: ProjectModel;
+  project: ProjectModel;
   private subscription: Subscription;
 
   rootDirectory: IDirectory[] = [];
@@ -25,7 +25,6 @@ export class FiletreeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    console.log('onInit');
     this.subscription = this.editorService.getCurrentProject$()
       .pipe()
       .subscribe(value => {
@@ -51,10 +50,9 @@ export class FiletreeComponent implements OnInit, OnDestroy {
         this.fileIndex.set(file.name, model);
       });
 
-
       return [
         {
-          name: this.project.title,
+          name: 'Files',
           icon: 'folder',
           expanded: true,
           files: files
@@ -65,8 +63,9 @@ export class FiletreeComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    console.log('onDestroy');
-    this.subscription.unsubscribe();
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 
   openFile(directoryName: string, fileName: string) {
