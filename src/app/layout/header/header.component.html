@@ -1,4 +1,5 @@
-<clr-header class="header-6" [@openClose]="!isHeaderVisible ? 'open' : 'closed'">
+<!--<clr-header class="header-6" [@openClose]="!isHeaderVisible ? 'open' : 'closed'">-->
+<clr-header class="header-6" *ngIf="!isHeaderVisible">
   <div class="branding" style="cursor: pointer;">
     <a class="nav-link" routerLink="/">
       <clr-icon shape="cloud"></clr-icon>
@@ -9,7 +10,7 @@
     <a [ngClass]="{'active' : isProjectActive}" class="nav-link nav-text" routerLink="/projects">
       Projects
     </a>
-    <a [ngClass]="{'active' : isEditorActive}" class="nav-link nav-text" routerLink="/">
+    <a [ngClass]="{'active' : isEditorActive}" class="nav-link nav-text" routerLink="{{editorLink}}">
       Editor
     </a>
     <!--<a class="nav-link nav-icon" routerLink="/projects">-->
@@ -38,5 +39,5 @@
     </clr-dropdown>
   </div>
 </clr-header>
-<div style="height: 4px; background: red; cursor: row-resize" (click)="onHide()"></div>
+<div style="height: 4px; border-bottom: 3px dotted; cursor: n-resize" (click)="onHide()"></div>
 <ng-content></ng-content>

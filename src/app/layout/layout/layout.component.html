@@ -3,14 +3,18 @@
   </app-header>
 
   <div class="content-container">
-      <div class="content-area" style="border-left: thick solid #ff0000;" (click)="onClickVerticalBar($event)">
-        <ng-content></ng-content>
+    <div class="content-area">
+      <ng-content></ng-content>
     </div>
 
-    <clr-vertical-nav *ngIf="verticalNavVisible" [clrVerticalNavCollapsible]="true"
-                      [(clrVerticalNavCollapsed)]="verticalNavCollapsed" [ngStyle]="getWidth()">
-      <app-filetree *ngIf="!verticalNavCollapsed">
-      </app-filetree>
+    <clr-vertical-nav
+      *ngIf="verticalNavVisible"
+      [clrVerticalNavCollapsible]="true"
+      [(clrVerticalNavCollapsed)]="isNavCollapsed"
+      [ngStyle]="getWidth()">
+
+      <app-filetree *ngIf="!isNavCollapsed"></app-filetree>
+
     </clr-vertical-nav>
   </div>
 

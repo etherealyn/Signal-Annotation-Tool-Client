@@ -37,12 +37,13 @@ import {
   ]
 })
 export class HeaderComponent implements OnInit, OnDestroy {
-  private isProjectActive = true;
-  private isEditorActive = false;
-  private isHeaderVisible = false;
+  isProjectActive = true;
+  isEditorActive = false;
+  isHeaderVisible = true;
 
   private user: User;
   private subscription: Subscription;
+  editorLink = '/';
 
   constructor(private router: Router,
               private authService: AuthService) {
@@ -58,6 +59,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
         } else if (url.startsWith('/editor')) {
           this.isProjectActive = false;
           this.isEditorActive = true;
+          this.editorLink = url;
         }
       }
     });
@@ -75,10 +77,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-
   onLogout() {
     this.authService.logout();
     this.router.navigate(['/auth']);
+    this.editorLink = '/';
   }
 
   @HostListener('window:scroll', ['$event'])
@@ -90,6 +92,4 @@ export class HeaderComponent implements OnInit, OnDestroy {
     // todo: improve appearance
     this.isHeaderVisible = !this.isHeaderVisible;
   }
-
-
 }

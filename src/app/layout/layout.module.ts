@@ -7,13 +7,15 @@ import { HeaderComponent } from './header/header.component';
 
 import { LayoutComponent } from './layout/layout.component';
 import { FiletreeComponent } from './filetree/filetree.component';
+import { UploadModule } from '../upload/upload.module';
 
 
 @NgModule({
   imports: [
     CommonModule,
     ClarityModule,
-    AppRouting
+    AppRouting,
+    UploadModule
   ],
   exports: [
     LayoutComponent,

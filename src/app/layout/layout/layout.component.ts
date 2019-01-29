@@ -9,7 +9,7 @@ import { Subscription } from 'rxjs';
 })
 export class LayoutComponent implements OnInit, OnDestroy {
 
-  verticalNavCollapsed = false;
+  isNavCollapsed = false;
   verticalNavVisible = false;
   verticalNavWidth = 13;
 
@@ -34,10 +34,6 @@ export class LayoutComponent implements OnInit, OnDestroy {
   }
 
   getWidth() {
-    return this.verticalNavCollapsed ? {} : { width: this.verticalNavWidth + 'rem' };
-  }
-
-  onClickVerticalBar(event: MouseEvent) {
-    console.log(event);
+    return this.isNavCollapsed ? {} : { width: this.verticalNavWidth + 'rem' };
   }
 }
