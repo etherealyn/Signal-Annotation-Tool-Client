@@ -32,8 +32,8 @@
       <div class="error active" *ngIf="error">
         {{errorMessage}}
       </div>
-      <span class="spinner spinner-lg" *ngIf="loading">Loading...</span>
-      <button type="submit" class="btn btn-primary">LOGIN</button>
+      <!--<span class="spinner spinner-lg" *ngIf="loading">Loading...</span>-->
+      <button [clrLoading]="loginBtnState" type="submit" class="btn btn-primary">LOGIN</button>
       <a href="javascript://" class="signup">Register</a>
     </div>
   </form>

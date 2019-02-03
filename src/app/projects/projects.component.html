@@ -1,5 +1,9 @@
 <app-project-form></app-project-form>
 
+<!--<div *ngIf="isLoading">-->
+  <!--<span class="spinner spinner-md">Loading...</span>-->
+<!--</div>-->
+
 <clr-datagrid>
   <clr-dg-column>Title</clr-dg-column>
   <clr-dg-column>Last Modification</clr-dg-column>
@@ -9,5 +13,8 @@
     <clr-dg-cell>{{project.modified | date}}</clr-dg-cell>
   </clr-dg-row>
 
-  <clr-dg-footer>{{projects.length}} project{{projects.length === 1 ? "" : "s"}}</clr-dg-footer>
+  <clr-dg-footer>
+    {{projects.length}} project{{projects.length === 1 ? "" : "s"}}
+  </clr-dg-footer>
 </clr-datagrid>
+
