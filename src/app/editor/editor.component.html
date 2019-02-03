@@ -1,3 +1,21 @@
 <!--<div class="vertical-line"></div>-->
 
-<app-videogrid></app-videogrid>
+<div class="container">
+  <div class="split-example">
+    <as-split [direction]="direction">
+      <as-split-area size="50">
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tiam, quis nostrud exercitation
+          ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
+          velit esse cillum dolore eu fugiat nulla pariatur.</p>
+      </as-split-area>
+      <as-split-area size="50">
+        <app-videogrid></app-videogrid>
+      </as-split-area>
+    </as-split>
+  </div>
+  <br>
+</div>
+
+<div class="btns">
+  <button class="btn btn-warning" (click)="direction = (direction === 'horizontal') ? 'vertical' : 'horizontal'">{{ 'Toggle direction: "' + direction + '"' }}</button>
+</div>

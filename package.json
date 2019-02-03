@@ -27,6 +27,7 @@
     "@clr/icons": "^1.0.2",
     "@clr/ui": "^1.0.2",
     "@webcomponents/custom-elements": "^1.2.1",
+    "angular-split": "^2.0.1",
     "core-js": "^2.5.7",
     "rxjs": "^6.3.3",
     "videogular2": "^6.4.0",

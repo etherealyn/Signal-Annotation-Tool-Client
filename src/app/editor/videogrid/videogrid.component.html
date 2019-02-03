@@ -1,5 +1,7 @@
-<button (click)="onPlay()"> Play</button>
-<button (click)="onPause()">Pause</button>
+<div class="btns">
+  <button class="btn btn-primary" (click)="onPlay()"> Play</button>
+  <button class="btn btn-primary-outline" (click)="onPause()">Pause</button>
+</div>
 
 <form action="#">
   Seek: <input #ramSelector name="Seek Time" type="range" min="0" max="100" [(ngModel)]="timeModel"

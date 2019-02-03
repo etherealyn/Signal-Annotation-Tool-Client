@@ -1,9 +1,9 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
-import {ProjectModel} from '../models/project.model';
-import {EditorService} from './editor.service';
-import {Subscription} from 'rxjs';
+import { ProjectModel } from '../models/project.model';
+import { EditorService } from './editor.service';
+import { Subscription } from 'rxjs';
 
 export interface Tile {
   color: string;
@@ -16,12 +16,14 @@ export interface Tile {
 @Component({
   selector: 'app-editor',
   templateUrl: './editor.component.html',
-  styleUrls: [ './editor.component.scss']
+  styleUrls: [ './editor.component.scss' ]
 })
 export class EditorComponent implements OnInit, OnDestroy {
   project: ProjectModel;
 
   subscription: Subscription;
+  direction = 'horizontal';
+
   constructor(private route: ActivatedRoute,
               private router: Router,
               private editorService: EditorService) {
