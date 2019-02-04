@@ -13,8 +13,7 @@ interface IVideo {
 export class VideogridComponent implements OnInit {
 
   apis: VgAPI[] = [];
-  timeModel: any;
-  selectedRam: any;
+  seekTime: any;
   guard = 0;
   playbackValues: string[] = ['0.25', '0.5', '0.75', '1', '1.25', '1.50', '1.75', '2'];
   offsetValues: number[] = [0, 0];
@@ -35,19 +34,14 @@ export class VideogridComponent implements OnInit {
   }
 
   onPlay() {
-    // this.apis.forEach((api, index) => {
-    //   const offset = this.offsetValues[index];
-    //   api.seekTime(offset);
-    // });
-
     this.apis.forEach((api: VgAPI) => {
       api.play();
     });
   }
 
   onPlayerReady(api: VgAPI) {
-    this.apis.push(api);
     api.volume = 0;
+    this.apis.push(api);
   }
 
   setTime(value) {
@@ -63,7 +57,6 @@ export class VideogridComponent implements OnInit {
 
   onMouseEnter(i: number) {
     this.apis[i].volume = 1;
-
   }
 
   onMouseLeave(i: number) {
@@ -79,7 +72,6 @@ export class VideogridComponent implements OnInit {
 
   onGlobalMouseLeave() {
     const api: VgAPI = this.apis[this.lastMouseLeft];
-
     api.volume = 1;
   }
 }

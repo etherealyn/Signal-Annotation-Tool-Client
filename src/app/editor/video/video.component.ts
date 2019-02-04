@@ -23,7 +23,7 @@ export class VideoComponent implements OnInit {
     this.api = api;
 
     this.api.getDefaultMedia().subscriptions.timeUpdate.subscribe(x => {
-      console.log(this.api.getDefaultMedia().currentTime, this.api.getDefaultMedia().duration);
+      console.log(this.api.currentTime);
     });
 
     this.playerReady.emit(api);

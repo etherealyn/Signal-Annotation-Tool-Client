@@ -1,9 +1,10 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { ProjectModel } from '../models/project.model';
 import { EditorService } from './editor.service';
 import { Subscription } from 'rxjs';
+import { VideogridComponent } from './videogrid/videogrid.component';
 
 export interface Tile {
   color: string;
@@ -23,6 +24,8 @@ export class EditorComponent implements OnInit, OnDestroy {
 
   subscription: Subscription;
   direction = 'horizontal';
+
+  @ViewChild(VideogridComponent) videoGrid: VideogridComponent;
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -47,5 +50,13 @@ export class EditorComponent implements OnInit, OnDestroy {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
+  }
+
+  onPlay() {
+    this.videoGrid.onPlay();
+  }
+
+  onPause() {
+    this.videoGrid.onPause();
   }
 }
