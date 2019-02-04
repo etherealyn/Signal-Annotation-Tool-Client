@@ -5,14 +5,7 @@ import { ProjectModel } from '../models/project.model';
 import { EditorService } from './editor.service';
 import { Subscription } from 'rxjs';
 import { VideogridComponent } from './videogrid/videogrid.component';
-
-export interface Tile {
-  color: string;
-  cols: number;
-  rows: number;
-  text: string;
-  source?: string;
-}
+import { AnnotationComponent } from './annotation/annotation.component';
 
 @Component({
   selector: 'app-editor',
@@ -26,6 +19,7 @@ export class EditorComponent implements OnInit, OnDestroy {
   direction = 'horizontal';
 
   @ViewChild(VideogridComponent) videoGrid: VideogridComponent;
+  @ViewChild(AnnotationComponent) annotation: AnnotationComponent;
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -44,6 +38,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     this.subscription.add(this.editorService.getOpenFiles$().subscribe(files => {
       console.log(files);
     }));
+
   }
 
   ngOnDestroy(): void {
@@ -54,9 +49,12 @@ export class EditorComponent implements OnInit, OnDestroy {
 
   onPlay() {
     this.videoGrid.onPlay();
+    // this.annotation.onStartRecord(this.videoGrid.apis[0]);
+    this.annotation.startRecording(this.videoGrid.apis[0]);
   }
 
   onPause() {
     this.videoGrid.onPause();
+    // this.annotation.stopRecording();
   }
 }

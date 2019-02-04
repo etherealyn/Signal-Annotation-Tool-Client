@@ -1,3 +1,4 @@
-<p>
-  annotation works!
-</p>
+<clr-checkbox-wrapper *ngFor="let clazz of classes; let i = index">
+  <input id='annotation-checkbox-{{i}}' type="checkbox" clrCheckbox [checked]="clazz.checked" (change)='clazz.checked = !clazz.checked'/>
+  <label for='annotation-checkbox-{{i}}'>{{clazz.name}}</label>
+</clr-checkbox-wrapper>

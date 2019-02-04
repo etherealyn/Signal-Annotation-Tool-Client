@@ -10,7 +10,7 @@ export class VideoComponent implements OnInit {
   @Input() source: String;
   @Output() playerReady: EventEmitter<any> = new EventEmitter();
 
-  private api: VgAPI;
+  api: VgAPI;
   url: String = 'http://localhost:8080/api/projects/files';
 
   constructor() {
@@ -22,9 +22,10 @@ export class VideoComponent implements OnInit {
   onPlayerReady$(api: VgAPI) {
     this.api = api;
 
+    /*
     this.api.getDefaultMedia().subscriptions.timeUpdate.subscribe(x => {
       console.log(this.api.currentTime);
-    });
+    });*/
 
     this.playerReady.emit(api);
   }
