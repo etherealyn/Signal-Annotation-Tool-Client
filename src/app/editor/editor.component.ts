@@ -57,4 +57,8 @@ export class EditorComponent implements OnInit, OnDestroy {
     this.videoGrid.onPause();
     // this.annotation.stopRecording();
   }
+
+  onClear() {
+    this.annotation.clearLabels();
+  }
 }

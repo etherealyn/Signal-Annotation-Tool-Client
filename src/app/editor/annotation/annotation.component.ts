@@ -20,7 +20,7 @@ class Classification {
   name: string;
   series: Range[] = [];
   checked = false;
-  isBeingLabelled = false;
+  finished = false;
 }
 
 
@@ -40,25 +40,24 @@ export class AnnotationComponent implements OnInit {
     {
       name: 'Северное сияние',
       checked: false,
-      isBeingLabelled: false,
+      finished: false,
       series: []
     },
     {
       name: 'Море',
       checked: false,
-      isBeingLabelled: false,
+      finished: false,
       series: []
     },
     {
       name: 'Облака',
       checked: false,
-      isBeingLabelled: false,
+      finished: false,
       series: []
     }
   ];
 
   private _timeUpdateSubscription: Subscription;
-  debug = JSON.stringify(this.classes);
 
   ngOnInit() {
   }
@@ -71,23 +70,34 @@ export class AnnotationComponent implements OnInit {
           const series = classification.series;
 
           if (classification.checked) {
-            if (series.length === 0 || (series.length !== 0 && series[series.length - 1].endTime !== 0)) {
-              console.log(name, `labelling started at ${vgAPI.currentTime}`);
-              classification.isBeingLabelled = true;
-              series.push(new Range(vgAPI.currentTime, 0));
+            if (series.length === 0 || classification.finished) {
+              series.push(new Range(vgAPI.currentTime, vgAPI.currentTime));
+              classification.finished = false;
+            } else {
+              series[series.length - 1].endTime = vgAPI.currentTime;
             }
           } else {
-            if (classification.isBeingLabelled) {
-              console.log(name, `labelling finished at ${vgAPI.currentTime}`);
-              classification.isBeingLabelled = false;
-              if (series.length !== 0) {
-                const range = series[series.length - 1];
-                range.endTime = vgAPI.currentTime;
-                series[series.length - 1] = range;
-              }
-              console.log(name, series);
-            }
+
           }
+
+          // if (classification.checked) {
+          //   if (series.length === 0 || (series.length !== 0 && series[series.length - 1].endTime !== 0)) {
+          //     console.log(name, `labelling started at ${vgAPI.currentTime}`);
+          //     classification.isBeingLabelled = true;
+          //     series.push(new Range(vgAPI.currentTime, 0));
+          //   }
+          // } else {
+          //   if (classification.isBeingLabelled) {
+          //     console.log(name, `labelling finished at ${vgAPI.currentTime}`);
+          //     classification.isBeingLabelled = false;
+          //     if (series.length !== 0) {
+          //       const range = series[series.length - 1];
+          //       range.endTime = vgAPI.currentTime;
+          //       series[series.length - 1] = range;
+          //     }
+          //     console.log(name, series);
+          //   }
+          // }
 
         }));
       }));
@@ -96,5 +106,19 @@ export class AnnotationComponent implements OnInit {
 
   get diagnostic() {
     return JSON.stringify(this.classes);
+  }
+
+  onChange(classification: Classification) {
+    const prev = classification.checked;
+    classification.checked = !classification.checked;
+    if (prev === true && classification.checked === false) {
+      classification.finished = true;
+    }
+  }
+
+  clearLabels() {
+    this.classes.forEach(value => {
+      value.series = [];
+    });
   }
 }

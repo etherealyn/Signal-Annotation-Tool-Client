@@ -1,7 +1,7 @@
 <clr-checkbox-wrapper *ngFor="let c of classes; let i = index">
   <input id='annotation-checkbox-{{i}}' type="checkbox" clrCheckbox
          [checked]="c.checked"
-         (change)='c.checked = !c.checked'/>
+         (change)='onChange(c)'/>
   <label for='annotation-checkbox-{{i}}'>{{c.name}}</label>
 </clr-checkbox-wrapper>
 

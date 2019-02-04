@@ -20,6 +20,7 @@
     <div class="btns">
       <button class="btn btn-primary" (click)="onPlay()"> Play</button>
       <button class="btn btn-primary-outline" (click)="onPause()">Pause</button>
+      <button class="btn btn-danger" (click)="onClear()">Clear Labels</button>
       <button class="btn btn-warning"
               (click)="direction = (direction === 'horizontal') ? 'vertical' : 'horizontal'">{{ 'Toggle direction: "' + direction + '"' }}</button>
     </div>
