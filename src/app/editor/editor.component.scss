@@ -27,6 +27,16 @@
   margin: 6px 0;
 }
 
-::ng-deep .as-split-gutter > div {
-  height: auto !important;
+//::ng-deep .as-split-gutter > div {
+//  height: auto !important;
+//}
+
+as-split {
+  overflow: inherit;
+  ::ng-deep .is-horizontal {
+    .as-split-gutter {
+      height: 100px !important;
+    }
+  }
+
 }

@@ -12,8 +12,6 @@
 </div>
 
 <form action="#">
-  <!--<ng-progress #progressBar></ng-progress>-->
-  <!--<button (click)="progressBar.start()">-->
   <label for="timeSelector">Seek:</label>
   <input #timeSelector
          id="timeSelector"
@@ -24,5 +22,8 @@
          [(ngModel)]="currentTime"
          (ngModelChange)="setTime($event)"
          value="0">
-  <output for="timeSelector">{{currentTime}}</output>
+  <output for="timeSelector">{{currentTime | number:'1.0-0'}}%</output>
 </form>
+
+<!--<ng-progress #progressBar></ng-progress>-->
+<!--<button (click)="progressBar.start()">Start</button>-->

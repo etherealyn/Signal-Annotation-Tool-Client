@@ -27,8 +27,8 @@ export class VideogridComponent implements OnInit {
 
   lastMouseLeft = 0;
 
-  currentTime;
-  max = 200;
+  currentTime = 0;
+  max = 100;
 
   constructor() {
   }
@@ -48,9 +48,12 @@ export class VideogridComponent implements OnInit {
 
     if (this.apis.length === 1) {
       this.head = api;
-      this.head.getDefaultMedia().subscriptions.durationChange.subscribe((value => {
-        console.log('duration change', value);
-      }))
+      // this.head.getDefaultMedia().subscriptions.durationChange.subscribe((value => {
+      //   console.log('duration change', value);
+      // }));
+      this.head.subscriptions.timeUpdate.subscribe(() => {
+        this.currentTime = (this.head.currentTime / this.head.duration) * 100;
+      });
 
       // const newOptions = Object.assign({}, this.options);
       // newOptions.ceil = this.head.duration;
@@ -63,7 +66,7 @@ export class VideogridComponent implements OnInit {
       this.guard += 1;
       this.apis.forEach((api: VgAPI) => {
         // api.getDefaultMedia().currentTime = value;
-        api.seekTime(value);
+        api.seekTime(value, true);
       });
     } else {
       this.guard = 0;
