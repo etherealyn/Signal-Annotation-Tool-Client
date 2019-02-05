@@ -10,3 +10,19 @@
     </mat-grid-tile>
   </mat-grid-list>
 </div>
+
+<form action="#">
+  <!--<ng-progress #progressBar></ng-progress>-->
+  <!--<button (click)="progressBar.start()">-->
+  <label for="timeSelector">Seek:</label>
+  <input #timeSelector
+         id="timeSelector"
+         name="Seek Time"
+         type="range"
+         min="0"
+         max="{{max}}"
+         [(ngModel)]="currentTime"
+         (ngModelChange)="setTime($event)"
+         value="0">
+  <output for="timeSelector">{{currentTime}}</output>
+</form>

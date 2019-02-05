@@ -4,7 +4,7 @@ import { VgCoreModule } from 'videogular2/core';
 import { VgControlsModule } from 'videogular2/controls';
 import { VgOverlayPlayModule } from 'videogular2/overlay-play';
 import { VgBufferingModule } from 'videogular2/buffering';
-import { MatGridListModule } from '@angular/material';
+import { MatGridListModule, MatSliderModule } from '@angular/material';
 import { ClarityModule } from '@clr/angular';
 import { FormsModule } from '@angular/forms';
 import { AngularSplitModule } from 'angular-split';
