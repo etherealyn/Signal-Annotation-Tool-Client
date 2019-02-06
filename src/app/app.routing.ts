@@ -10,7 +10,7 @@ import { AuthGuard } from './auth/auth.guard';
 const appRoutes: Routes = [
   { path: '', redirectTo: '/projects', pathMatch: 'full' },
   { path: 'auth', component: LoginComponent },
-  // { path: 'register', component: LoginComponent },
+  // { filename: 'register', component: LoginComponent },
   { path: 'projects', component: ProjectsComponent, canActivate: [ AuthGuard ] },
   { path: 'editor/:id', component: EditorComponent, canActivate: [ AuthGuard ] },
   { path: '**', redirectTo: ''}

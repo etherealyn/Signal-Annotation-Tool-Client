@@ -26,7 +26,6 @@ export class FiletreeComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.subscription = this.editorService.getCurrentProject$()
-      .pipe()
       .subscribe(value => {
         if (value && value.fileTree) {
           this.project = value;
@@ -69,9 +68,7 @@ export class FiletreeComponent implements OnInit, OnDestroy {
   }
 
   openFile(directoryName: string, fileName: string) {
-    console.log(directoryName, fileName);
     const fileModel = this.fileIndex.get(fileName);
-
     if (fileModel.mimetype.startsWith('video')) {
       this.editorService.openFile(fileModel);
     }

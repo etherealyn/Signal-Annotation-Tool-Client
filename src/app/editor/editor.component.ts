@@ -6,6 +6,7 @@ import { EditorService } from './editor.service';
 import { Subscription } from 'rxjs';
 import { VideogridComponent } from './videogrid/videogrid.component';
 import { AnnotationComponent } from './annotation/annotation.component';
+import { IVideo } from './video/video.interface';
 
 @Component({
   selector: 'app-editor',
@@ -14,10 +15,11 @@ import { AnnotationComponent } from './annotation/annotation.component';
 })
 export class EditorComponent implements OnInit, OnDestroy {
   project: ProjectModel;
+  videos: IVideo[] = [];
 
-  subscription: Subscription;
+  private subscription: Subscription;
+
   direction = 'horizontal';
-
   @ViewChild(VideogridComponent) videoGrid: VideogridComponent;
   @ViewChild(AnnotationComponent) annotation: AnnotationComponent;
 
@@ -31,6 +33,17 @@ export class EditorComponent implements OnInit, OnDestroy {
     this.subscription = this.editorService.getCurrentProject$().subscribe(project => {
       if (project && project.id === projectId) {
         this.project = project;
+
+        const videos: IVideo[] = [];
+        this.project.fileTree.children.forEach((child => {
+          if (child.mimetype.startsWith('video')) {
+            videos.push({
+              source: child.filename
+            });
+          }
+        }));
+
+        this.videos = videos;
       }
     });
     this.editorService.loadProject(projectId);

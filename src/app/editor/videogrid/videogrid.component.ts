@@ -1,10 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { VgAPI } from 'videogular2/core';
-
-interface IVideo {
-  source: string;
-  startOffset?: number;
-}
+import { IVideo } from '../video/video.interface';
 
 @Component({
   selector: 'app-videogrid',
@@ -13,17 +9,12 @@ interface IVideo {
 })
 export class VideogridComponent implements OnInit {
 
+  @Input() videos: IVideo[];
+
   head: VgAPI;
   apis: VgAPI[] = [];
   guard = 0;
   playbackValues: string[] = [ '0.25', '0.5', '0.75', '1', '1.25', '1.50', '1.75', '2' ];
-
-  videos: IVideo[] = [
-    {source: '191cf9c7446c3a62257ff046777e015b'},
-    {source: '191cf9c7446c3a62257ff046777e015b'},
-    // {source: '191cf9c7446c3a62257ff046777e015b'},
-    // {source: '191cf9c7446c3a62257ff046777e015b'},
-  ];
 
   lastMouseLeft = 0;
 

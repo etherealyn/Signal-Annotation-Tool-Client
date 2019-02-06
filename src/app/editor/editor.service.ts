@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ProjectsService } from '../projects/projects.service';
 import { ProjectModel } from '../models/project.model';
-import {FileModel} from '../models/file.model';
+import { FileModel } from '../models/file.model';
 
 @Injectable({
   providedIn: 'root'
@@ -26,9 +26,9 @@ export class EditorService {
   loadProject(id: string) {
     const currentProject = this.currentProjectSubject.getValue();
     if (!currentProject || (currentProject && currentProject.id !== id)) {
-        this.projectsService.getProject(id)
-          .toPromise()
-          .then(value => this.currentProjectSubject.next(value));
+      this.projectsService.getProject(id)
+        .toPromise()
+        .then(value => this.currentProjectSubject.next(value));
     }
   }
 
