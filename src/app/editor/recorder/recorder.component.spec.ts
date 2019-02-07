@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AnnotationComponent } from './annotation.component';
+import { RecorderComponent } from './recorder.component';
 
-describe('AnnotationComponent', () => {
-  let component: AnnotationComponent;
-  let fixture: ComponentFixture<AnnotationComponent>;
+describe('RecorderComponent', () => {
+  let component: RecorderComponent;
+  let fixture: ComponentFixture<RecorderComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AnnotationComponent ]
+      declarations: [ RecorderComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AnnotationComponent);
+    fixture = TestBed.createComponent(RecorderComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

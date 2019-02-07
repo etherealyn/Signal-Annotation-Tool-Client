@@ -5,8 +5,9 @@ import { ProjectModel } from '../models/project.model';
 import { EditorService } from './editor.service';
 import { Subscription } from 'rxjs';
 import { VideogridComponent } from './videogrid/videogrid.component';
-import { AnnotationComponent } from './annotation/annotation.component';
+import { RecorderComponent } from './recorder/recorder.component';
 import { IVideo } from './video/video.interface';
+import { VgAPI } from 'videogular2/core';
 
 @Component({
   selector: 'app-editor',
@@ -21,7 +22,7 @@ export class EditorComponent implements OnInit, OnDestroy {
 
   direction = 'horizontal';
   @ViewChild(VideogridComponent) videoGrid: VideogridComponent;
-  @ViewChild(AnnotationComponent) annotation: AnnotationComponent;
+  @ViewChild(RecorderComponent) annotation: RecorderComponent;
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -29,11 +30,14 @@ export class EditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    /** Get project id from the current route */
     const projectId = this.route.snapshot.paramMap.get('id');
+
     this.subscription = this.editorService.getCurrentProject$().subscribe(project => {
       if (project && project.id === projectId) {
         this.project = project;
 
+        /** Gather all videos */
         const videos: IVideo[] = [];
         this.project.fileTree.children.forEach((child => {
           if (child.mimetype.startsWith('video')) {
@@ -48,10 +52,9 @@ export class EditorComponent implements OnInit, OnDestroy {
     });
     this.editorService.loadProject(projectId);
 
-    this.subscription.add(this.editorService.getOpenFiles$().subscribe(files => {
-      console.log(files);
-    }));
-
+    // this.subscription.add(this.editorService.getOpenFiles$().subscribe(files => {
+    //   console.log(files);
+    // }));
   }
 
   ngOnDestroy(): void {
@@ -62,16 +65,17 @@ export class EditorComponent implements OnInit, OnDestroy {
 
   onPlay() {
     this.videoGrid.onPlay();
-    // this.annotation.onStartRecord(this.videoGrid.apis[0]);
-    this.annotation.startRecording(this.videoGrid.apis[0]);
   }
 
   onPause() {
     this.videoGrid.onPause();
-    // this.annotation.stopRecording();
   }
 
   onClear() {
     this.annotation.clearLabels();
+  }
+
+  onPlayerReady(vgApi: VgAPI) {
+    this.annotation.setVgApi(vgApi);
   }
 }

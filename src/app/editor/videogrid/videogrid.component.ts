@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { VgAPI } from 'videogular2/core';
 import { IVideo } from '../video/video.interface';
 
@@ -10,9 +10,9 @@ import { IVideo } from '../video/video.interface';
 export class VideogridComponent implements OnInit {
 
   @Input() videos: IVideo[];
+  @Output() playerReady = new EventEmitter();
 
-  head: VgAPI;
-  apis: VgAPI[] = [];
+  apis: VgAPI[];
   guard = 0;
   playbackValues: string[] = [ '0.25', '0.5', '0.75', '1', '1.25', '1.50', '1.75', '2' ];
 
@@ -34,26 +34,23 @@ export class VideogridComponent implements OnInit {
   }
 
   onPlayerReady(api: VgAPI) {
-    api.volume = 0;
+    if (!this.apis) {
+      this.apis = [];
+    }
+
     this.apis.push(api);
 
     if (this.apis.length === 1) {
-      this.head = api;
-      // this.head.getDefaultMedia().subscriptions.durationChange.subscribe((value => {
-      //   console.log('duration change', value);
-      // }));
-      this.head.subscriptions.timeUpdate.subscribe(() => {
-        this.currentTime = (this.head.currentTime / this.head.duration) * 100;
+      const head = this.apis[0];
+      head.subscriptions.timeUpdate.subscribe(() => {
+        this.currentTime = (head.currentTime / head.duration) * 100;
       });
-
-      // const newOptions = Object.assign({}, this.options);
-      // newOptions.ceil = this.head.duration;
-      // this.options = newOptions;
     }
   }
 
   setTime(value) {
-    if (this.guard % 2 === 0) { /** This funny logic is due to a bug on Webkit-based browsers, leading to change firing twice */
+    if (this.guard % 2 === 0) {
+      /** This funny logic is due to a bug on Webkit-based browsers, leading to change firing twice */
       this.guard += 1;
       this.apis.forEach((api: VgAPI) => {
         // api.getDefaultMedia().currentTime = value;

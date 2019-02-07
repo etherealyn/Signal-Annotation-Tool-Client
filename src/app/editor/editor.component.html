@@ -1,21 +1,26 @@
 <!--<div class="vertical-line"></div>-->
+
 <as-split direction="vertical">
+  <!-- vertical split start-->
   <as-split-area size="90">
     <div class="container">
       <div class="split-example">
+        <!-- horizontal split start-->
         <as-split [direction]="direction">
-          <as-split-area size="50">
-            <app-videogrid [videos]="videos"></app-videogrid>
+          <as-split-area size="10">
+            <app-videogrid [videos]="videos" (playerReady)='onPlayerReady($event)'></app-videogrid>
           </as-split-area>
-          <as-split-area size="50">
-            <app-annotation></app-annotation>
+          <!-- horizontal split center-->
+          <as-split-area size="90">
+            <app-recorder></app-recorder>
           </as-split-area>
         </as-split>
+        <!-- horizontal split end-->
       </div>
       <br>
     </div>
   </as-split-area>
-
+  <!-- vertical split center-->
   <as-split-area size="10">
     <div class="btns">
       <button class="btn btn-primary" (click)="onPlay()"> Play</button>
@@ -26,4 +31,5 @@
               (click)="direction = (direction === 'horizontal') ? 'vertical' : 'horizontal'">{{ 'Toggle direction: "' + direction + '"' }}</button>
     </div>
   </as-split-area>
+  <!-- vertical split end-->
 </as-split>

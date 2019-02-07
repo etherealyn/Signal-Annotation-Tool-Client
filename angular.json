@@ -23,6 +23,7 @@
               "src/assets"
             ],
             "styles": [
+              "node_modules/vis/dist/vis.min.css",
               "node_modules/videogular2/fonts/videogular.css",
               "node_modules/@clr/icons/clr-icons.min.css",
               "node_modules/@clr/ui/clr-ui.min.css",

@@ -30,8 +30,10 @@
     "angular-split": "^2.0.1",
     "core-js": "^2.5.7",
     "d3": "^5.8.0",
+    "moment": "^2.24.0",
     "rxjs": "^6.3.3",
     "videogular2": "^6.4.0",
+    "vis": "^4.21.0",
     "zone.js": "^0.8.26"
   },
   "devDependencies": {
@@ -44,6 +46,7 @@
     "@types/jasmine": "^3.3.0",
     "@types/jasminewd2": "^2.0.6",
     "@types/node": "^10.12.10",
+    "@types/vis": "^4.21.10",
     "codelyzer": "^4.5.0",
     "jasmine-core": "^3.3.0",
     "jasmine-spec-reporter": "~4.2.1",

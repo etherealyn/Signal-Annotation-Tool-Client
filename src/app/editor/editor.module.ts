@@ -14,10 +14,11 @@ import { EditorComponent } from './editor.component';
 import { UploadModule } from '../upload/upload.module';
 import { VideoComponent } from './video/video.component';
 import { VideogridComponent } from './videogrid/videogrid.component';
-import { AnnotationComponent } from './annotation/annotation.component';
+import { RecorderComponent } from './recorder/recorder.component';
+import { TimelineComponent } from './timeline/timeline.component';
 
 @NgModule({
-  declarations: [ EditorComponent, VideoComponent, VideogridComponent, AnnotationComponent ],
+  declarations: [ EditorComponent, VideoComponent, VideogridComponent, RecorderComponent, TimelineComponent ],
   imports: [
     CommonModule,
     FormsModule,
