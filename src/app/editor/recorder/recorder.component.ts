@@ -13,6 +13,8 @@ import { Range } from './range';
 })
 export class RecorderComponent implements OnInit {
 
+  labellingClasses = [ '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16' ];
+
   @ViewChild(TimelineComponent) timelineVisualisation: TimelineComponent;
 
   constructor() {
@@ -23,9 +25,7 @@ export class RecorderComponent implements OnInit {
   private subscription: Subscription;
 
   ngOnInit() {
-    const labellingClasses = [ 'Aurora', 'Sea', 'Thunder' ];
-
-    this.classes = labellingClasses.map(name => {
+    this.classes = this.labellingClasses.map(name => {
       return {
         name: name,
         buttonChecked: false,
@@ -35,20 +35,12 @@ export class RecorderComponent implements OnInit {
     });
   }
 
-  onChange(classification: Classification) {
-    const prev = classification.buttonChecked;
-    classification.buttonChecked = !classification.buttonChecked;
-    if (prev === true && classification.buttonChecked === false) {
-      classification.finished = true;
-    }
-  }
 
   clearLabels() {
     this.classes.forEach(value => {
       value.series = [];
     });
   }
-
 
   setVgApi(vgApi: VgAPI) {
     const subscriptions: IMediaSubscriptions = vgApi.subscriptions;
@@ -73,5 +65,17 @@ export class RecorderComponent implements OnInit {
         );
       })
     );
+  }
+
+  onChange(cls: Classification, groupId: number) {
+    const prev = cls.buttonChecked;
+    cls.buttonChecked = !cls.buttonChecked;
+    if (prev === true && cls.buttonChecked === false) {
+      cls.finished = true;
+      const id = cls.series.length - 1;
+      const range = cls.series[id];
+      console.log(range);
+      this.timelineVisualisation.addItem(groupId, range.startTime, range.endTime);
+    }
   }
 }

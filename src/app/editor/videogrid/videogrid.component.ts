@@ -46,6 +46,10 @@ export class VideogridComponent implements OnInit {
         this.currentTime = (head.currentTime / head.duration) * 100;
       });
     }
+
+    if (this.apis.length === this.videos.length) {
+      this.playerReady.emit(this.apis[0]);
+    }
   }
 
   setTime(value) {

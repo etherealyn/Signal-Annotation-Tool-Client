@@ -85,7 +85,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   @HostListener('window:scroll', ['$event'])
   onScroll(event) {
-    console.log(event);
   }
 
   onHide() {

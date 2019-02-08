@@ -7,11 +7,11 @@
       <div class="split-example">
         <!-- horizontal split start-->
         <as-split [direction]="direction">
-          <as-split-area size="10">
+          <as-split-area size="50">
             <app-videogrid [videos]="videos" (playerReady)='onPlayerReady($event)'></app-videogrid>
           </as-split-area>
           <!-- horizontal split center-->
-          <as-split-area size="90">
+          <as-split-area size="50">
             <app-recorder></app-recorder>
           </as-split-area>
         </as-split>
