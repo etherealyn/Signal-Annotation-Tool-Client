@@ -21,12 +21,6 @@ export class VideoComponent implements OnInit {
 
   onPlayerReady$(api: VgAPI) {
     this.api = api;
-
-    /*
-    this.api.getDefaultMedia().subscriptions.timeUpdate.subscribe(x => {
-      console.log(this.api.currentTime);
-    });*/
-
     this.playerReady.emit(api);
   }
 }

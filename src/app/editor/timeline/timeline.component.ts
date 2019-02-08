@@ -1,13 +1,13 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import * as vis from 'vis';
-import { DataItem, DataSet, Timeline } from 'vis';
+import { DataItem, DataSet, IdType, Timeline } from 'vis';
 
 @Component({
   selector: 'app-timeline',
   templateUrl: './timeline.component.html',
   styleUrls: [ './timeline.component.scss' ]
 })
-export class TimelineComponent implements OnInit {
+export class TimelineComponent implements OnInit, OnDestroy {
 
   @Input() groupNames: string[];
 
@@ -18,14 +18,17 @@ export class TimelineComponent implements OnInit {
     // margin: {
     //   item: 20
     // },
-    min: 0,
-    max: 100
+    min: -1,
+    max: 100,
   };
   private timeline: Timeline;
   private items: DataSet<DataItem>;
+  private playbackTimeId: IdType;
 
   constructor() {
   }
+
+  counter = 0;
 
   ngOnInit(): void {
     // const now = moment().minutes(0).seconds(0).milliseconds(0);
@@ -52,18 +55,41 @@ export class TimelineComponent implements OnInit {
     }*/
 
     this.items = new vis.DataSet([
-      {id: 0, group: 0, className: 'expected', content: 'hidden item', start: 50},
+      {id: -1, group: 0, className: 'expected', content: 'hidden item (you normally shouldnt see this)', start: -100},
     ]);
 
     // create visualization
     const container = document.getElementById('timeline');
     this.timeline = new vis.Timeline(container, this.items, groups, this.options);
+    this.playbackTimeId = this.timeline.addCustomTime(0.0, 'currentPlayingTime');
+    // this.timeline.on('timechanged', function (properties) {
+    //   // console.log(properties);
+    // });
   }
 
-  addItem(groupId: number, start: number | string, end: number | string) {
-    const id = this.items.length;
-    const item = {id: id, group: groupId, content: 'item ' + id, start: start, end: end};
+  addItemBox(id: number, groupId: number, start: number | string) {
+    const item: DataItem = {id: id, group: groupId, content: 'item ' + id, start: start, end: start};
     this.items.add(item);
     this.timeline.focus(id);
+  }
+
+  addItem(id: number, groupId: number, start: number | string, end: number | string) {
+    const item: DataItem = {id: id, group: groupId, content: 'item ' + id, start: start, end: end};
+    this.items.add(item);
+    this.timeline.focus(id);
+  }
+
+  updateItem(id: number, endTime: number) {
+    const item: DataItem = this.items.get(id);
+    item.end = endTime;
+    this.items.update(item);
+  }
+
+  updateCurrentTime(time: number) {
+    this.timeline.setCustomTime(time, this.playbackTimeId);
+  }
+
+  ngOnDestroy(): void {
+    this.timeline.destroy();
   }
 }
