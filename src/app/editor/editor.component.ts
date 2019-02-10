@@ -24,6 +24,8 @@ export class EditorComponent implements OnInit, OnDestroy {
   @ViewChild(VideogridComponent) videoGrid: VideogridComponent;
   @ViewChild(RecorderComponent) annotation: RecorderComponent;
 
+  classes: string[] = [ 'Aurora', 'Clouds', 'Lights' ];
+
   constructor(private route: ActivatedRoute,
               private router: Router,
               private editorService: EditorService) {
@@ -51,6 +53,18 @@ export class EditorComponent implements OnInit, OnDestroy {
       }
     });
     this.editorService.loadProject(projectId);
+
+    setTimeout(() => {
+      console.log('changing classes');
+      this.classes = [ ...this.classes, 'Cosmos without hatered' ];
+    }, 2000);
+
+    setTimeout(() => {
+      console.log('changing classes again');
+      const newClasses = [ ...this.classes ];
+      newClasses.pop();
+      this.classes = newClasses;
+    }, 3000);
 
     // this.subscription.add(this.editorService.getOpenFiles$().subscribe(files => {
     //   console.log(files);

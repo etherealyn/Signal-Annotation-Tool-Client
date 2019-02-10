@@ -1,17 +1,19 @@
-<clr-checkbox-container clrInline>
-  <clr-checkbox-wrapper *ngFor="let c of classes; let i = index">
-    <input id='annotation-checkbox-{{i}}' type="checkbox" clrCheckbox
-           [checked]="c.buttonChecked"
-           (change)='onCheckboxChange(c, i)'/>
-    <label for='annotation-checkbox-{{i}}'>{{c.name}}</label>
-  </clr-checkbox-wrapper>
-</clr-checkbox-container>
+<!--<clr-checkbox-container clrInline>-->
+  <!--<clr-checkbox-wrapper *ngFor="let c of classes; let i = index">-->
+    <!--<input id='annotation-checkbox-{{i}}' type="checkbox" clrCheckbox-->
+           <!--[checked]="c.buttonChecked"-->
+           <!--(change)='onCheckboxChange(c, i)'/>-->
+    <!--<label for='annotation-checkbox-{{i}}'>{{c.name}}</label>-->
+  <!--</clr-checkbox-wrapper>-->
+<!--</clr-checkbox-container>-->
 
-<!--<div *ngFor="let c of classes">-->
-<!--{{c.name}}-->
-<!--<div *ngFor="let s of c.series">-->
-<!--{{s.startTime}} {{s.endTime}}-->
-<!--</div>-->
-<!--</div>-->
-
+<div class="btn-group">
+  <div class="checkbox btn" *ngFor="let c of classes; let i = index">
+    <input type="checkbox" id="btn-demo-check-{{i}}" [checked]="c.buttonChecked" (change)='onCheckboxChange(c, i)'>
+    <label for="btn-demo-check-{{i}}" class="checkbox-button">{{c.name}}</label>
+  </div>
+</div>
+<br>
 <app-timeline [groupNames]="labellingClasses"></app-timeline>
+
+

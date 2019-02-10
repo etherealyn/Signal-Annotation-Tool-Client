@@ -33,9 +33,20 @@
 
 as-split {
   overflow: inherit;
+
   ::ng-deep .is-horizontal {
     .as-split-gutter {
       height: 100px !important;
+      background: yellow;
+    }
+  }
+
+  ::ng-deep .is-vertical {
+    .as-split-gutter {
+      background: red;
+      .as-split-gutter-icon {
+        flex-basis: 11px;
+      }
     }
   }
 

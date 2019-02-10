@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { TimelineComponent } from '../timeline/timeline.component';
 import { Classification } from './classification';
@@ -12,32 +12,24 @@ import { throttleTime } from 'rxjs/operators';
   templateUrl: './recorder.component.html',
   styleUrls: [ './recorder.component.scss' ]
 })
-export class RecorderComponent implements OnInit {
+export class RecorderComponent implements OnInit, OnChanges {
 
-  labellingClasses = [ '1', '2', '3', '4'];
+  // labellingClasses = [ '1', '2', '3', '4'];
+  @Input() labellingClasses: string[] = [];
+
+  classes: Classification[] = [];
+  private counter: number;
+  private subscription: Subscription;
 
   @ViewChild(TimelineComponent) timelineVisualisation: TimelineComponent;
 
   constructor() {
   }
 
-  private classes: Classification[] = [];
-  private counter: number;
-
-  private subscription: Subscription;
-
   ngOnInit() {
     this.counter = 0;
-    this.classes = this.labellingClasses.map(name => {
-      return {
-        name: name,
-        buttonChecked: false,
-        finished: false,
-        series: []
-      };
-    });
+    this.classes = this.labellingClasses.map(name => new Classification(name, []));
   }
-
 
   clearLabels() {
     this.classes.forEach(value => {
@@ -52,28 +44,28 @@ export class RecorderComponent implements OnInit {
     this.subscription = timeUpdate
       .pipe(throttleTime(500))
       .subscribe((() => {
-        this.classes.forEach(((classification, groupId) => {
-            const series = classification.series;
-            const currentTime = vgApi.currentTime;
-            const seriesCount = series.length;
+          this.classes.forEach(((classification, groupId) => {
+              const series = classification.series;
+              const currentTime = vgApi.currentTime;
+              const seriesCount = series.length;
 
-            if (classification.buttonChecked) {
-              if (seriesCount === 0 || classification.finished) {
-                const range = new Range(this.counter, currentTime, currentTime);
-                series.push(range);
-                classification.finished = false;
-                this.counter += 1;
-                this.timelineVisualisation.addItemBox(range.id, groupId, currentTime);
-              } else {
-                const lastRange: Range = series[seriesCount - 1];
-                lastRange.endTime = currentTime;
-                this.timelineVisualisation.updateItem(lastRange.id, lastRange.endTime);
+              if (classification.buttonChecked) {
+                if (seriesCount === 0 || classification.finished) {
+                  const range = new Range(this.counter, currentTime, currentTime);
+                  series.push(range);
+                  classification.finished = false;
+                  this.counter += 1;
+                  this.timelineVisualisation.addItemBox(range.id, groupId, currentTime);
+                } else {
+                  const lastRange: Range = series[seriesCount - 1];
+                  lastRange.endTime = currentTime;
+                  this.timelineVisualisation.updateItem(lastRange.id, lastRange.endTime);
+                }
               }
-            }
-          })
-        );
-      })
-    );
+            })
+          );
+        })
+      );
 
     this.subscription.add(timeUpdate.pipe(throttleTime(100)).subscribe(() => {
       this.timelineVisualisation.updateCurrentTime(vgApi.currentTime);
@@ -88,6 +80,19 @@ export class RecorderComponent implements OnInit {
       // const id = cls.series.length - 1;
       // const range = cls.series[id];
       // this.timelineVisualisation.addItem(range.id, groupId, range.startTime, range.endTime);
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!changes.labellingClasses.isFirstChange()) {
+      const previous: string[] = changes.labellingClasses.previousValue;
+      const current: string[] = changes.labellingClasses.currentValue;
+
+      const newElements = current.filter(item => previous.indexOf(item) < 0);
+      const removedElements = previous.filter(item => current.indexOf(item) < 0);
+      console.log(newElements);
+      console.log(removedElements);
+      // todo: propagate changes
     }
   }
 }
