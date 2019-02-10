@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { VgAPI } from 'videogular2/core';
 import { IVideo } from '../video/video.interface';
+import { throttleTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-videogrid',
@@ -14,6 +15,7 @@ export class VideogridComponent implements OnInit {
 
   apis: VgAPI[];
   guard = 0;
+  isPlaying = false;
   playbackValues: string[] = [ '0.25', '0.5', '0.75', '1', '1.25', '1.50', '1.75', '2' ];
 
   lastMouseLeft = 0;
@@ -31,6 +33,7 @@ export class VideogridComponent implements OnInit {
     this.apis.forEach((api: VgAPI) => {
       api.play();
     });
+    this.isPlaying = true;
   }
 
   onPlayerReady(api: VgAPI) {
@@ -42,7 +45,7 @@ export class VideogridComponent implements OnInit {
 
     if (this.apis.length === 1) {
       const head = this.apis[0];
-      head.subscriptions.timeUpdate.subscribe(() => {
+      head.subscriptions.timeUpdate.pipe(throttleTime(50)).subscribe(() => {
         this.currentTime = (head.currentTime / head.duration) * 100;
       });
     }
@@ -78,10 +81,19 @@ export class VideogridComponent implements OnInit {
     this.apis.forEach((api: VgAPI) => {
       api.pause();
     });
+    this.isPlaying = false;
   }
 
   onGlobalMouseLeave() {
     const api: VgAPI = this.apis[this.lastMouseLeft];
     api.volume = 1;
+  }
+
+  onPlayPause() {
+    if (!this.isPlaying) {
+      this.onPlay();
+    } else {
+      this.onPause();
+    }
   }
 }
