@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import * as vis from 'vis';
 import { DataItem, DataSet, IdType, Timeline } from 'vis';
 
@@ -7,7 +7,7 @@ import { DataItem, DataSet, IdType, Timeline } from 'vis';
   templateUrl: './timeline.component.html',
   styleUrls: [ './timeline.component.scss' ]
 })
-export class TimelineComponent implements OnInit, OnDestroy {
+export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input() groupNames: string[];
 
@@ -18,8 +18,9 @@ export class TimelineComponent implements OnInit, OnDestroy {
     // margin: {
     //   item: 20
     // },
-    min: -1,
-    max: 100,
+    min: 0,
+    max: 100, // to-do: fixme,
+    editable: true
   };
   private timeline: Timeline;
   private items: DataSet<DataItem>;
@@ -81,8 +82,10 @@ export class TimelineComponent implements OnInit, OnDestroy {
 
   updateItem(id: number, endTime: number) {
     const item: DataItem = this.items.get(id);
-    item.end = endTime;
-    this.items.update(item);
+    if (item) {
+      item.end = endTime;
+      this.items.update(item);
+    }
   }
 
   updateCurrentTime(time: number) {
@@ -91,5 +94,9 @@ export class TimelineComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.timeline.destroy();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+
   }
 }
