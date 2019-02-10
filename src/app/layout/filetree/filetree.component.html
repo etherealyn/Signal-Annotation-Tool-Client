@@ -1,4 +1,9 @@
-<app-dialog [currentProject]="project"></app-dialog>
+<!--<app-dialog [currentProject]="project"></app-dialog>-->
+
+<div style="margin-left: 24px" *ngIf="project">
+  <strong>{{project.title}}</strong><br>
+</div>
+<hr>
 
 <clr-tree-node *ngFor="let directory of rootDirectory">
   <clr-icon [attr.shape]="directory.icon"></clr-icon>

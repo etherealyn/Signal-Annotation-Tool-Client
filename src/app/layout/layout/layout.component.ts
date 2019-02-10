@@ -9,7 +9,7 @@ import { Subscription } from 'rxjs';
 })
 export class LayoutComponent implements OnInit, OnDestroy {
 
-  isNavCollapsed = true;
+  isNavCollapsed = false;
   verticalNavVisible = false;
   verticalNavWidth = 13;
 
