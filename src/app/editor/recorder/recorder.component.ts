@@ -21,6 +21,9 @@ export class RecorderComponent implements OnInit, OnChanges {
   private counter: number;
   private subscription: Subscription;
 
+  private currentTimeDelay = 50; // ms
+  private timelineUpdateDelay = 50; // ms
+
   @ViewChild(TimelineComponent) timelineVisualisation: TimelineComponent;
 
   constructor() {
@@ -42,7 +45,7 @@ export class RecorderComponent implements OnInit, OnChanges {
     const timeUpdate = subscriptions.timeUpdate;
 
     this.subscription = timeUpdate
-      .pipe(throttleTime(500))
+      .pipe(throttleTime(this.timelineUpdateDelay))
       .subscribe((() => {
           this.classes.forEach(((classification, groupId) => {
               const series = classification.series;
@@ -67,7 +70,7 @@ export class RecorderComponent implements OnInit, OnChanges {
         })
       );
 
-    this.subscription.add(timeUpdate.pipe(throttleTime(100)).subscribe(() => {
+    this.subscription.add(timeUpdate.pipe(throttleTime(this.currentTimeDelay)).subscribe(() => {
       this.timelineVisualisation.updateCurrentTime(vgApi.currentTime);
     }));
   }

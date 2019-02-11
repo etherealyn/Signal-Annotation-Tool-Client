@@ -1,4 +1,4 @@
-<div (mouseleave)="onGlobalMouseLeave()">
+<div (mouseleave)="onGlobalMouseLeave()" *ngIf="videos && videos.length !== 0">
   <mat-grid-list cols="2" rowHeight="2:1">
     <mat-grid-tile *ngFor="let video of videos; let i = index">
       <app-video
@@ -15,12 +15,15 @@
       <clr-icon *ngIf='isPlaying' shape="pause" class="is-solid is-inverse"></clr-icon>
     </div>
 
-    <div style='width: 100%; height: 100%'>
+    <div>
+      <button class="btn btn-inverse" (click)="nextPlaybackSpeed()">{{getPlaybackValue()}}x</button>
+    </div>
+
+    <div style='width: 90%; height: 100%'>
       <input id="timeSelector" type="range" min="0" max="{{max}}" class="slider" [(ngModel)]="currentTime"
              (ngModelChange)="setTime($event)" value="0">
       <!--<output for="timeSelector">{{currentTime | number:'1.0-0'}}%</output>-->
     </div>
-
   </div>
 </div>
 

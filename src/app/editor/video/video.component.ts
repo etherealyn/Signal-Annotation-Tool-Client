@@ -12,6 +12,7 @@ export class VideoComponent implements OnInit {
 
   api: VgAPI;
   url: String = 'http://localhost:8080/api/projects/files';
+  playbackValues: string[] = [ '1', '2' ];
 
   constructor() {
   }

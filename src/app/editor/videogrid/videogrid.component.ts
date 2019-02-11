@@ -16,7 +16,9 @@ export class VideogridComponent implements OnInit {
   apis: VgAPI[];
   guard = 0;
   isPlaying = false;
-  playbackValues: string[] = [ '0.25', '0.5', '0.75', '1', '1.25', '1.50', '1.75', '2' ];
+
+  private playbackIndex = 3;
+  playbackValues: string[] = [ '0.25', '0.5', '0.75', '1.0', '1.25', '1.50', '1.75', '2.0' ];
 
   lastMouseLeft = 0;
 
@@ -95,5 +97,16 @@ export class VideogridComponent implements OnInit {
     } else {
       this.onPause();
     }
+  }
+
+  nextPlaybackSpeed() {
+    this.playbackIndex = (this.playbackIndex + 1) % this.playbackValues.length;
+    this.apis.forEach((api: VgAPI) => {
+      api.playbackRate = (this.playbackValues[ this.playbackIndex ]);
+    });
+  }
+
+  getPlaybackValue() {
+    return this.playbackValues[this.playbackIndex];
   }
 }

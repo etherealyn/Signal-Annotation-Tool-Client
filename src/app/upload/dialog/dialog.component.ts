@@ -4,7 +4,7 @@ import { forkJoin, Observable } from 'rxjs';
 import { ProjectModel } from '../../models/project.model';
 
 @Component({
-  selector: 'app-dialog',
+  selector: 'app-upload-dialog',
   templateUrl: './dialog.component.html',
   styleUrls: [ './dialog.component.scss' ]
 })
