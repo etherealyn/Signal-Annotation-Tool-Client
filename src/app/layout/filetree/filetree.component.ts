@@ -4,11 +4,10 @@ import { ProjectModel } from '../../models/project.model';
 import { Subscription } from 'rxjs';
 import { DirectoryModel } from '../../models/directory.model';
 
-import { IFile } from './file';
-import { IDirectory } from './directory';
+import { IFile } from '../../interfaces/file';
+import { IDirectory } from '../../interfaces/directory';
 import { FileModel } from '../../models/file.model';
-import { AnnotationClass } from '../../models/annotation-class.model';
-import { DialogComponent } from '../../upload/dialog/dialog.component';
+import { FileUploadComponent } from '../../upload/file-upload/file-upload.component';
 
 @Component({
   selector: 'app-filetree',
@@ -23,9 +22,7 @@ export class FiletreeComponent implements OnInit, OnDestroy {
   rootDirectory: IDirectory[] = [];
   fileIndex = new Map<string, FileModel>();
 
-  annotationsFolder: IDirectory;
-
-  @ViewChild(DialogComponent) uploadDialog: DialogComponent;
+  @ViewChild(FileUploadComponent) uploadDialog: FileUploadComponent;
 
   constructor(private editorService: EditorService) {
   }
@@ -36,29 +33,10 @@ export class FiletreeComponent implements OnInit, OnDestroy {
         if (value && value.fileTree) {
           this.project = value;
           this.rootDirectory = this.buildFileTree(this.project.fileTree);
-          this.annotationsFolder = this.buildAnnotationsTree(this.project.annotationClasses);
         }
       });
   }
 
-  buildAnnotationsTree(classes: AnnotationClass[]) {
-    const annotationsFolder: IDirectory = {
-      name: 'Annotation Classes',
-      icon: 'folder',
-      expanded: true,
-      files: []
-    };
-    if (classes) {
-      classes.forEach(model => {
-        annotationsFolder.files.push({
-          name: model.name,
-          icon: 'tag',
-          active: false
-        });
-      });
-    }
-    return annotationsFolder;
-  }
 
   buildFileTree(fileTree: DirectoryModel): IDirectory[] {
     const filesFolder = {
@@ -73,6 +51,7 @@ export class FiletreeComponent implements OnInit, OnDestroy {
       fileTree.children.forEach(model => {
         const file: IFile = {
           name: model.name,
+          filename: model.filename,
           icon: model.mimetype.startsWith('video') ? 'film-strip' : 'file',
           active: false
         };
@@ -91,15 +70,19 @@ export class FiletreeComponent implements OnInit, OnDestroy {
     }
   }
 
-  openFile(directoryName: string, fileName: string) {
-    const fileModel = this.fileIndex.get(fileName);
-    if (fileModel.mimetype.startsWith('video')) {
-      this.editorService.openFile(fileModel);
-    }
+  openFile(file: IFile) {
+    // const fileModel = this.fileIndex.get(fileName);
+    // if (fileModel.mimetype.startsWith('video')) {
+    //   this.editorService.openFile(fileModel);
+    // }
+    file.active = !file.active;
   }
 
   openUploadDialog() {
     this.uploadDialog.openDialog();
   }
 
+  onFileDelete(filename: string) {
+    console.log(filename);
+  }
 }

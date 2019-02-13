@@ -9,6 +9,8 @@ import { LayoutComponent } from './layout/layout.component';
 import { FiletreeComponent } from './filetree/filetree.component';
 import { UploadModule } from '../upload/upload.module';
 
+import { LabelTreeComponent } from './labeltree/label-tree.component';
+
 
 @NgModule({
   imports: [
@@ -23,6 +25,7 @@ import { UploadModule } from '../upload/upload.module';
   declarations: [ HeaderComponent,
     LayoutComponent,
     FiletreeComponent,
+    LabelTreeComponent,
   ]
 })
 export class LayoutModule {

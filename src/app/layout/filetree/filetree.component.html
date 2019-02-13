@@ -4,7 +4,7 @@
 </div>
 <hr>
 
-<app-upload-dialog *ngIf="project" [currentProject]="project"></app-upload-dialog>
+<app-file-upload *ngIf="project" [currentProject]="project"></app-file-upload>
 
 <clr-tree-node *ngFor="let directory of rootDirectory">
   <div>
@@ -19,40 +19,17 @@
   <ng-template [(clrIfExpanded)]="directory.expanded">
     <clr-tree-node *ngFor="let file of directory.files">
       <button
-        (click)="openFile(directory.name, file.name)"
+        (click)="openFile(file)"
         class="clr-treenode-link"
         [class.active]="file.active">
         <clr-icon [attr.shape]="file.icon"></clr-icon>
         {{file.name }}
       </button>
-
       <div>
-        <button class="btn btn-link btn-icon">
+        <button class="btn btn-link btn-icon" (click)="onFileDelete(file.filename)">
           <clr-icon shape="trash"></clr-icon>
         </button>
       </div>
-    </clr-tree-node>
-  </ng-template>
-</clr-tree-node>
-
-<clr-tree-node *ngIf="annotationsFolder">
-  <div>
-    <clr-icon [attr.shape]='annotationsFolder.expanded ? "folder-open" : "folder"'></clr-icon>
-    {{ annotationsFolder.name }}
-  </div>
-  <div class="btn-group btn-link btn-icon action-icons">
-    <button type="button" class="btn" title="Create Classes">
-      <clr-icon shape="plus"></clr-icon>
-    </button>
-  </div>
-  <ng-template [(clrIfExpanded)]="annotationsFolder.expanded">
-    <clr-tree-node *ngFor="let annotationClass of annotationsFolder.files">
-      <button
-        class="clr-treenode-link"
-        [class.active]="annotationClass.active">
-        <clr-icon [attr.shape]="annotationClass.icon"></clr-icon>
-        {{annotationClass.name }}
-      </button>
     </clr-tree-node>
   </ng-template>
 </clr-tree-node>
