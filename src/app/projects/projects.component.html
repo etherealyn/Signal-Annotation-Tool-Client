@@ -6,10 +6,12 @@
 
 <clr-datagrid>
   <clr-dg-column>Title</clr-dg-column>
+  <clr-dg-column>Description</clr-dg-column>
   <clr-dg-column>Last Modification</clr-dg-column>
 
   <clr-dg-row *ngFor="let project of projects">
     <clr-dg-cell><a routerLink="/editor/{{project.id}}">{{project.title}}</a></clr-dg-cell>
+    <clr-dg-cell>{{project.description}}</clr-dg-cell>
     <clr-dg-cell>{{project.modified | date}}</clr-dg-cell>
   </clr-dg-row>
 
