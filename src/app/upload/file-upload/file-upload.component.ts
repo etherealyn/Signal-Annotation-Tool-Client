@@ -4,11 +4,11 @@ import { forkJoin, Observable } from 'rxjs';
 import { ProjectModel } from '../../models/project.model';
 
 @Component({
-  selector: 'app-upload-dialog',
-  templateUrl: './dialog.component.html',
-  styleUrls: [ './dialog.component.scss' ]
+  selector: 'app-file-upload',
+  templateUrl: './file-upload.component.html',
+  styleUrls: [ './file-upload.component.scss' ]
 })
-export class DialogComponent implements OnInit {
+export class FileUploadComponent implements OnInit {
   @Input() currentProject: ProjectModel;
 
   @ViewChild('file') file;

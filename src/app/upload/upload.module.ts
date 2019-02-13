@@ -4,13 +4,12 @@ import { CommonModule } from '@angular/common';
 import { ClarityModule } from '@clr/angular';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { DialogComponent } from './dialog/dialog.component';
+import { FileUploadComponent } from './file-upload/file-upload.component';
 import { UploadService } from './upload.service';
-import {FormsModule} from '@angular/forms';
-
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
-  declarations: [ DialogComponent ],
+  declarations: [ FileUploadComponent ],
   imports: [
     CommonModule,
     BrowserAnimationsModule,
@@ -18,9 +17,9 @@ import {FormsModule} from '@angular/forms';
     HttpClientModule,
     FormsModule
   ],
-  entryComponents: [ DialogComponent],
-  exports: [ DialogComponent ],
-  providers: [ UploadService]
+  entryComponents: [ FileUploadComponent ],
+  exports: [ FileUploadComponent ],
+  providers: [ UploadService ]
 })
 export class UploadModule {
 }
