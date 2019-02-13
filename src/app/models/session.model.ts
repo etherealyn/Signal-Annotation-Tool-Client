@@ -1,7 +1,7 @@
-import { User } from './user.model';
+import { UserModel } from './user.model';
 
-export class Session {
+export class SessionModel {
   accessToken: string;
   expiresIn: number;
-  user: User;
+  user: UserModel;
 }

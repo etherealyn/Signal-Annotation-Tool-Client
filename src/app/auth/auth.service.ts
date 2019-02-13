@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {catchError, map} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 
 import {environment} from '../../environments/environment';
-import {Session} from '../models/session.model';
-import {User} from '../models/user.model';
+import {SessionModel} from '../models/session.model';
+import {UserModel} from '../models/user.model';
 
 
 @Injectable({
@@ -15,26 +15,26 @@ export class AuthService {
 
   private authUrl = `${environment.apiUrl}/auth`;
 
-  private currentSessionSubject: BehaviorSubject<Session>;
-  public currentSession$: Observable<Session>;
+  private currentSessionSubject: BehaviorSubject<SessionModel>;
+  public currentSession$: Observable<SessionModel>;
 
   constructor(private http: HttpClient) {
-    this.currentSessionSubject = new BehaviorSubject<Session>(JSON.parse(localStorage.getItem('currentSession$')));
+    this.currentSessionSubject = new BehaviorSubject<SessionModel>(JSON.parse(localStorage.getItem('currentSession$')));
     this.currentSession$ = this.currentSessionSubject.asObservable();
   }
 
-  public get currentSessionValue(): Session {
+  public get currentSessionValue(): SessionModel {
     return this.currentSessionSubject.value;
   }
 
-  public get currentUserValue(): User {
+  public get currentUserValue(): UserModel {
     if (this.currentSessionSubject.value) {
       return this.currentSessionSubject.value.user;
     }
   }
 
   login(username: string, password: string): Observable<any> {
-    return this.http.post<Session>(this.authUrl, {username, password})
+    return this.http.post<SessionModel>(this.authUrl, {username, password})
       .pipe(map(session => {
           if (session && session.user && session.accessToken) {
             localStorage.setItem('currentSession$', JSON.stringify(session));

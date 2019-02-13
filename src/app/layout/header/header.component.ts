@@ -1,8 +1,8 @@
 import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
 import {Router, RouterEvent} from '@angular/router';
 import {AuthService} from '../../auth/auth.service';
-import {Session} from '../../models/session.model';
-import {User} from '../../models/user.model';
+import {SessionModel} from '../../models/session.model';
+import {UserModel} from '../../models/user.model';
 import {Subscription} from 'rxjs';
 import {
   trigger,
@@ -41,7 +41,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isEditorActive = false;
   isHeaderVisible = true;
 
-  private user: User;
+  private user: UserModel;
   private subscription: Subscription;
   editorLink = '/';
 
@@ -65,7 +65,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     });
 
     this.subscription.add(
-      this.authService.currentSession$.subscribe((x: Session) => {
+      this.authService.currentSession$.subscribe((x: SessionModel) => {
         if (x && x.user) {
           this.user = x.user;
         }

@@ -1,5 +1,5 @@
 import { DirectoryModel } from './directory.model';
-import { AnnotationClass } from './annotation-class.model';
+import { LabelModel } from './label.model';
 
 export class ProjectModel {
   constructor(
@@ -9,6 +9,6 @@ export class ProjectModel {
     public ownerId?: string,
     public description?: string,
     public fileTree?: DirectoryModel,
-    public annotationClasses?: AnnotationClass[],
+    public labels?: LabelModel[],
   ) {}
 }

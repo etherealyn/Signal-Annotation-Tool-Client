@@ -1,6 +1,6 @@
 
 
-export class UserAuthorization {
+export class UserAuthModel {
 
   constructor(
     public username: string,

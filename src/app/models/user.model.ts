@@ -1,6 +1,6 @@
 
 
-export class User {
+export class UserModel {
   id: string;
   username: string;
   email: string;
