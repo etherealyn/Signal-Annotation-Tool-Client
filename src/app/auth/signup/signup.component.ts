@@ -20,15 +20,11 @@ export class SignupComponent implements OnInit {
   error = false;
   arePasswordsSame = false;
   message = '';
+  errorMessage = '';
+
   signupBtnState: ClrLoadingState = ClrLoadingState.DEFAULT;
   complete = false;
 
-  /**
-   * 1. Enter credentials
-   * 2. Request the server to create this user
-   * 3. Wait for an answer: if success redirect to projects overview
-   * 4. if failure notify user of the failure and allow sending request again
-   * */
   constructor(private authService: AuthService,
               private router: Router) {
   }
@@ -60,6 +56,8 @@ export class SignupComponent implements OnInit {
           console.error('authService.error: ', error);
           this.signupBtnState = ClrLoadingState.ERROR;
           this.error = true;
+          this.errorMessage = error;
+          this.loading = false;
         }
       );
   }
