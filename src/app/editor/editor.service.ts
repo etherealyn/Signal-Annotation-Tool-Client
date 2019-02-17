@@ -12,6 +12,12 @@ export class EditorService {
   private currentProjectSubject: BehaviorSubject<ProjectModel>;
   private readonly currentProject$: Observable<ProjectModel>;
 
+  // private currentFileSubject: BehaviorSubject<FileTreeModel>;
+  // private readonly currentFileTree$: Observable<FileTreeModel>;
+  //
+  // private currentLabelsSubject: BehaviorSubject<LabelModel[]>;
+  // private currentLabels: Observable<LabelModel[]>;
+
   private openFilesSubject: BehaviorSubject<Map<string, FileModel>>;
   private readonly openFiles$: Observable<Map<string, FileModel>>;
 
@@ -24,7 +30,7 @@ export class EditorService {
   }
 
   loadProject(id: string) {
-    const currentProject = this.currentProjectSubject.getValue();
+    const currentProject = this.getCurrentProjectValue();
     if (!currentProject || (currentProject && currentProject.id !== id)) {
       this.projectsService.getProject(id)
         .toPromise()
@@ -36,6 +42,10 @@ export class EditorService {
     return this.currentProject$;
   }
 
+  private getCurrentProjectValue(): ProjectModel {
+    return this.currentProjectSubject.getValue();
+  }
+
   openFile(fileModel: FileModel) {
     const openFiles: Map<string, FileModel> = this.openFilesSubject.getValue();
     openFiles.set(fileModel.name, fileModel);
@@ -44,5 +54,9 @@ export class EditorService {
 
   getOpenFiles$() {
     return this.openFiles$;
+  }
+
+  addLabel(name: string) {
+    console.log('add label', name);
   }
 }

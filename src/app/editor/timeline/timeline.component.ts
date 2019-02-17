@@ -74,12 +74,6 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
     this.timeline.focus(id);
   }
 
-  addItem(id: number, groupId: number, start: number | string, end: number | string) {
-    const item: DataItem = {id: id, group: groupId, content: 'item ' + id, start: start, end: end};
-    this.items.add(item);
-    this.timeline.focus(id);
-  }
-
   updateItem(id: number, endTime: number) {
     const item: DataItem = this.items.get(id);
     if (item) {

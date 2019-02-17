@@ -13,7 +13,10 @@
       [(clrVerticalNavCollapsed)]="isNavCollapsed"
       [ngStyle]="getWidth()">
 
-      <app-filetree *ngIf="!isNavCollapsed"></app-filetree>
+      <div *ngIf="!isNavCollapsed">
+        <app-filetree></app-filetree>
+        <app-label-tree></app-label-tree>
+      </div>
 
     </clr-vertical-nav>
   </div>

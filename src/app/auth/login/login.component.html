@@ -1,40 +1,31 @@
-<div class="login-wrapper">
-  <form class="login" (ngSubmit)="onSubmit()" #authForm="ngForm">
-    <section class="title">
-      <h3 class="welcome">Login to</h3>
-      Signal Annotation Tool
-      <!--<h5 class="hint">Use your Company ID to sign in or create one now</h5>-->
-    </section>
-    <div class="login-group">
-      <!--<clr-select-container>-->
-      <!--<select clrSelect name="type" [(ngModel)]="authModel.type">-->
-      <!--<option value="local">Local Users</option>-->
-      <!--<option value="admin">Administrator</option>-->
-      <!--</select>-->
-      <!--</clr-select-container>-->
-      <clr-input-container>
-        <input type="text" name="username" clrInput placeholder="Username or email"
-               [(ngModel)]="authModel.username"/>
-      </clr-input-container>
+<form class="login" (ngSubmit)="onSubmit()" #loginForm="ngForm">
+  <section class="title">
+    <h3 class="welcome">Login to</h3>
+    {{appName}}
+  </section>
 
-      <clr-password-container>
-        <input type="password" name="password" clrPassword placeholder="Password"
-               [(ngModel)]="authModel.password"/>
-      </clr-password-container>
+  <div class="login-group">
+    <clr-input-container>
+      <input type="text" name="username" clrInput placeholder="Username or email"
+             [(ngModel)]="authModel.username"/>
+    </clr-input-container>
 
-      <clr-checkbox-wrapper>
-        <label>Remember me
-        </label>
-        <input type="checkbox" name="rememberMe" clrCheckbox
-               [(ngModel)]="authModel.rememberMe"/>
-      </clr-checkbox-wrapper>
+    <clr-password-container>
+      <input type="password" name="password" clrPassword placeholder="Password"
+             [(ngModel)]="authModel.password"/>
+    </clr-password-container>
 
-      <div class="error active" *ngIf="error">
-        {{errorMessage}}
-      </div>
-      <!--<span class="spinner spinner-lg" *ngIf="loading">Loading...</span>-->
-      <button [clrLoading]="loginBtnState" type="submit" class="btn btn-primary">LOGIN</button>
-      <a href="javascript://" class="signup">Register</a>
+    <clr-checkbox-wrapper>
+      <label>Remember me
+      </label>
+      <input type="checkbox" name="rememberMe" clrCheckbox
+             [(ngModel)]="authModel.rememberMe"/>
+    </clr-checkbox-wrapper>
+
+    <div class="error active" *ngIf="error">
+      {{errorMessage}}
     </div>
-  </form>
-</div>
+    <button [clrLoading]="loginBtnState" type="submit" class="btn btn-primary">LOGIN</button>
+    <button class="btn btn-outline signup" (click)="onRegisterClick()">Register</button>
+  </div>
+</form>

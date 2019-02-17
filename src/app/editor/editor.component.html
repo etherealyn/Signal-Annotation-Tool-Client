@@ -9,9 +9,11 @@
         <as-split [direction]="direction">
           <as-split-area size="50">
             <app-videogrid [videos]="videos" (playerReady)='onPlayerReady($event)'></app-videogrid>
+            <!--<p *ngIf="isEmpty(videos)" class="no-data">Start by uploading some videos.</p>-->
           </as-split-area>
           <!-- horizontal split center-->
           <as-split-area size="50">
+            <!--<p *ngIf="isEmpty(classes)" class="no-data">And creating some labels.</p>-->
             <app-recorder [labellingClasses]="classes"></app-recorder>
           </as-split-area>
         </as-split>

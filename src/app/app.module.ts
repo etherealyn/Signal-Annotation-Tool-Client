@@ -13,11 +13,6 @@ import { AuthModule } from './auth/auth.module';
 import { ErrorInterceptor } from './auth/error.interceptor';
 import { JwtInterceptor } from './auth/jwt.interceptor';
 
-import { VgBufferingModule } from 'videogular2/buffering';
-import { VgOverlayPlayModule } from 'videogular2/overlay-play';
-import { VgControlsModule } from 'videogular2/controls';
-import { VgCoreModule } from 'videogular2/core';
-
 @NgModule({
   declarations: [
     AppComponent,

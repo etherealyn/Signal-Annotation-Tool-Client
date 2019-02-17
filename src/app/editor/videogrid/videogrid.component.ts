@@ -2,6 +2,8 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { VgAPI } from 'videogular2/core';
 import { IVideo } from '../video/video.interface';
 import { throttleTime } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
+import { IMediaSubscriptions } from 'videogular2/src/core/vg-media/i-playable';
 
 @Component({
   selector: 'app-videogrid',
@@ -9,6 +11,8 @@ import { throttleTime } from 'rxjs/operators';
   styleUrls: [ './videogrid.component.scss' ]
 })
 export class VideogridComponent implements OnInit {
+  constructor() {
+  }
 
   @Input() videos: IVideo[];
   @Output() playerReady = new EventEmitter();
@@ -17,25 +21,28 @@ export class VideogridComponent implements OnInit {
   guard = 0;
   isPlaying = false;
 
-  private playbackIndex = 3;
-  playbackValues: string[] = [ '0.25', '0.5', '0.75', '1.0', '1.25', '1.50', '1.75', '2.0' ];
-
-  lastMouseLeft = 0;
+  playbackValues: string[] = [ '0.25', '0.5', '0.75', '1.0', '1.25', '1.50', '1.75', '2.0', '3.0', '4.0', '5.0' ];
 
   currentTime = 0;
-  max = 100;
 
-  constructor() {
-  }
+  private playbackIndex = 3;
+  private progressDelayMilli = 50;
+  private lastMouseLeft = 0;
+
+  private timeUpdateSubscription: Subscription;
 
   ngOnInit() {
   }
 
   onPlay() {
-    this.apis.forEach((api: VgAPI) => {
-      api.play();
-    });
-    this.isPlaying = true;
+    if (this.apis) {
+      this.apis.forEach((api: VgAPI) => {
+        api.play();
+      });
+      this.isPlaying = true;
+    } else {
+      console.error('There are no videos to play');
+    }
   }
 
   onPlayerReady(api: VgAPI) {
@@ -46,9 +53,10 @@ export class VideogridComponent implements OnInit {
     this.apis.push(api);
 
     if (this.apis.length === 1) {
-      const head = this.apis[0];
-      head.subscriptions.timeUpdate.pipe(throttleTime(50)).subscribe(() => {
-        this.currentTime = (head.currentTime / head.duration) * 100;
+      const master = this.apis[0];
+      master.subscriptions.timeUpdate.pipe(throttleTime(this.progressDelayMilli)).subscribe(() => {
+        // this.currentTime = (master.currentTime / master.duration) * 100;
+        this.currentTime = master.currentTime;
       });
     }
 
@@ -57,13 +65,12 @@ export class VideogridComponent implements OnInit {
     }
   }
 
-  setTime(value) {
+  seekTime(value) {
     if (this.guard % 2 === 0) {
       /** This funny logic is due to a bug on Webkit-based browsers, leading to change firing twice */
       this.guard += 1;
       this.apis.forEach((api: VgAPI) => {
-        // api.getDefaultMedia().currentTime = value;
-        api.seekTime(value, true);
+        api.seekTime(value); // fixme
       });
     } else {
       this.guard = 0;
@@ -108,5 +115,9 @@ export class VideogridComponent implements OnInit {
 
   getPlaybackValue() {
     return this.playbackValues[this.playbackIndex];
+  }
+
+  getDuration() {
+
   }
 }

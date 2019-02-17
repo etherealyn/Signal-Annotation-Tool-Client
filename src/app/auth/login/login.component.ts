@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 
 import { UserAuthModel } from '../../models/user.authorization.model';
 import { AuthService } from '../auth.service';
@@ -7,11 +7,15 @@ import { Subscription } from 'rxjs';
 import { ClrLoadingState } from '@clr/angular';
 
 @Component({
-  selector: 'app-auth',
+  selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit, OnDestroy {
+
+  @Input() appName: string;
+  @Output() onRegisterIntent = new EventEmitter();
+
   authModel = new UserAuthModel('', '', true);
 
   returnUrl: string;
@@ -47,6 +51,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this._subscription = this.authService.login(this.authModel.username, this.authModel.password)
       .subscribe(
         data => {
+
           if (data) {
             this.loading = false;
             this.loginBtnState = ClrLoadingState.SUCCESS;
@@ -62,9 +67,9 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.loginBtnState = ClrLoadingState.ERROR;
 
           if (error === 'Unknown Error') {
-            this.errorMessage = 'An error occured. Please, try to reload the page.';
+            this.errorMessage = 'An unknown error occured';
           } else if (error === 'Forbidden') {
-            this.errorMessage = 'Such username and password combination does not match any our records.';
+            this.errorMessage = 'Username and password combination is unknown';
           }
         });
   }
@@ -73,5 +78,9 @@ export class LoginComponent implements OnInit, OnDestroy {
     if (this._subscription) {
       this._subscription.unsubscribe();
     }
+  }
+
+  onRegisterClick() {
+    this.onRegisterIntent.emit();
   }
 }

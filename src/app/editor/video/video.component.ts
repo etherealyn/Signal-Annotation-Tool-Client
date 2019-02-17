@@ -1,5 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import { VgAPI } from 'videogular2/core';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-video',
@@ -12,7 +13,10 @@ export class VideoComponent implements OnInit {
 
   api: VgAPI;
   url: String = 'http://localhost:8080/api/projects/files';
-  playbackValues: string[] = [ '1', '2' ];
+
+  duration = 0;
+
+  private subscription: Subscription;
 
   constructor() {
   }
@@ -23,5 +27,9 @@ export class VideoComponent implements OnInit {
   onPlayerReady$(api: VgAPI) {
     this.api = api;
     this.playerReady.emit(api);
+
+    this.subscription = api.subscriptions.durationChange.subscribe(() => {
+      this.duration = api.duration;
+    });
   }
 }

@@ -15,6 +15,10 @@ import { VgAPI } from 'videogular2/core';
   styleUrls: [ './editor.component.scss' ]
 })
 export class EditorComponent implements OnInit, OnDestroy {
+  constructor(private route: ActivatedRoute,
+              private router: Router,
+              private editorService: EditorService) {
+  }
   project: ProjectModel;
   videos: IVideo[] = [];
 
@@ -22,13 +26,20 @@ export class EditorComponent implements OnInit, OnDestroy {
 
   direction = 'horizontal';
   @ViewChild(VideogridComponent) videoGrid: VideogridComponent;
-  @ViewChild(RecorderComponent) annotation: RecorderComponent;
+  @ViewChild(RecorderComponent) recorder: RecorderComponent;
 
   classes: string[] = [ 'Aurora', 'Clouds', 'Lights' ];
+  // classes: string[] = [];
 
-  constructor(private route: ActivatedRoute,
-              private router: Router,
-              private editorService: EditorService) {
+  isEmpty(xs: any[]): boolean {
+    if (!xs) {
+      return true;
+    } else {
+      if (xs.length === 0) {
+        return true;
+      }
+    }
+    return false;
   }
 
   ngOnInit() {
@@ -38,6 +49,7 @@ export class EditorComponent implements OnInit, OnDestroy {
     this.subscription = this.editorService.getCurrentProject$().subscribe(project => {
       if (project && project.id === projectId) {
         this.project = project;
+        console.log(project);
 
         /** Gather all videos */
         const videos: IVideo[] = [];
@@ -59,13 +71,6 @@ export class EditorComponent implements OnInit, OnDestroy {
       this.classes = [ ...this.classes, 'Cosmos without hatered' ];
     }, 2000);
 
-    setTimeout(() => {
-      console.log('changing classes again');
-      const newClasses = [ ...this.classes ];
-      newClasses.pop();
-      this.classes = newClasses;
-    }, 3000);
-
     // this.subscription.add(this.editorService.getOpenFiles$().subscribe(files => {
     //   console.log(files);
     // }));
@@ -86,10 +91,10 @@ export class EditorComponent implements OnInit, OnDestroy {
   }
 
   onClear() {
-    this.annotation.clearLabels();
+    this.recorder.clearLabels();
   }
 
   onPlayerReady(vgApi: VgAPI) {
-    this.annotation.setVgApi(vgApi);
+    this.recorder.setVgApi(vgApi);
   }
 }
