@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { EditorService } from '../../editor/editor.service';
 import { ProjectModel } from '../../models/project.model';
 import { Subscription } from 'rxjs';
@@ -83,6 +83,7 @@ export class FiletreeComponent implements OnInit, OnDestroy {
   }
 
   onFileDelete(filename: string) {
-    console.log(filename);
+    this.editorService.deleteFile(filename);
+    console.error('FileTree.onFileDelete', 'Not Implemented'); // fixme
   }
 }

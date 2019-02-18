@@ -50,13 +50,13 @@ export class LabelTreeComponent implements OnInit {
   addNewLabel() {
     const index = this.annotationsFolder.files.length + 1;
     const name = `Label ${index}`;
+    this.editorService.addLabel(name);
+
     this.annotationsFolder.files.push({
       name: name,
       icon: 'tag',
       active: false
     });
-
-    this.editorService.addLabel(name);
   }
 
   onLabelDelete(i: number) {

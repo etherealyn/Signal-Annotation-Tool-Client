@@ -2,15 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpEventType, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { ProjectsService } from '../projects/projects.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UploadService {
 
-  baseUrl = `${environment.apiUrl}`;
-
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,
+              private projectsService: ProjectsService) {
+  }
 
   public uploadToProject(id: string, files: Set<File>) {
     /* the resulting map*/
@@ -22,10 +23,7 @@ export class UploadService {
       formData.append('file', file, file.name);
 
       /* create a http-post request and pass the form, report the upload progress */
-      const req = new HttpRequest('POST',
-        `${this.baseUrl}/projects/upload/${id}`, formData, {
-          reportProgress: true
-        });
+      const req = new HttpRequest('POST', `${this.projectsService.projectsUrl}/upload/${id}`, formData, { reportProgress: true});
 
       /* create a new progress subject for every file*/
       const progress = new Subject<number>();
@@ -43,9 +41,7 @@ export class UploadService {
       });
 
       /* Save every progress-observable in a map of all observables*/
-      status[file.name] = {
-        progress: progress.asObservable()
-      };
+      status[file.name] = { progress: progress.asObservable() };
     });
     return status;
   }

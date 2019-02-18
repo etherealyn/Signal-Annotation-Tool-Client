@@ -1,6 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import { VgAPI } from 'videogular2/core';
 import { Subscription } from 'rxjs';
+import { ProjectsService } from '../../projects/projects.service';
 
 @Component({
   selector: 'app-video',
@@ -12,13 +13,14 @@ export class VideoComponent implements OnInit {
   @Output() playerReady: EventEmitter<any> = new EventEmitter();
 
   api: VgAPI;
-  url: String = 'http://localhost:8080/api/projects/files';
+  url: String;
 
   duration = 0;
 
   private subscription: Subscription;
 
-  constructor() {
+  constructor(private projectsService: ProjectsService) {
+    this.url = `${projectsService.projectsUrl}/files`;
   }
 
   ngOnInit() {

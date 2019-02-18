@@ -33,7 +33,6 @@ export class SignupComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log('onSubmit');
     this.loading = true;
     this.signupBtnState = ClrLoadingState.LOADING;
     this.error = false;

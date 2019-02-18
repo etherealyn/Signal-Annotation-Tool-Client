@@ -5,25 +5,32 @@ import { catchError, map, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 import { ProjectModel } from '../models/project.model';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProjectsService {
 
-  private projectsUrl = `${environment.apiUrl}/projects`;
+  projectsUrl = `${environment.apiUrl}/project`;
 
   private projectsSubject: BehaviorSubject<ProjectModel[]>;
   currentProjects$: Observable<ProjectModel[]>;
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private authService: AuthService,
+    private http: HttpClient
+  ) {
     this.projectsSubject = new BehaviorSubject<ProjectModel[]>([]);
     this.currentProjects$ = this.projectsSubject.asObservable();
-    this.getProjects().toPromise().then((value => this.projectsSubject.next(value)));
+    this.getProjects().toPromise().then((value => {
+      this.projectsSubject.next(value);
+    }));
   }
 
   getProjects(): Observable<ProjectModel[]> {
-    return this.http.get<ProjectModel[]>(`${this.projectsUrl}`)
+    const userId = this.authService.currentUserValue.id;
+    return this.http.get<ProjectModel[]>(`${this.projectsUrl}/all/${userId}`)
       .pipe(
         catchError(this.handleError('getProjects', []))
       );
@@ -66,5 +73,9 @@ export class ProjectsService {
       // Let the app keep running by returning an empty result.
       return of(result as T);
     };
+  }
+
+  deleteFile(id: string, filename: string) {
+    console.log(id, filename);
   }
 }

@@ -28,19 +28,6 @@ export class EditorComponent implements OnInit, OnDestroy {
   @ViewChild(VideogridComponent) videoGrid: VideogridComponent;
   @ViewChild(RecorderComponent) recorder: RecorderComponent;
 
-  classes: string[] = [ 'Aurora', 'Clouds', 'Lights' ];
-  // classes: string[] = [];
-
-  isEmpty(xs: any[]): boolean {
-    if (!xs) {
-      return true;
-    } else {
-      if (xs.length === 0) {
-        return true;
-      }
-    }
-    return false;
-  }
 
   ngOnInit() {
     /** Get project id from the current route */
@@ -49,7 +36,6 @@ export class EditorComponent implements OnInit, OnDestroy {
     this.subscription = this.editorService.getCurrentProject$().subscribe(project => {
       if (project && project.id === projectId) {
         this.project = project;
-        console.log(project);
 
         /** Gather all videos */
         const videos: IVideo[] = [];
@@ -64,16 +50,8 @@ export class EditorComponent implements OnInit, OnDestroy {
         this.videos = videos;
       }
     });
+
     this.editorService.loadProject(projectId);
-
-    setTimeout(() => {
-      console.log('changing classes');
-      this.classes = [ ...this.classes, 'Cosmos without hatered' ];
-    }, 2000);
-
-    // this.subscription.add(this.editorService.getOpenFiles$().subscribe(files => {
-    //   console.log(files);
-    // }));
   }
 
   ngOnDestroy(): void {
@@ -95,6 +73,6 @@ export class EditorComponent implements OnInit, OnDestroy {
   }
 
   onPlayerReady(vgApi: VgAPI) {
-    this.recorder.setVgApi(vgApi);
+    // this.recorder.setVgApi(vgApi); // fixme
   }
 }

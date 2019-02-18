@@ -41,13 +41,13 @@ export class AuthService {
 
     if (error.error instanceof ErrorEvent) {
       // A client-side or network error occurred. Handle it accordingly.
-      console.log('An error occurred:', error.error.message);
+      console.log('An client-side error occurred:', error.error.message);
     } else {
       // The backend returned an unsuccessful response code.
       // The response body may contain clues as to what went wrong,
       switch (error.status) {
         case 400:
-          message = 'Please try to refresh the page';
+          message = 'Please try to reloadCurrentProject the page';
           break;
         case 500:
           message = 'The server is unable to fulfill the request. Please contact your system administrator';
