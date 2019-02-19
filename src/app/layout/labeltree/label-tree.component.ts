@@ -32,6 +32,14 @@ export class LabelTreeComponent implements OnInit {
           this.annotationsFolder = this.buildAnnotationsTree(this.project.labels);
         }
       });
+
+    this.subscription.add(this.labelService.getLabels$().subscribe(value => {
+      const projectId = value.projectId;
+      const labels = value.labels;
+      if (this.project.id === projectId) {
+        this.annotationsFolder = this.buildAnnotationsTree(labels);
+      }
+    }));
   }
 
   buildAnnotationsTree(classes: LabelModel[]) {
@@ -62,12 +70,12 @@ export class LabelTreeComponent implements OnInit {
 
     this.labelService.addLabel({ projectId, authorId, name });
 
-    this.annotationsFolder.files.push({ name: name, icon: 'tag', active: false });
+    // this.annotationsFolder.files.push({ name: name, icon: 'tag', active: false });
   }
 
   onLabelDelete(i: number) {
 
-    // this.labelService.deleteLabel(labelId);
+    this.labelService.deleteLabel(this.project.id, i);
 
     this.annotationsFolder.files.splice(i, 1);
   }

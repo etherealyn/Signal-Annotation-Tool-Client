@@ -1,6 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 import { LabelPayload } from './label.payload';
+import { LabelModel } from '../models/label.model';
+
+interface Labels {
+  projectId: string;
+  labels: LabelModel[];
+}
 
 @Injectable({
   providedIn: 'root'
@@ -8,21 +14,20 @@ import { LabelPayload } from './label.payload';
 export class LabelsService {
 
   constructor(private socket: Socket) {
-    this.socket.fromEvent('addLabel').subscribe(value => console.log(value));
 
-    this.socket.on('connect', function () {
+    this.socket.on('connect', () => {
       console.log('Connected');
     });
 
-    this.socket.on('addLabel', function (data) {
+    this.socket.on('addLabel', data => {
       console.log('addLabel', data);
     });
 
-    this.socket.on('editLabel', function (data) {
+    this.socket.on('editLabel', data => {
       console.log('editLabel', data);
     });
 
-    this.socket.on('disconnect', function () {
+    this.socket.on('disconnect', () => {
       console.log('Disconnected');
     });
   }
@@ -31,11 +36,15 @@ export class LabelsService {
     this.socket.emit('addLabel', payload);
   }
 
+  getLabels$() {
+    return this.socket.fromEvent<Labels>('getLabels');
+  }
+
   editLabelName(payload: LabelPayload) {
     this.socket.emit('editLabel', payload);
   }
 
-  deleteLabel(labelId: string) {
-    this.socket.emit('deleteLabel', labelId);
+  deleteLabel(projectId: string, index: number) {
+    this.socket.emit('deleteLabel', {projectId, index});
   }
 }
