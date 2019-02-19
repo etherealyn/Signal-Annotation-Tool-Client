@@ -25,7 +25,7 @@
         <clr-icon [attr.shape]="file.icon"></clr-icon>
         {{file.name }}
       </button>
-      <div>
+      <div *ngIf="false">
         <button class="btn btn-link btn-icon" (click)="onFileDelete(file.filename)">
           <clr-icon shape="trash"></clr-icon>
         </button>
