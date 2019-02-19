@@ -16,9 +16,9 @@
     </clr-password-container>
 
     <clr-checkbox-wrapper>
-      <label>Remember me
+      <label for="rememberMe">Remember me
       </label>
-      <input type="checkbox" name="rememberMe" clrCheckbox
+      <input type="checkbox" id="rememberMe" name="rememberMe" clrCheckbox
              [(ngModel)]="authModel.rememberMe"/>
     </clr-checkbox-wrapper>
 
@@ -26,6 +26,6 @@
       {{errorMessage}}
     </div>
     <button [clrLoading]="loginBtnState" type="submit" class="btn btn-primary">LOGIN</button>
-    <button class="btn btn-outline signup" (click)="onRegisterClick()">Register</button>
+    <button class="btn btn-outline signup" (click)="onRegisterClick()">Register instead</button>
   </div>
 </form>

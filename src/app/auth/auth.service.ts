@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 import { SessionModel } from '../models/session.model';
@@ -41,7 +41,7 @@ export class AuthService {
 
     if (error.error instanceof ErrorEvent) {
       // A client-side or network error occurred. Handle it accordingly.
-      console.log('An client-side error occurred:', error.error.message);
+      message = error.error.message;
     } else {
       // The backend returned an unsuccessful response code.
       // The response body may contain clues as to what went wrong,

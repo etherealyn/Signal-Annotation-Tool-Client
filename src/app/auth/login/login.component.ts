@@ -14,7 +14,7 @@ import { ClrLoadingState } from '@clr/angular';
 export class LoginComponent implements OnInit, OnDestroy {
 
   @Input() appName: string;
-  @Output() onRegisterIntent = new EventEmitter();
+  @Output() registerIntent = new EventEmitter();
 
   authModel = new UserAuthModel('', '', true);
 
@@ -66,7 +66,6 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.error = true;
           this.loginBtnState = ClrLoadingState.ERROR;
 
-          console.log(error);
           this.errorMessage = 'An unknown error occured';
 
           if (error === 'Forbidden') {
@@ -82,6 +81,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   onRegisterClick() {
-    this.onRegisterIntent.emit();
+    this.registerIntent.emit();
   }
 }
