@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError} from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 import { ProjectModel } from '../models/project.model';
@@ -12,11 +12,6 @@ import { AuthService } from '../auth/auth.service';
 })
 export class ProjectsService {
 
-  projectsUrl = `${environment.apiUrl}/project`;
-
-  private projectsSubject: BehaviorSubject<ProjectModel[]>;
-  currentProjects$: Observable<ProjectModel[]>;
-
   constructor(
     private authService: AuthService,
     private http: HttpClient
@@ -26,6 +21,15 @@ export class ProjectsService {
     this.getProjects().toPromise().then((value => {
       this.projectsSubject.next(value);
     }));
+  }
+
+  projectsUrl = `${environment.apiUrl}/project`;
+
+  private projectsSubject: BehaviorSubject<ProjectModel[]>;
+  currentProjects$: Observable<ProjectModel[]>;
+
+  static deleteFile(id: string, filename: string) {
+    console.log(id, filename);
   }
 
   getProjects(): Observable<ProjectModel[]> {
@@ -75,7 +79,9 @@ export class ProjectsService {
     };
   }
 
-  deleteFile(id: string, filename: string) {
-    console.log(id, filename);
+  reload() {
+    this.getProjects().toPromise().then((value => {
+      this.projectsSubject.next(value);
+    }));
   }
 }
