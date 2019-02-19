@@ -36,7 +36,7 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
     // create a data set with groups
     const groups = new vis.DataSet();
     for (let g = 0; g < this.groupNames.length; g++) {
-      groups.add({id: g, content: this.groupNames[g]});
+      groups.add({ id: g, content: this.groupNames[g] });
     }
 
     // create a dataset with items
@@ -56,7 +56,7 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
     }*/
 
     this.items = new vis.DataSet([
-      {id: -1, group: 0, className: 'expected', content: 'hidden item (you normally shouldnt see this)', start: -100},
+      { id: -1, group: 0, className: 'expected', content: 'hidden item (you normally shouldnt see this)', start: -100 },
     ]);
 
     // create visualization
@@ -69,7 +69,7 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   addItemBox(id: number, groupId: number, start: number | string) {
-    const item: DataItem = {id: id, group: groupId, content: 'item ' + id, start: start, end: start};
+    const item: DataItem = { id: id, group: groupId, content: 'item ' + id, start: start, end: start };
     this.items.add(item);
     this.timeline.focus(id);
   }

@@ -66,9 +66,10 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.error = true;
           this.loginBtnState = ClrLoadingState.ERROR;
 
-          if (error === 'Unknown Error') {
-            this.errorMessage = 'An unknown error occured';
-          } else if (error === 'Forbidden') {
+          console.log(error);
+          this.errorMessage = 'An unknown error occured';
+
+          if (error === 'Forbidden') {
             this.errorMessage = 'Username and password combination is unknown';
           }
         });

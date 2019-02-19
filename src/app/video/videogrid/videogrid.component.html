@@ -1,6 +1,6 @@
-<div (mouseleave)="onGlobalMouseLeave()" *ngIf="videos && videos.length !== 0">
-  <mat-grid-list cols="{{videos.length === 1 ? '1' : '2'}}" rowHeight="2:1">
-    <mat-grid-tile *ngFor="let video of videos; let i = index">
+<div (mouseleave)="onGlobalMouseLeave()" *ngIf="videoSources && videoSources.length !== 0">
+  <mat-grid-list cols="{{videoSources.length === 1 ? '1' : '2'}}" rowHeight="2:1">
+    <mat-grid-tile *ngFor="let video of videoSources; let i = index">
       <app-video
         source='{{video.source}}' (playerReady)="onPlayerReady($event)"
         (mouseenter)='onMouseEnter(i)'
@@ -20,8 +20,7 @@
     </div>
 
     <div style='width: 80%; height: 100%; text-align: center'>
-      <input id="timeSelector" type="range" min="0" max="{{getDuration()}}" class="slider" [(ngModel)]="currentTime"
-             (ngModelChange)="seekTime($event)" value="0">
+      <input id="timeSelector" type="range" min="0" max="{{duration}}" class="slider" [(ngModel)]="currentTime" (ngModelChange)="seekTime($event)" value="0">
       <!--<output for="timeSelector">{{currentTime | number:'1.0-0'}}%</output>-->
     </div>
   </div>

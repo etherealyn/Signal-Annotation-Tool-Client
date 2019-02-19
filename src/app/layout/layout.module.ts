@@ -10,6 +10,7 @@ import { FiletreeComponent } from './filetree/filetree.component';
 import { UploadModule } from '../upload/upload.module';
 
 import { LabelTreeComponent } from './labeltree/label-tree.component';
+import { LabelsModule } from '../labels/labels.module';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { LabelTreeComponent } from './labeltree/label-tree.component';
     CommonModule,
     ClarityModule,
     AppRouting,
-    UploadModule
+    UploadModule,
+    LabelsModule
   ],
   exports: [
     LayoutComponent,

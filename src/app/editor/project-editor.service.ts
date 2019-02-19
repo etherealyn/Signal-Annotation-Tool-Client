@@ -2,18 +2,23 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ProjectsService } from '../projects/projects.service';
 import { ProjectModel } from '../models/project.model';
+import { Socket } from 'ngx-socket-io';
 
 @Injectable({
   providedIn: 'root'
 })
-export class EditorService {
+export class ProjectEditorService {
 
   private currentProjectSubject: BehaviorSubject<ProjectModel>;
   private readonly currentProject$: Observable<ProjectModel>;
 
-  constructor(private projectsService: ProjectsService) {
+  constructor(private projectsService: ProjectsService, private socket: Socket) {
     this.currentProjectSubject = new BehaviorSubject(null);
     this.currentProject$ = this.currentProjectSubject.asObservable();
+
+    this.socket.emit('message', 'hi from project editor service', (data) => {
+      console.log(data);
+    });
   }
 
   loadProject(id: string) {
@@ -33,9 +38,6 @@ export class EditorService {
     return this.currentProjectSubject.getValue();
   }
 
-  addLabel(name: string) {
-    console.log('Add label', name);
-  }
 
   reloadCurrentProject() {
     this.projectsService.getProject(this.getCurrentProjectValue().id)

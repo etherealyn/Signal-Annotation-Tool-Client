@@ -12,6 +12,9 @@ import { EditorModule } from './editor/editor.module';
 import { AuthModule } from './auth/auth.module';
 import { ErrorInterceptor } from './auth/error.interceptor';
 import { JwtInterceptor } from './auth/jwt.interceptor';
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+
+const config: SocketIoConfig = { url: 'http://localhost:8080', options: {} };
 
 @NgModule({
   declarations: [
@@ -26,6 +29,7 @@ import { JwtInterceptor } from './auth/jwt.interceptor';
     LayoutModule,
     ProjectsModule,
     EditorModule,
+    SocketIoModule.forRoot(config)
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

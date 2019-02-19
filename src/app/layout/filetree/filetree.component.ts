@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { EditorService } from '../../editor/editor.service';
+import { ProjectEditorService } from '../../editor/project-editor.service';
 import { ProjectModel } from '../../models/project.model';
 import { Subscription } from 'rxjs';
 import { DirectoryModel } from '../../models/directory.model';
@@ -24,7 +24,7 @@ export class FiletreeComponent implements OnInit, OnDestroy {
 
   @ViewChild(FileUploadComponent) uploadDialog: FileUploadComponent;
 
-  constructor(private editorService: EditorService) {
+  constructor(private editorService: ProjectEditorService) {
   }
 
   ngOnInit() {
