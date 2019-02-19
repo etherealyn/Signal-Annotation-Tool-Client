@@ -1,4 +1,4 @@
-import {Component, HostListener, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Router, RouterEvent} from '@angular/router';
 import {AuthService} from '../../auth/auth.service';
 import {SessionModel} from '../../models/session.model';
@@ -45,6 +45,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private subscription: Subscription;
   editorLink = '/';
 
+
   constructor(private router: Router,
               private authService: AuthService) {
   }
@@ -83,12 +84,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.editorLink = '/';
   }
 
-  @HostListener('window:scroll', ['$event'])
-  onScroll(event) {
-  }
-
   onHide() {
     // todo: improve appearance
     this.isHeaderVisible = !this.isHeaderVisible;
+  }
+
+  get username() {
+    if (this.user) {
+      return this.user.username;
+    }
+    return '';
   }
 }
