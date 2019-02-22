@@ -8,14 +8,12 @@ import { AppRouting } from '../app.routing';
 
 import { ProjectsComponent } from './projects.component';
 import { ProjectModalComponent } from './project-modal/project-modal.component';
-import { InviteComponent } from './invite/invite.component';
 
 
 @NgModule({
   declarations: [
     ProjectsComponent,
     ProjectModalComponent,
-    InviteComponent
   ],
   imports: [
     CommonModule,
