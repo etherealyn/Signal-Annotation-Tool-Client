@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Socket } from 'ngx-socket-io';
 import { LabelPayload } from './label.payload';
 import { LabelModel } from '../models/label.model';
+import { LabelsSocket } from './labels.socket';
 
 interface Labels {
   projectId: string;
@@ -13,18 +13,10 @@ interface Labels {
 })
 export class LabelsService {
 
-  constructor(private socket: Socket) {
+  constructor(private socket: LabelsSocket) {
 
     this.socket.on('connect', () => {
       console.log('Connected');
-    });
-
-    this.socket.on('addLabel', data => {
-      console.log('addLabel', data);
-    });
-
-    this.socket.on('editLabel', data => {
-      console.log('editLabel', data);
     });
 
     this.socket.on('disconnect', () => {
