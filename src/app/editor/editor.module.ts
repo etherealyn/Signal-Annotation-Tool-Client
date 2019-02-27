@@ -8,12 +8,11 @@ import { AngularSplitModule } from 'angular-split';
 import { AppRouting } from '../app.routing';
 import { EditorComponent } from './editor.component';
 import { UploadModule } from '../upload/upload.module';
-import { RecorderComponent } from './recorder/recorder.component';
 import { TimelineComponent } from './timeline/timeline.component';
 import { VideoModule } from '../video/video.module';
 
 @NgModule({
-  declarations: [ EditorComponent, RecorderComponent, TimelineComponent ],
+  declarations: [ EditorComponent, TimelineComponent ],
   imports: [
     CommonModule,
     FormsModule,

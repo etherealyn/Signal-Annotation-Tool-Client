@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { VgAPI } from 'videogular2/core';
 import { IVideo } from '../video.interface';
 import { ProjectEditorService } from '../../editor/project-editor.service';
 import { LinkedList } from 'typescript-collections';
 import { IMediaSubscriptions } from 'videogular2/src/core/vg-media/i-playable';
+import { VideoService } from '../video.service';
 
 @Component({
   selector: 'app-videogrid',
@@ -25,24 +26,24 @@ export class VideogridComponent implements OnInit {
   private lastMouseLeft = 0;
 
   private playbackIndex = 3;
-  private playbackValues: string[] = [ '0.25', '0.5', '0.75', '1.0', '1.25', '1.50', '1.75', '2.0', '3.0', '4.0', ];
+  private playbackValues: string[] = [ '0.25', '0.5', '0.75', '1.0', '1.25', '1.50', '1.75', '2.0', '3.0' ];
 
   private subscription;
   private timeUpdateSubscription;
 
-
-  constructor(private projectEditorService: ProjectEditorService) {
+  constructor(private videoService: VideoService,
+              private editorService: ProjectEditorService) {
 
   }
 
   ngOnInit() {
-    this.subscription = this.projectEditorService.getCurrentProject$().subscribe(project => {
+    this.subscription = this.editorService.getCurrentProject$().subscribe(project => {
       if (project) {
         /** Gather all videoSources */
         const videos: IVideo[] = [];
         project.fileTree.children.forEach((child => {
           if (child.mimetype.startsWith('video')) {
-            videos.push({ source: child.filename });
+            videos.push({source: child.filename});
           }
         }));
 
@@ -53,6 +54,7 @@ export class VideogridComponent implements OnInit {
 
   private onPlayerReady(api: VgAPI) {
     this.apis.add(api);
+    this.videoService.onPlayerReady(api);
 
     if (this.timeUpdateSubscription) {
 
@@ -137,6 +139,13 @@ export class VideogridComponent implements OnInit {
 
   getPlaybackValue() {
     return this.playbackValues[this.playbackIndex];
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent) {
+    if (event.code === 'Space') {
+      this.onPlayPause();
+    }
   }
 
   /** Video Controls END*/

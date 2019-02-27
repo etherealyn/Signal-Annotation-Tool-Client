@@ -9,6 +9,7 @@ import { VgOverlayPlayModule } from 'videogular2/overlay-play';
 import { VgBufferingModule } from 'videogular2/buffering';
 import { ClarityModule } from '@clr/angular';
 import { FormsModule } from '@angular/forms';
+import { VideoService } from './video.service';
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import { FormsModule } from '@angular/forms';
     VgOverlayPlayModule,
     VgBufferingModule,
   ],
-  exports: [ VideogridComponent ]
+  exports: [ VideogridComponent ],
+  providers: [ VideoService]
 })
 export class VideoModule {
 }

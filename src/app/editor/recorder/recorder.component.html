@@ -1,8 +1,0 @@
-<div class="btn-group">
-  <div class="checkbox btn" *ngFor="let c of classes; let i = index">
-    <input type="checkbox" id="btn-demo-check-{{i}}" [checked]="c.buttonChecked" (change)='onCheckboxChange(c, i)'>
-    <label for="btn-demo-check-{{i}}" class="checkbox-button">{{c.name}}</label>
-  </div>
-</div>
-<br>
-<!--<app-timeline *ngIf="labellingClasses" [groupNames]="labellingClasses"></app-timeline>-->

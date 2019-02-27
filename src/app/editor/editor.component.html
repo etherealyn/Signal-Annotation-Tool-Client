@@ -1,7 +1,7 @@
 <!--<div class="vertical-line"></div>-->
 
-<!--<as-split direction="vertical">-->
-  <!--<as-split-area size="90">-->
+<as-split direction="vertical">
+  <as-split-area size="90">
     <div class="container">
       <div class="split-example">
         <!-- ********************************************************** -->
@@ -10,24 +10,23 @@
             <app-videogrid></app-videogrid>
           </as-split-area>
           <as-split-area size="50">
-            <app-recorder></app-recorder>
+            <app-timeline></app-timeline>
           </as-split-area>
         </as-split>
         <!-- ********************************************************** -->
       </div>
       <br>
     </div>
-  <!--</as-split-area>-->
-  <!--<as-split-area size="10">-->
-    <!--<div class="btns">-->
-      <!--<button class="btn btn-primary" (click)="onPlay()"> Play</button>-->
-      <!--<button class="btn btn-primary-outline" (click)="onPause()">Pause</button>-->
-      <!--<button class="btn btn-danger" (click)="onClear()">Clear Labels</button>-->
-      <!--<button class="btn btn-primary-outline">Undo</button>-->
-      <!--<button class="btn btn-primary-outline">Redo</button>-->
-      <!--<button class="btn btn-warning"-->
-              <!--(click)="direction = (direction === 'horizontal') ? 'vertical' : 'horizontal'">{{ 'Toggle direction: "' + direction + '"' }}</button>-->
-    <!--</div>-->
-  <!--</as-split-area>-->
-  <!-- vertical split end-->
-<!--</as-split>-->
+  </as-split-area>
+  <as-split-area size="10">
+    <div class="btns">
+      <button class="btn btn-primary"> Play</button>
+      <button class="btn btn-primary-outline">Pause</button>
+      <button class="btn btn-danger">Clear Labels</button>
+      <button class="btn btn-primary-outline">Undo</button>
+      <button class="btn btn-primary-outline">Redo</button>
+      <button class="btn btn-warning" (click)="direction = (direction === 'horizontal') ? 'vertical' : 'horizontal'">{{ 'Toggle direction: "' + direction + '"' }}</button>
+    </div>
+  </as-split-area>
+  <!-- vertical split end -->
+</as-split>
