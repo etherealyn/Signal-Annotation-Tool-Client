@@ -17,15 +17,15 @@
       <!--</button>-->
 
       <div class="clr-treenode-link">
-        <clr-icon [attr.shape]="label.icon"></clr-icon>
-        <!--<input type="text" name="example" value="{{label.name}}"/>-->
-        {{label.name}}
+        <!--<clr-icon [attr.shape]="label.icon"></clr-icon>-->
+        <input type="text" [(ngModel)]="label.name" (change)="onLabelNameChange(i)"/>
+        <!--{{label.name}}-->
       </div>
       <div>
         <!--<button class="btn btn-link btn-icon" (click)="onLabelHide(i)">-->
           <!--<clr-icon shape="eye-hide"></clr-icon>-->
         <!--</button>-->
-        <button class="btn btn-link btn-icon" (click)="onLabelDelete(i)">
+        <button class="btn btn-link btn-icon" (click)="onLabelDelete(label.id, i)">
           <clr-icon shape="trash"></clr-icon>
         </button>
       </div>

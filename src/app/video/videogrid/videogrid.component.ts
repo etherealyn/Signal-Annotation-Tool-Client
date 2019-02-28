@@ -137,15 +137,34 @@ export class VideogridComponent implements OnInit {
     });
   }
 
+  previousPlaybackSpeed() {
+    this.playbackIndex = (this.playbackIndex - 1) % this.playbackValues.length;
+    if (this.playbackIndex < 0) {
+      this.playbackIndex = this.playbackValues.length - 1;
+    }
+    this.apis.forEach((api: VgAPI) => {
+      api.playbackRate = (this.playbackValues[this.playbackIndex]);
+    });
+  }
+
   getPlaybackValue() {
     return this.playbackValues[this.playbackIndex];
   }
 
   @HostListener('window:keydown', ['$event'])
   onKeyDown(event: KeyboardEvent) {
-    if (event.code === 'Space') {
-      this.onPlayPause();
-    }
+    // console.log(event.code, event.shiftKey);
+    // if (event.code === 'Space') {
+    //   this.onPlayPause();
+    // }
+    //
+    // if (event.shiftKey) {
+    //   if (event.code === 'Period') {
+    //     this.nextPlaybackSpeed();
+    //   } else if (event.code === 'Comma') {
+    //     this.previousPlaybackSpeed();
+    //   }
+    // }
   }
 
   /** Video Controls END*/

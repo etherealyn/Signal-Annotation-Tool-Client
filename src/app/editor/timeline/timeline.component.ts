@@ -1,10 +1,8 @@
-import { Component, HostListener, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { Component, HostListener, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import * as vis from 'vis';
-import { DataItem, DataSet, DateType, IdType, Timeline, TimelineOptions } from 'vis';
+import { DataGroup, DataItem, DataSet, DateType, IdType, Timeline, TimelineOptions } from 'vis';
 import { LabelsService } from 'src/app/labels/labels.service';
-import { takeLast, pairwise, take, first, throttleTime, last } from 'rxjs/operators';
-import { map } from 'd3';
-import { LabelModel } from 'src/app/models/label.model';
+import { pairwise, throttleTime } from 'rxjs/operators';
 import { ProjectEditorService } from '../project-editor.service';
 import { Classification } from '../../models/classification';
 import { VideoService } from '../../video/video.service';
@@ -13,7 +11,6 @@ import { LinkedList } from 'typescript-collections';
 import { Subscription } from 'rxjs';
 import { IMediaSubscriptions } from 'videogular2/src/core/vg-media/i-playable';
 import { Range } from '../../models/range';
-import { Set } from 'typescript-collections';
 
 @Component({
   selector: 'app-timeline',
@@ -41,8 +38,8 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
     editable: true,
   };
   private timeline: Timeline;
-  private groups = new vis.DataSet();
-  private items: DataSet<DataItem> = new vis.DataSet();
+  private groups = new vis.DataSet<DataGroup>();
+  private items = new vis.DataSet<DataItem>();
   private playbackTimeId: IdType;
   private subscription: Subscription;
   private counter = 0;
@@ -69,34 +66,61 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
     [ 'Numpad9', 8 ]
   ]);
 
+  private static toggleRecording(cls: Classification) {
+    const prev = cls.buttonChecked;
+    cls.buttonChecked = !cls.buttonChecked;
+    if (prev === true && cls.buttonChecked === false) {
+      cls.isLabellingFinished = true;
+    }
+  }
+
   ngOnInit(): void {
-    console.log('ngOnInit');
-    console.log('ngOnInit', 'enter');
+    console.log('TimelineComponent', 'OnInit');
     this.subscription = this.labelService.getLabels$()
       .pipe(pairwise(), throttleTime(50))
       .subscribe((value) => {
-          // this.classes = value.labels.map(x => new Classification(x.name, [])); // fixme series
-          console.log('ngOnInit', 'getLabels', value);
+          // this.classes = value.labels.map(x => new Classification(x.name, [])); // fixme seriesl
           const prev = value[0].labels;
           const curr = value[1].labels;
 
           if (prev && curr) {
-            if (prev.length !== curr.length) {
+            /** if the length of previous and current arrays is the same then:
+             * 1) this is the first observable value: no previous element exists
+             * 2) an element was edited
+             * */
+            if (prev.length === curr.length) {
+              curr.forEach(x => {
+                if (!this.groups.get(x.id)) {
+                  this.groups.add({id: x.id, content: x.name});
+                }
+              });
+
+              const edited = curr.filter(x => !prev.find(y => x.id === y.id && y.name === x.name));
+              console.log('edited', edited);
+              edited.forEach(x => {
+                const group: DataGroup = this.groups.get(x.id);
+                if (group) {
+                  group.content = x.name;
+                  this.groups.update(group);
+                }
+              });
+            } else {
+              /** if the length of previous and current arrays is different, then an element was either added or removed */
               const added = curr.filter(x => !prev.find(y => x.id === y.id));
               const deleted = prev.filter(x => !curr.find(y => x.id === y.id));
-              console.log('ngOnInit', 'add/delete', {added, deleted});
 
               added.forEach(x => {
-                this.groups.add({id: x.id, content: x.name});
+                const newGroup = {id: x.id, content: x.name};
+                console.log('add group', newGroup);
+                this.groups.add(newGroup);
               });
-              deleted.forEach(x => this.groups.remove(x.id));
+              deleted.forEach(x => {
+                const removed = this.groups.remove(x.id);
+                console.log('groups removed', removed);
+              });
 
               // console.log('  added ', JSON.stringify(added));
               // console.log('deleted ', JSON.stringify(deleted));
-            } else {
-              curr.forEach(x => {
-                this.groups.add({id: x.id, content: x.name});
-              });
             }
           }
         }
@@ -104,7 +128,6 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
 
     this.subscription.add(this.editorService.getCurrentProject$()
       .subscribe(value => {
-        console.log('ngOnInit', 'getCurrentProject', value);
         if (value) {
           const labels = value.labels;
           if (labels) {
@@ -117,12 +140,10 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
 
     this.subscription.add(this.videoService.playerReady
       .subscribe((api: VgAPI) => {
-        console.log('ngOnInit', 'playerReady');
         this.apis.add(api);
         const sub: IMediaSubscriptions = api.subscriptions;
         if (this.apis.size() === 1) {
           this.subscription.add(sub.timeUpdate.subscribe(() => {
-            console.log('ngOnInit', 'timeUpdate', api.currentTime);
             this.updateCurrentTime(api.currentTime);
 
             this.classes.forEach((($class) => {
@@ -132,10 +153,10 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
               const groupId = $class.id;
 
               if ($class.buttonChecked) {
-                if (seriesCount === 0 || $class.finished) {
+                if (seriesCount === 0 || $class.isLabellingFinished) {
                   const range = new Range(this.counter, currentTime, currentTime);
                   series.push(range);
-                  $class.finished = false;
+                  $class.isLabellingFinished = false;
                   this.counter += 1;
                   this.addItemBox(range.id, groupId, currentTime);
                 } else {
@@ -154,13 +175,11 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
       }));
 
     this.subscription.add(this.labelService.getLabels$().subscribe(value => {
-      console.log('ngOnInit', 'getLabels', 'classes');
       this.classes = value.labels.map(x => new Classification(x.id, x.name, [])); // fixme series
     }));
 
     this.subscription.add(this.editorService.getCurrentProject$()
       .subscribe(value => {
-        console.log('ngOnInit', 'getLabels', 'classes');
         if (value) {
           this.classes = value.labels.map(x => new Classification(x.id, x.name, []));
         }
@@ -194,7 +213,6 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   addItemBox(id: number, groupId: number | string, start: number | string) {
-    console.log('addItemBox: ', id, groupId, start);
     const item: DataItem = {id: id, group: groupId, content: 'item ' + id, start: start, end: start};
     this.items.add(item);
     this.timeline.focus(id);
@@ -233,10 +251,10 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
   //             const seriesCount = series.length;
   //
   //             if (classification.buttonChecked) {
-  //               if (seriesCount === 0 || classification.finished) {
+  //               if (seriesCount === 0 || classification.isLabellingFinished) {
   //                 const range = new Range(this.counter, currentTime, currentTime);
   //                 series.push(range);
-  //                 classification.finished = false;
+  //                 classification.isLabellingFinished = false;
   //                 this.counter += 1;
   //                 this.addItemBox(range.id, groupId, currentTime);
   //               } else {
@@ -252,15 +270,8 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
   //
   // }
 
-  onCheckboxChange(cls: Classification, groupId: number | string) {
-    const prev = cls.buttonChecked;
-    cls.buttonChecked = !cls.buttonChecked;
-    if (prev === true && cls.buttonChecked === false) {
-      cls.finished = true;
-      // const id = cls.series.length - 1;
-      // const range = cls.series[id];
-      // this.timelineVisualisation.addItem(range.id, groupId, range.startTime, range.endTime);
-    }
+  onCheckboxChange(clazz: Classification) {
+    TimelineComponent.toggleRecording(clazz);
   }
 
   private setMax(duration: DateType) {
@@ -271,11 +282,9 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
 
   @HostListener('window:keydown', [ '$event' ])
   onKeyDown(event: KeyboardEvent) {
-    console.log('keydown');
-    const clazz = this.classes[this.keyBindings.get(event.code)];
-    console.log(clazz);
-    if (clazz) {
-      clazz.buttonChecked = !clazz.buttonChecked;
-    }
+    // const clazz = this.classes[this.keyBindings.get(event.code)];
+    // if (clazz) {
+    //   TimelineComponent.toggleRecording(clazz);
+    // }
   }
 }

@@ -52,6 +52,7 @@ export class LabelTreeComponent implements OnInit {
     if (classes) {
       classes.forEach(model => {
         annotationsFolder.files.push({
+          id: model.id,
           name: model.name,
           icon: 'tag',
           active: false
@@ -73,14 +74,16 @@ export class LabelTreeComponent implements OnInit {
     // this.annotationsFolder.files.push({ name: name, icon: 'tag', active: false });
   }
 
-  onLabelDelete(i: number) {
-
-    this.labelService.deleteLabel(this.project.id, i);
-
-    this.annotationsFolder.files.splice(i, 1);
+  onLabelDelete(labelId: string, index: number) {
+    console.log('label delete', labelId, index);
+    this.labelService.deleteLabel(this.project.id, labelId);
+    this.annotationsFolder.files.splice(index, 1);
   }
 
-  onLabelHide(i: number) {
-    // this.annotationsFolder.files[i].hidden = !this.annotationsFolder.files[i].hidden;
+  onLabelNameChange(i: number) {
+    const label = this.annotationsFolder.files[i];
+    if (label) {
+      this.labelService.editLabelName(this.project.id, label.id, label.name);
+    }
   }
 }

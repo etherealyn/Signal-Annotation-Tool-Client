@@ -11,11 +11,13 @@ import { UploadModule } from '../upload/upload.module';
 
 import { LabelTreeComponent } from './labeltree/label-tree.component';
 import { LabelsModule } from '../labels/labels.module';
+import { FormsModule } from '@angular/forms';
 
 
 @NgModule({
   imports: [
     CommonModule,
+    FormsModule,
     ClarityModule,
     AppRouting,
     UploadModule,

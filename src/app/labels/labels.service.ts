@@ -32,11 +32,11 @@ export class LabelsService {
     return this.socket.fromEvent<Labels>('getLabels');
   }
 
-  editLabelName(payload: LabelPayload) {
-    this.socket.emit('editLabel', payload);
+  editLabelName(projectId: string, labelId: string, name: string) {
+    this.socket.emit('editLabel', {projectId, labelId, name});
   }
 
-  deleteLabel(projectId: string, index: number) {
-    this.socket.emit('deleteLabel', {projectId, index});
+  deleteLabel(projectId: string, labelId: string) {
+    this.socket.emit('deleteLabel', {projectId, labelId});
   }
 }
