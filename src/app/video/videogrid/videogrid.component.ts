@@ -5,6 +5,7 @@ import { ProjectEditorService } from '../../editor/project-editor.service';
 import { LinkedList } from 'typescript-collections';
 import { IMediaSubscriptions } from 'videogular2/src/core/vg-media/i-playable';
 import { VideoService } from '../video.service';
+import { Hotkey, HotkeysService } from 'angular2-hotkeys';
 
 @Component({
   selector: 'app-videogrid',
@@ -32,8 +33,52 @@ export class VideogridComponent implements OnInit {
   private timeUpdateSubscription;
 
   constructor(private videoService: VideoService,
-              private editorService: ProjectEditorService) {
+              private editorService: ProjectEditorService,
+              private hotkeysService: HotkeysService
+  ) {
+    this.registerHotkeys();
+  }
 
+  private registerHotkeys() {
+    const playVideoHotkey = new Hotkey('space', (): boolean => {
+      this.onPlayPause();
+      return false;
+    }, undefined, 'Play the video(s)');
+    const nextPlayback = new Hotkey('shift+>', (): boolean => {
+      this.nextPlaybackSpeed();
+      return false;
+    }, undefined, 'Next playback speed');
+    const prevPlayback = new Hotkey('shift+<', (): boolean => {
+      this.nextPlaybackSpeed();
+      return false;
+    }, undefined, 'Previous playback speed');
+    const cursorSound = new Hotkey('alt+j', (): boolean => {
+      this.cursorSound = !this.cursorSound;
+      return false;
+    }, undefined, 'Enable/disable `Cursor Sound` mode: an audio source is selected on mouse hover (default On)');
+
+    const back = new Hotkey('left', (): boolean => {
+      this.seekTime(this.currentTime - 5);
+      return false;
+    }, undefined, '5 seconds back');
+
+    const windback = new Hotkey('shift+left', (): boolean => {
+      this.seekTime(this.currentTime - 15);
+      return false;
+    }, undefined, '15 seconds back');
+
+    const forward = new Hotkey('right', (): boolean => {
+      this.seekTime(this.currentTime + 5);
+      return false;
+    }, undefined, '5 seconds forward');
+
+    const windforward = new Hotkey('shift+right', (): boolean => {
+      this.seekTime(this.currentTime + 15);
+      return false;
+    }, undefined, '15 seconds forward');
+
+    [ playVideoHotkey, nextPlayback, prevPlayback, cursorSound, back, windback, forward, windforward ]
+      .forEach(hotkey => this.hotkeysService.add(hotkey));
   }
 
   ngOnInit() {
@@ -151,7 +196,7 @@ export class VideogridComponent implements OnInit {
     return this.playbackValues[this.playbackIndex];
   }
 
-  @HostListener('window:keydown', ['$event'])
+  @HostListener('window:keydown', [ '$event' ])
   onKeyDown(event: KeyboardEvent) {
     // console.log(event.code, event.shiftKey);
     // if (event.code === 'Space') {

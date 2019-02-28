@@ -13,6 +13,7 @@ import { IMediaSubscriptions } from 'videogular2/src/core/vg-media/i-playable';
 import { Range } from '../../models/range';
 import { RecordingEvent } from './recordingEvent';
 import { RecordingEventType } from './recordingEventType';
+import { Hotkey, HotkeysService } from 'angular2-hotkeys';
 
 @Component({
   selector: 'app-timeline',
@@ -21,13 +22,7 @@ import { RecordingEventType } from './recordingEventType';
 })
 export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
 
-  constructor(private editorService: ProjectEditorService,
-              private labelService: LabelsService,
-              private videoService: VideoService) {
-  }
-
   private recordingEvents = new EventEmitter<RecordingEvent>();
-
 
   private classes: Classification[];
   private apis: LinkedList<VgAPI> = new LinkedList<VgAPI>();
@@ -48,7 +43,6 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
   private playbackTimeId: IdType;
   private subscription: Subscription;
   private counter = 0;
-
   keyBindings = new Map<string, number>([
     [ 'Digit1', 0 ],
     [ 'Digit2', 1 ],
@@ -71,11 +65,31 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
     [ 'Numpad9', 8 ]
   ]);
 
+  constructor(private editorService: ProjectEditorService,
+              private labelService: LabelsService,
+              private videoService: VideoService,
+              private hotkeyService: HotkeysService) {
+    this.registerHotkeys();
+  }
+
+  private registerHotkeys() {
+    for (let i = 0; i < 9; ++i) {
+      const hotkey = new Hotkey(`${i + 1}`, (event: KeyboardEvent): boolean => {
+        const clazz = this.classes[i];
+        if (clazz) {
+          this.toggleRecording(clazz);
+        }
+        return false;
+      }, undefined, `Toggle recording of the ${i + 1} label`);
+      this.hotkeyService.add(hotkey);
+    }
+  }
+
   private toggleRecording(cls: Classification) {
     const prev = cls.buttonChecked;
     cls.buttonChecked = !cls.buttonChecked;
     if (prev === true && cls.buttonChecked === false) {
-      this.recordingEvents.emit({ eventType: RecordingEventType.Stop });
+      this.recordingEvents.emit({eventType: RecordingEventType.Stop});
       cls.isLabellingFinished = true;
     }
   }
@@ -267,9 +281,6 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
 
   @HostListener('window:keydown', [ '$event' ])
   onKeyDown(event: KeyboardEvent) {
-    // const clazz = this.classes[this.keyBindings.get(event.code)];
-    // if (clazz) {
-    //   TimelineComponent.toggleRecording(clazz);
-    // }
+
   }
 }

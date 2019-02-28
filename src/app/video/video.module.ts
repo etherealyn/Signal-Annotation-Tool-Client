@@ -10,6 +10,7 @@ import { VgBufferingModule } from 'videogular2/buffering';
 import { ClarityModule } from '@clr/angular';
 import { FormsModule } from '@angular/forms';
 import { VideoService } from './video.service';
+import { HotkeyModule } from 'angular2-hotkeys';
 
 
 @NgModule({
@@ -23,6 +24,7 @@ import { VideoService } from './video.service';
     VgControlsModule,
     VgOverlayPlayModule,
     VgBufferingModule,
+    HotkeyModule,
   ],
   exports: [ VideogridComponent ],
   providers: [ VideoService]
