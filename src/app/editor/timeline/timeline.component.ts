@@ -1,6 +1,6 @@
-import { Component, HostListener, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, HostListener, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import * as vis from 'vis';
-import { DataGroup, DataItem, DataSet, DateType, IdType, Timeline, TimelineOptions } from 'vis';
+import { DataGroup, DataItem, DateType, IdType, Timeline, TimelineOptions } from 'vis';
 import { LabelsService } from 'src/app/labels/labels.service';
 import { pairwise, throttleTime } from 'rxjs/operators';
 import { ProjectEditorService } from '../project-editor.service';
@@ -11,6 +11,8 @@ import { LinkedList } from 'typescript-collections';
 import { Subscription } from 'rxjs';
 import { IMediaSubscriptions } from 'videogular2/src/core/vg-media/i-playable';
 import { Range } from '../../models/range';
+import { RecordingEvent } from './recordingEvent';
+import { RecordingEventType } from './recordingEventType';
 
 @Component({
   selector: 'app-timeline',
@@ -23,6 +25,9 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
               private labelService: LabelsService,
               private videoService: VideoService) {
   }
+
+  private recordingEvents = new EventEmitter<RecordingEvent>();
+
 
   private classes: Classification[];
   private apis: LinkedList<VgAPI> = new LinkedList<VgAPI>();
@@ -66,16 +71,16 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
     [ 'Numpad9', 8 ]
   ]);
 
-  private static toggleRecording(cls: Classification) {
+  private toggleRecording(cls: Classification) {
     const prev = cls.buttonChecked;
     cls.buttonChecked = !cls.buttonChecked;
     if (prev === true && cls.buttonChecked === false) {
+      this.recordingEvents.emit({ eventType: RecordingEventType.Stop });
       cls.isLabellingFinished = true;
     }
   }
 
   ngOnInit(): void {
-    console.log('TimelineComponent', 'OnInit');
     this.subscription = this.labelService.getLabels$()
       .pipe(pairwise(), throttleTime(50))
       .subscribe((value) => {
@@ -96,7 +101,6 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
               });
 
               const edited = curr.filter(x => !prev.find(y => x.id === y.id && y.name === x.name));
-              console.log('edited', edited);
               edited.forEach(x => {
                 const group: DataGroup = this.groups.get(x.id);
                 if (group) {
@@ -111,16 +115,11 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
 
               added.forEach(x => {
                 const newGroup = {id: x.id, content: x.name};
-                console.log('add group', newGroup);
                 this.groups.add(newGroup);
               });
               deleted.forEach(x => {
-                const removed = this.groups.remove(x.id);
-                console.log('groups removed', removed);
+                this.groups.remove(x.id);
               });
-
-              // console.log('  added ', JSON.stringify(added));
-              // console.log('deleted ', JSON.stringify(deleted));
             }
           }
         }
@@ -154,12 +153,14 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
 
               if ($class.buttonChecked) {
                 if (seriesCount === 0 || $class.isLabellingFinished) {
+                  this.recordingEvents.emit({eventType: RecordingEventType.Start});
                   const range = new Range(this.counter, currentTime, currentTime);
                   series.push(range);
                   $class.isLabellingFinished = false;
                   this.counter += 1;
                   this.addItemBox(range.id, groupId, currentTime);
                 } else {
+                  this.recordingEvents.emit({eventType: RecordingEventType.Recording});
                   const lastRange: Range = series[seriesCount - 1];
                   lastRange.endTime = currentTime;
                   this.updateItem(lastRange.id, lastRange.endTime);
@@ -168,9 +169,9 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
             }));
           }));
 
-          // this.subscription.add(sub.durationChange.subscribe(() => {
-          //   this.setMax(api.duration);
-          // }));
+          this.subscription.add(sub.durationChange.subscribe(() => {
+            this.setMax(api.duration);
+          }));
         }
       }));
 
@@ -190,6 +191,22 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
     this.timeline = new vis.Timeline(container, this.items, this.groups, this.options);
     this.playbackTimeId = this.timeline.addCustomTime(0.0, 'currentPlayingTime');
 
+
+    this.subscription.add(this.recordingEvents.subscribe(x => {
+      switch (x) {
+        case RecordingEventType.Start:
+          console.log('recording started');
+          break;
+        case RecordingEventType.Stop:
+          console.log('recording stopped');
+          break;
+        case RecordingEventType.Recording:
+          console.log('recording ...');
+          break;
+        default:
+
+      }
+    }));
 
     // create a dataset with items
     /*
@@ -238,40 +255,8 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
 
   }
 
-  // private initRecorder(vgApi: VgAPI) {
-  //   const subscriptions: IMediaSubscriptions = vgApi.subscriptions;
-  //   const timeUpdate = subscriptions.timeUpdate;
-  //
-  //   timeUpdate
-  //     .pipe(throttleTime(50))
-  //     .subscribe((() => {
-  //         this.classes.forEach(((classification, groupId) => {
-  //             const series = classification.series;
-  //             const currentTime = vgApi.currentTime;
-  //             const seriesCount = series.length;
-  //
-  //             if (classification.buttonChecked) {
-  //               if (seriesCount === 0 || classification.isLabellingFinished) {
-  //                 const range = new Range(this.counter, currentTime, currentTime);
-  //                 series.push(range);
-  //                 classification.isLabellingFinished = false;
-  //                 this.counter += 1;
-  //                 this.addItemBox(range.id, groupId, currentTime);
-  //               } else {
-  //                 const lastRange: Range = series[seriesCount - 1];
-  //                 lastRange.endTime = currentTime;
-  //                 this.updateItem(lastRange.id, lastRange.endTime);
-  //               }
-  //             }
-  //           })
-  //         );
-  //       })
-  //     );
-  //
-  // }
-
   onCheckboxChange(clazz: Classification) {
-    TimelineComponent.toggleRecording(clazz);
+    this.toggleRecording(clazz);
   }
 
   private setMax(duration: DateType) {
