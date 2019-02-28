@@ -44,11 +44,11 @@ export class VideogridComponent implements OnInit {
       this.onPlayPause();
       return false;
     }, undefined, 'Play the video(s)');
-    const nextPlayback = new Hotkey('shift+>', (): boolean => {
+    const nextPlayback = new Hotkey('shift+period', (): boolean => {
       this.nextPlaybackSpeed();
       return false;
     }, undefined, 'Next playback speed');
-    const prevPlayback = new Hotkey('shift+<', (): boolean => {
+    const prevPlayback = new Hotkey('shift+comma', (): boolean => {
       this.nextPlaybackSpeed();
       return false;
     }, undefined, 'Previous playback speed');

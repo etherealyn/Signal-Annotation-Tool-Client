@@ -206,19 +206,20 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
     this.playbackTimeId = this.timeline.addCustomTime(0.0, 'currentPlayingTime');
 
 
-    this.subscription.add(this.recordingEvents.subscribe(x => {
-      switch (x) {
+    this.subscription.add(this.recordingEvents.subscribe((event: RecordingEvent) => {
+      switch (event.eventType) {
         case RecordingEventType.Start:
-          console.log('recording started');
+          // console.log('recording started');
           break;
         case RecordingEventType.Stop:
           console.log('recording stopped');
+          console.log(this.classes);
           break;
         case RecordingEventType.Recording:
-          console.log('recording ...');
+          // console.log('recording ...');
           break;
         default:
-
+          break;
       }
     }));
 
@@ -244,7 +245,7 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   addItemBox(id: number, groupId: number | string, start: number | string) {
-    const item: DataItem = {id: id, group: groupId, content: 'item ' + id, start: start, end: start};
+    const item: DataItem = {id: id, group: groupId, content: `Label ${id}`, start: start, end: start};
     this.items.add(item);
     this.timeline.focus(id);
   }
@@ -259,6 +260,7 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
 
   updateCurrentTime(time: number) {
     this.timeline.setCustomTime(time, this.playbackTimeId);
+    // this.timeline.moveTo(time);
   }
 
   ngOnDestroy(): void {
