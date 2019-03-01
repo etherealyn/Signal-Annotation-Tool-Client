@@ -1,35 +1,32 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ProjectsService } from './projects.service';
-import { ProjectModel } from './project.model';
-import { Subscription } from 'rxjs';
-import { AuthService } from '../auth/auth.service';
-
+import { ProjectModel } from '../models/project.model';
 
 @Component({
   selector: 'app-projects',
   templateUrl: './projects.component.html',
   styles: []
 })
-export class ProjectsComponent implements OnInit, OnDestroy {
+export class ProjectsComponent implements OnInit {
   projects: ProjectModel[] = [];
-
-  private subscription: Subscription;
+  isDatagridView = false;
 
   constructor(private projectsService: ProjectsService) {
   }
 
   ngOnInit() {
-    this.getProjects();
-  }
-
-  getProjects(): any {
-    this.subscription = this.projectsService.getProjects()
+    this.projectsService.currentProjects$
       .subscribe(projects => {
-        this.projects = projects;
-      });
+          this.projects = projects;
+        }
+      );
   }
 
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+  refresh() {
+    this.projectsService.reload();
+  }
+
+  onInvite() {
+    console.log('onInvite');
   }
 }

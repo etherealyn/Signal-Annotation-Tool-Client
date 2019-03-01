@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 
 import { environment } from '../../environments/environment';
-import { Session } from './session.model';
-import { User } from './user.model';
+import { SessionModel } from '../models/session.model';
+import { UserModel } from '../models/user.model';
+import { UserSignupModel } from '../models/user.registration.model';
 
 
 @Injectable({
@@ -13,65 +14,84 @@ import { User } from './user.model';
 })
 export class AuthService {
 
-  private authUrl = `${environment.apiUrl}/auth`;
-
-  private currentSessionSubject: BehaviorSubject<Session>;
-  public currentSession: Observable<Session>;
-
   constructor(private http: HttpClient) {
-    this.currentSessionSubject = new BehaviorSubject<Session>(JSON.parse(localStorage.getItem('currentSession')));
-    this.currentSession = this.currentSessionSubject.asObservable();
+    this.currentSessionSubject = new BehaviorSubject<SessionModel>(JSON.parse(localStorage.getItem('currentSession$')));
+    this.currentSession$ = this.currentSessionSubject.asObservable();
   }
 
-  public get currentSessionValue(): Session {
+  public get currentSessionValue(): SessionModel {
     return this.currentSessionSubject.value;
   }
 
-  public get currentUserValue(): User {
+  public get currentUserValue(): UserModel {
     if (this.currentSessionSubject.value) {
       return this.currentSessionSubject.value.user;
     }
   }
 
-  login(username: string, password: string) {
-    return this.http.post<any>(this.authUrl, { username, password })
+  private authUrl = `${environment.apiUrl}/auth`;
+  private userUrl = `${environment.apiUrl}/users`;
+
+  private currentSessionSubject: BehaviorSubject<SessionModel>;
+  public currentSession$: Observable<SessionModel>;
+
+
+  private static handleRegistrationError(error: HttpErrorResponse) {
+    let message = 'Something bad happened; please try again later.';
+
+    if (error.error instanceof ErrorEvent) {
+      // A client-side or network error occurred. Handle it accordingly.
+      message = error.error.message;
+    } else {
+      // The backend returned an unsuccessful response code.
+      // The response body may contain clues as to what went wrong,
+      switch (error.status) {
+        case 400:
+          message = 'Please try to reloadCurrentProject the page';
+          break;
+        case 500:
+          message = 'The server is unable to fulfill the request. Please contact your system administrator';
+          break;
+        case 409:
+          message = 'A user with such details already exists';
+          break;
+        default:
+          message = 'Something bad happened; please try again later.';
+          break;
+      }
+    }
+    // return an observable with a user-facing error message
+    return throwError(message);
+  }
+
+  login(username: string, password: string): Observable<any> {
+    return this.http.post<SessionModel>(this.authUrl, {username, password})
       .pipe(map(session => {
           if (session && session.user && session.accessToken) {
-            localStorage.setItem('currentSession', JSON.stringify(session));
+            localStorage.setItem('currentSession$', JSON.stringify(session));
             this.currentSessionSubject.next(session);
           }
           return session;
-        }),
-        catchError(this.handleError('login', null))
+        })
       );
   }
 
   logout() {
-    localStorage.removeItem('currentSession');
+    localStorage.removeItem('currentSession$');
     this.currentSessionSubject.next(null);
-  }
-
-  /**
-   * Handle Http operation that failed.
-   * Let the app continue.
-   * @param operation - name of the operation that failed
-   * @param result - optional value to return as the observable result
-   */
-  private handleError<T>(operation = 'operation', result?: T): (error: any) => Observable<T> {
-    return (error: any): Observable<T> => {
-
-      // TODO: send the error to remote logging infrastructure
-      console.error(error); // log to console instead
-
-      // TODO: better job of transforming error for user consumption
-      // this.log(`${operation} failed: ${error.message}`);
-
-      // Let the app keep running by returning an empty result.
-      return of(result as T);
-    };
   }
 
   isLoggedIn() {
     return this.currentSessionSubject.getValue();
+  }
+
+  register(signupModel: UserSignupModel): Observable<HttpResponse<any>> {
+    return this.http.post<any>(this.userUrl,
+      {
+        username: signupModel.username,
+        email: signupModel.email,
+        password: signupModel.password
+      })
+      .pipe(catchError(AuthService.handleRegistrationError));
   }
 }

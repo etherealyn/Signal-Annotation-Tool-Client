@@ -4,24 +4,32 @@ import { AppRouting } from '../app.routing';
 import { ClarityModule } from '@clr/angular';
 
 import { HeaderComponent } from './header/header.component';
-import { SidebarComponent } from './sidebar/sidebar.component';
+
 import { LayoutComponent } from './layout/layout.component';
-import { SubbarComponent } from './subbar/subbar.component';
+import { FiletreeComponent } from './filetree/filetree.component';
+import { UploadModule } from '../upload/upload.module';
+
+import { LabelTreeComponent } from './labeltree/label-tree.component';
+import { LabelsModule } from '../labels/labels.module';
+import { FormsModule } from '@angular/forms';
+
 
 @NgModule({
   imports: [
     CommonModule,
+    FormsModule,
     ClarityModule,
-    AppRouting
+    AppRouting,
+    UploadModule,
+    LabelsModule
   ],
   exports: [
     LayoutComponent,
-    SidebarComponent
   ],
   declarations: [ HeaderComponent,
-    SidebarComponent,
     LayoutComponent,
-    SubbarComponent
+    FiletreeComponent,
+    LabelTreeComponent,
   ]
 })
 export class LayoutModule {

@@ -12,6 +12,8 @@ import { EditorModule } from './editor/editor.module';
 import { AuthModule } from './auth/auth.module';
 import { ErrorInterceptor } from './auth/error.interceptor';
 import { JwtInterceptor } from './auth/jwt.interceptor';
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+import { HotkeyModule } from 'angular2-hotkeys';
 
 @NgModule({
   declarations: [
@@ -19,17 +21,18 @@ import { JwtInterceptor } from './auth/jwt.interceptor';
   ],
   imports: [
     BrowserModule,
+    HotkeyModule.forRoot({cheatSheetCloseEsc: true}),
     BrowserAnimationsModule,
     AppRouting,
     ClarityModule,
     AuthModule,
     LayoutModule,
     ProjectsModule,
-    EditorModule
+    EditorModule,
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},
+    {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},
   ],
   bootstrap: [ AppComponent ]
 })

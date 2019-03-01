@@ -1,7 +1,9 @@
-<clr-header class="header-6">
+<!--<clr-header class="header-6" [@openClose]="!isHeaderVisible ? 'open' : 'closed'">-->
+<clr-header class="header-6" *ngIf="!isHeaderVisible">
   <div class="branding" style="cursor: pointer;">
     <a class="nav-link" routerLink="/">
-      <clr-icon shape="cloud"></clr-icon>
+      <span class="label label-warning"><strong>ALPHA</strong></span>
+      <!--<clr-icon shape="cloud"></clr-icon>-->
       <span class="title">Signal Annotation Tool</span>
     </a>
   </div>
@@ -9,7 +11,7 @@
     <a [ngClass]="{'active' : isProjectActive}" class="nav-link nav-text" routerLink="/projects">
       Projects
     </a>
-    <a [ngClass]="{'active' : isEditorActive}" class="nav-link nav-text" routerLink="/">
+    <a [ngClass]="{'active' : isEditorActive}" class="nav-link nav-text" routerLink="{{editorLink}}">
       Editor
     </a>
     <!--<a class="nav-link nav-icon" routerLink="/projects">-->
@@ -19,15 +21,15 @@
       <!--<clr-icon shape="cog"></clr-icon>-->
     <!--</a>-->
   </div>
-  <form [ngClass]="{'active' : isProjectActive}" class="search">
-    <label for="search_input">
-      <input id="search_input" type="text" placeholder="Search for projects...">
-    </label>
+  <form *ngIf="isProjectActive" class="search">
+    <!--<label for="search_input">-->
+      <!--<input id="search_input" type="text" placeholder="Search for projects...">-->
+    <!--</label>-->
   </form>
   <div class="header-actions">
     <clr-dropdown class="dropdown bottom-right">
       <button class="nav-text" clrDropdownToggle>
-        {{user.email}}
+        {{username}}
         <clr-icon shape="caret down"></clr-icon>
       </button>
       <div class="dropdown-menu">
@@ -38,5 +40,5 @@
     </clr-dropdown>
   </div>
 </clr-header>
-
+<!--<div style="height: 4px; border-bottom: 3px dotted; cursor: n-resize" (click)="onHide()"></div>-->
 <ng-content></ng-content>

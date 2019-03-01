@@ -1,0 +1,33 @@
+<div (mouseleave)="onGlobalMouseLeave()" *ngIf="videoSources && videoSources.length !== 0">
+  <mat-grid-list cols="{{videoSources.length === 1 ? '1' : '2'}}" rowHeight="2:1">
+    <mat-grid-tile *ngFor="let video of videoSources; let i = index" class="video-container">
+      <app-video
+        source='{{video.source}}' (playerReady)="onPlayerReady($event)"
+        (mouseenter)='onMouseEnter(i)'
+        (mouseleave)='onMouseLeave(i)'
+      >
+      </app-video>
+    </mat-grid-tile>
+  </mat-grid-list>
+  <div class="videogrid-controls">
+    <div class="play-pause" (click)="onPlayPause()">
+      <clr-icon *ngIf='!isPlaying' shape="play" class="is-solid is-inverse"></clr-icon>
+      <clr-icon *ngIf='isPlaying' shape="pause" class="is-solid is-inverse"></clr-icon>
+    </div>
+
+    <div>
+      <button class="btn btn-inverse" (click)="nextPlaybackSpeed()">{{getPlaybackValue()}}x</button>
+    </div>
+
+    <!--<div style="text-align: center; color: white">{{currentTime}}</div>-->
+    <div style='width: 80%; height: 100%; text-align: center'>
+
+      <input id="timeSelector" type="range" min="0" max="{{duration}}" class="slider" [(ngModel)]="currentTime" (ngModelChange)="seekTime($event)" value="0">
+      <!--<output for="timeSelector">{{currentTime | number:'1.0-0'}}%</output>-->
+    </div>
+  </div>
+</div>
+
+
+<!--<ng-progress #progressBar></ng-progress>-->
+<!--<button (click)="progressBar.startTime()">Start</button>-->

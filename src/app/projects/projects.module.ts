@@ -13,7 +13,7 @@ import { ProjectModalComponent } from './project-modal/project-modal.component';
 @NgModule({
   declarations: [
     ProjectsComponent,
-    ProjectModalComponent
+    ProjectModalComponent,
   ],
   imports: [
     CommonModule,

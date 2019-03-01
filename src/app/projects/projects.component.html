@@ -1,13 +1,57 @@
-<app-project-form></app-project-form>
+<app-project-form xmlns="http://www.w3.org/1999/html"></app-project-form>
 
-<clr-datagrid>
+<!--<div *ngIf="isLoading">-->
+<!--<span class="spinner spinner-md">Loading...</span>-->
+<!--</div>-->
+
+<button class="btn btn-outline" (click)="isDatagridView = !isDatagridView">Toggle
+  view: {{isDatagridView ? 'Datagrid' : 'Cards'}}</button>
+
+<clr-datagrid *ngIf="isDatagridView">
   <clr-dg-column>Title</clr-dg-column>
+  <clr-dg-column>Description</clr-dg-column>
   <clr-dg-column>Last Modification</clr-dg-column>
+  <clr-dg-column>OwnerId</clr-dg-column>
+  <clr-dg-column>MemberIds</clr-dg-column>
+  <clr-dg-column></clr-dg-column>
 
   <clr-dg-row *ngFor="let project of projects">
     <clr-dg-cell><a routerLink="/editor/{{project.id}}">{{project.title}}</a></clr-dg-cell>
+    <clr-dg-cell>{{project.description}}</clr-dg-cell>
     <clr-dg-cell>{{project.modified | date}}</clr-dg-cell>
+    <clr-dg-cell>{{project.ownerId}}</clr-dg-cell>
+    <clr-dg-cell>{{project.memberIds}}</clr-dg-cell>
+    <clr-dg-cell><a href="javascript://" (click)="onInvite()">Invite Users</a></clr-dg-cell>
   </clr-dg-row>
 
-  <clr-dg-footer>{{projects.length}} project{{projects.length === 1 ? "" : "s"}}</clr-dg-footer>
+  <clr-dg-footer>
+    {{projects.length}} project{{projects.length === 1 ? "" : "s"}}
+  </clr-dg-footer>
 </clr-datagrid>
+
+<div *ngIf="!isDatagridView">
+  <div class="clr-row">
+    <div class="clr-col" *ngFor="let project of projects">
+      <div class="card">
+        <div class="card-header">
+          {{project.title}}
+        </div>
+        <div class="card-block">
+          <!--<div class="card-title">-->
+          <!--Block-->
+          <!--</div>-->
+          <div class="card-text">
+            <strong>Description:</strong> {{project.description}} <br>
+            <strong>Modified:</strong> {{project.modified}} <br>
+            <strong>OwnerId:</strong> {{project.ownerId}} <br>
+            <strong>MemberIds:</strong> {{project.memberIds}}
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-sm btn-primary-outline" routerLink="/editor/{{project.id}}">Open Project</button>
+          <button class="btn btn-sm btn-link" (click)="onInvite()">Invite Users</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

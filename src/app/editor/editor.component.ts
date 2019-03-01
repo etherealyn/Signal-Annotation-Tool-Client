@@ -1,42 +1,51 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit} from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
-import { ProjectsService } from '../projects/projects.service';
-import { ProjectModel } from '../projects/project.model';
-import { Subscription } from 'rxjs';
+import { ProjectModel } from '../models/project.model';
+import { ProjectEditorService } from './project-editor.service';
+import { VgAPI } from 'videogular2/core';
 
 @Component({
   selector: 'app-editor',
   templateUrl: './editor.component.html',
-  styles: []
+  styleUrls: ['./editor.component.scss']
 })
-export class EditorComponent implements OnInit, OnDestroy {
-  private project: ProjectModel;
-
-  private subscription: Subscription;
-
+export class EditorComponent implements OnInit {
   constructor(private route: ActivatedRoute,
-              private projectService: ProjectsService) {
+    private router: Router,
+    private editorService: ProjectEditorService) {
   }
+
+  project: ProjectModel;
+  direction = 'horizontal';
+  labelNames: string[] = [];
 
   ngOnInit() {
-    this.getProject();
-  }
+    /** Get project id from the current route */
+    const projectId = this.route.snapshot.paramMap.get('id');
+    this.editorService.loadProject(projectId);
 
-  private getProject() {
-    const id = this.route.snapshot.paramMap.get('id');
-    this.subscription = this.projectService.getProject(id)
-      .subscribe(project => {
-        console.log(project);
-        this.project = project;
+    this.editorService.getCurrentProject$()
+      .subscribe((value) => {
+        if (value && value.labels) {
+          this.labelNames = value.labels.map(x => x.name);
+        }
       });
   }
 
-  get diagnostic() {
-    return JSON.stringify(this.project);
+  onPlay() {
+    // this.videoGrid.onPlay();
   }
 
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+  onPause() {
+    // this.videoGrid.onPause();
+  }
+
+  onClear() {
+    // this.recorder.clearLabels();
+  }
+
+  onPlayerReady(vgApi: VgAPI) {
+    // this.recorder.setVgApi(vgApi); // fixme
   }
 }

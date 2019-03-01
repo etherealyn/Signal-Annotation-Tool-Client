@@ -1,6 +1,32 @@
-<div class="content-container">
-  <div class="content-area">
-    {{diagnostic}}}
-  </div>
-</div>
-
+<!--<div class="vertical-line"></div>-->
+<hotkeys-cheatsheet></hotkeys-cheatsheet>
+<as-split direction="vertical">
+  <as-split-area size="99">
+    <div class="container">
+      <div class="split-example">
+        <!-- ********************************************************** -->
+        <as-split [direction]="direction">
+          <as-split-area size="50">
+            <app-videogrid></app-videogrid>
+          </as-split-area>
+          <as-split-area size="50">
+            <app-timeline></app-timeline>
+          </as-split-area>
+        </as-split>
+        <!-- ********************************************************** -->
+      </div>
+      <br>
+    </div>
+  </as-split-area>
+  <as-split-area size="1">
+    <div class="btns">
+      <button class="btn btn-primary"> Play</button>
+      <button class="btn btn-primary-outline">Pause</button>
+      <button class="btn btn-danger">Clear Labels</button>
+      <button class="btn btn-primary-outline">Undo</button>
+      <button class="btn btn-primary-outline">Redo</button>
+      <button class="btn btn-warning" (click)="direction = (direction === 'horizontal') ? 'vertical' : 'horizontal'">{{ 'Toggle direction: "' + direction + '"' }}</button>
+    </div>
+  </as-split-area>
+  <!-- vertical split end -->
+</as-split>
