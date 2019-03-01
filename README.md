@@ -1,4 +1,9 @@
-# Signal Annotation Tool Client
+# Signal Annotation Tool (Client)
+
+* [Signal Annotation Tool](https://github.com/phev8/signal-annotation-tool)
+* [Signal Annotation Tool (Client)](https://github.com/etherealyn/signal-annotation-tool-client) (this repository)
+* [Signal Annotation Tool (Server)](https://github.com/etherealyn/signal-annotation-tool-server)
+
 
 ## Development server
 
