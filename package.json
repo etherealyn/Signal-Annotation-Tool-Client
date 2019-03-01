@@ -1,6 +1,10 @@
 {
   "name": "signal-annotation-tool",
   "version": "1.0.0a",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/etherealyn/signal-annotation-tool-client.git"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
