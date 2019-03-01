@@ -1,5 +1,6 @@
 export class RangeModel {
-  start: number;
-  end: number;
+  id: string;
   authorId: string;
+  startTime: number;
+  endTime: number;
 }

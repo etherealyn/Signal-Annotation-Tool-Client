@@ -1,6 +1,7 @@
-import { Component, EventEmitter, HostListener, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import * as vis from 'vis';
 import { DataGroup, DataItem, DateType, IdType, Timeline, TimelineOptions } from 'vis';
+import * as hyperid from 'hyperid';
 import { LabelsService } from 'src/app/labels/labels.service';
 import { pairwise, throttleTime } from 'rxjs/operators';
 import { ProjectEditorService } from '../project-editor.service';
@@ -11,9 +12,12 @@ import { LinkedList } from 'typescript-collections';
 import { Subscription } from 'rxjs';
 import { IMediaSubscriptions } from 'videogular2/src/core/vg-media/i-playable';
 import { Range } from '../../models/range';
-import { RecordingEvent } from './recordingEvent';
-import { RecordingEventType } from './recordingEventType';
+import { RecordingEvent } from '../../models/recording.event';
+import { RecordingEventType } from '../../models/recording.event.type';
 import { Hotkey, HotkeysService } from 'angular2-hotkeys';
+import { AuthService } from '../../auth/auth.service';
+import { LabelModel } from '../../models/label.model';
+import { ProjectModel } from '../../models/project.model';
 
 @Component({
   selector: 'app-timeline',
@@ -22,9 +26,10 @@ import { Hotkey, HotkeysService } from 'angular2-hotkeys';
 })
 export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
 
+  private project: ProjectModel;
   private recordingEvents = new EventEmitter<RecordingEvent>();
+  private instance = hyperid();
 
-  private classes: Classification[];
   private apis: LinkedList<VgAPI> = new LinkedList<VgAPI>();
   private options: TimelineOptions = {
     groupOrder: 'content',  // groupOrder can be a property name or a sorting function,
@@ -38,34 +43,16 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
     editable: true,
   };
   private timeline: Timeline;
+
+  private classes: Classification[];
   private groups = new vis.DataSet<DataGroup>();
   private items = new vis.DataSet<DataItem>();
   private playbackTimeId: IdType;
   private subscription: Subscription;
-  private counter = 0;
-  keyBindings = new Map<string, number>([
-    [ 'Digit1', 0 ],
-    [ 'Digit2', 1 ],
-    [ 'Digit3', 2 ],
-    [ 'Digit4', 3 ],
-    [ 'Digit5', 4 ],
-    [ 'Digit6', 5 ],
-    [ 'Digit7', 6 ],
-    [ 'Digit8', 7 ],
-    [ 'Digit9', 8 ],
 
-    [ 'Numpad1', 0 ],
-    [ 'Numpad2', 1 ],
-    [ 'Numpad3', 2 ],
-    [ 'Numpad4', 3 ],
-    [ 'Numpad5', 4 ],
-    [ 'Numpad6', 5 ],
-    [ 'Numpad7', 6 ],
-    [ 'Numpad8', 7 ],
-    [ 'Numpad9', 8 ]
-  ]);
 
   constructor(private editorService: ProjectEditorService,
+              private authService: AuthService,
               private labelService: LabelsService,
               private videoService: VideoService,
               private hotkeyService: HotkeysService) {
@@ -83,14 +70,26 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
       }, undefined, `Toggle recording of the ${i + 1} label`);
       this.hotkeyService.add(hotkey);
     }
+
+    this.hotkeyService.add(new Hotkey('ctrl+s', (event: KeyboardEvent): boolean => {
+      console.log('save');
+      return false;
+    }, undefined, `Save the labels on the server`));
+
+    this.hotkeyService.add(new Hotkey('ctrl+e', (event: KeyboardEvent): boolean => {
+      console.log('export');
+      return false;
+    }, undefined, `Export the labels`));
   }
 
   private toggleRecording(cls: Classification) {
     const prev = cls.buttonChecked;
     cls.buttonChecked = !cls.buttonChecked;
+    /** if button's checked state switches from true to false, it means that the user wished to stop the recording*/
     if (prev === true && cls.buttonChecked === false) {
-      this.recordingEvents.emit({eventType: RecordingEventType.Stop});
       cls.isLabellingFinished = true;
+      const range = cls.series[cls.series.length - 1];
+      this.recordingEvents.emit({eventType: RecordingEventType.Stop, labelId: cls.id, range: range});
     }
   }
 
@@ -140,9 +139,10 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
       );
 
     this.subscription.add(this.editorService.getCurrentProject$()
-      .subscribe(value => {
-        if (value) {
-          const labels = value.labels;
+      .subscribe((project: ProjectModel) => {
+        if (project) {
+          this.project = project;
+          const labels = project.labels;
           if (labels) {
             labels.forEach((x) => {
               this.groups.add({id: x.id, content: x.name});
@@ -164,20 +164,22 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
               const currentTime = api.currentTime;
               const seriesCount = series.length;
               const groupId = $class.id;
+              const authorId = this.authService.currentUserValue.id;
 
               if ($class.buttonChecked) {
+                /** if the range list is empty or the labelling is finished we need to add a new range element*/
                 if (seriesCount === 0 || $class.isLabellingFinished) {
-                  this.recordingEvents.emit({eventType: RecordingEventType.Start});
-                  const range = new Range(this.counter, currentTime, currentTime);
+                  const rangeId = this.instance();
+                  const range = new Range(rangeId, authorId, currentTime, currentTime);
                   series.push(range);
                   $class.isLabellingFinished = false;
-                  this.counter += 1;
-                  this.addItemBox(range.id, groupId, currentTime);
+                  this.addItemBox(rangeId, groupId, currentTime);
+                  this.recordingEvents.emit({eventType: RecordingEventType.Start, labelId: groupId, range: range});
                 } else {
-                  this.recordingEvents.emit({eventType: RecordingEventType.Recording});
                   const lastRange: Range = series[seriesCount - 1];
                   lastRange.endTime = currentTime;
                   this.updateItem(lastRange.id, lastRange.endTime);
+                  this.recordingEvents.emit({eventType: RecordingEventType.Recording, labelId: groupId, range: lastRange});
                 }
               }
             }));
@@ -190,13 +192,26 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
       }));
 
     this.subscription.add(this.labelService.getLabels$().subscribe(value => {
-      this.classes = value.labels.map(x => new Classification(x.id, x.name, [])); // fixme series
+      this.classes = this.labelsToClasses(value.labels);
+      console.log('getLabels', this.classes);
     }));
 
     this.subscription.add(this.editorService.getCurrentProject$()
       .subscribe(value => {
         if (value) {
-          this.classes = value.labels.map(x => new Classification(x.id, x.name, []));
+          this.classes = this.labelsToClasses(value.labels);
+          console.log('getCurrentProject', this.classes);
+          this.classes.forEach(label => {
+            if (label.series) {
+              const ranges = label.series;
+              ranges.forEach(range => {
+                const count = this.items.length;
+                if (!this.items.get(range.id)) {
+                  this.items.add({id: range.id, group: label.id, content: `Label ${count}`, start: range.startTime, end: range.endTime});
+                }
+              });
+            }
+          });
         }
       }));
 
@@ -212,8 +227,10 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
           // console.log('recording started');
           break;
         case RecordingEventType.Stop:
-          console.log('recording stopped');
-          console.log(this.classes);
+          console.log('recording stopped', JSON.stringify(event.range));
+          if (this.project) {
+            this.labelService.addRange(this.project.id, event.labelId, event.range);
+          }
           break;
         case RecordingEventType.Recording:
           // console.log('recording ...');
@@ -227,14 +244,14 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
     /*
     const items = new vis.DataSet();
     for (let i = 0; i < itemCount; i++) {
-      const start = now.clone().add(Math.random() * 200, 'hours');
+      const startTime = now.clone().add(Math.random() * 200, 'hours');
       const group = Math.floor(Math.random() * groupCount);
       items.add({
         id: i,
         group: group,
         content: 'item ' + i +
           ' <span style="color:#97B0F8;">(' + names[group] + ')</span>',
-        start: start,
+        startTime: startTime,
         type: 'box'
       });
     }*/
@@ -242,15 +259,33 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
     // this.timeline.on('timechanged', function (properties) {
     //   // console.log(properties);
     // });
+    this.items.on('remove', (event, properties, senderId) => {
+      console.log(event, properties);
+      if (event === 'remove') {
+        const id = properties.items[0];
+        const groupId = properties.oldData[0].group;
+        this.labelService.removeRange(this.project.id, groupId, id);
+      }
+    });
   }
 
-  addItemBox(id: number, groupId: number | string, start: number | string) {
-    const item: DataItem = {id: id, group: groupId, content: `Label ${id}`, start: start, end: start};
+  private labelsToClasses(labels: LabelModel[]) {
+    return labels.map(label => {
+      const ranges: Range[] = label.series
+        ? label.series.map(range => new Range(range.id, range.authorId, range.startTime, range.endTime))
+        : [];
+      return new Classification(label.id, label.name, label.authorId, ranges);
+    });
+  }
+
+  addItemBox(id: string, groupId: number | string, start: number | string) {
+    const count = this.items.length;
+    const item: DataItem = {id: id, group: groupId, content: `Label ${count}`, start: start, end: start};
     this.items.add(item);
     this.timeline.focus(id);
   }
 
-  updateItem(id: number, endTime: number) {
+  updateItem(id: string, endTime: number) {
     const item: DataItem = this.items.get(id);
     if (item) {
       item.end = endTime;
@@ -260,7 +295,7 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
 
   updateCurrentTime(time: number) {
     this.timeline.setCustomTime(time, this.playbackTimeId);
-    // this.timeline.moveTo(time);
+    // this.timeline.moveTo(time); todo
   }
 
   ngOnDestroy(): void {
@@ -279,10 +314,5 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
     const newOptions: TimelineOptions = Object.assign({}, this.options);
     newOptions.max = duration;
     this.timeline.setOptions(newOptions);
-  }
-
-  @HostListener('window:keydown', [ '$event' ])
-  onKeyDown(event: KeyboardEvent) {
-
   }
 }

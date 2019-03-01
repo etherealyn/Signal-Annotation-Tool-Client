@@ -1,12 +1,9 @@
 import { Injectable } from '@angular/core';
 import { LabelPayload } from './label.payload';
-import { LabelModel } from '../models/label.model';
 import { LabelsSocket } from './labels.socket';
-
-interface Labels {
-  projectId: string;
-  labels: LabelModel[];
-}
+import { Labels } from '../interfaces/ILabels';
+import { Range } from '../models/range';
+import { IdType } from 'vis';
 
 @Injectable({
   providedIn: 'root'
@@ -38,5 +35,14 @@ export class LabelsService {
 
   deleteLabel(projectId: string, labelId: string) {
     this.socket.emit('deleteLabel', {projectId, labelId});
+  }
+
+  addRange(projectId: string, labelId: string, range: Range) {
+    this.socket.emit('addRange', {projectId, labelId, range});
+  }
+
+  removeRange(projectId: string, labelId: string, rangeId: string) {
+    const payload = {projectId, labelId, rangeId};
+    this.socket.emit('removeRange', payload);
   }
 }

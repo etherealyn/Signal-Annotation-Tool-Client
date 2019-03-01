@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { IDirectory } from '../../interfaces/directory';
+import { IDirectory } from '../../interfaces/IDirectory';
 import { LabelModel } from '../../models/label.model';
 import { ProjectModel } from '../../models/project.model';
 import { ProjectEditorService } from '../../editor/project-editor.service';

@@ -4,8 +4,8 @@ import { ProjectModel } from '../../models/project.model';
 import { Subscription } from 'rxjs';
 import { DirectoryModel } from '../../models/directory.model';
 
-import { IFile } from '../../interfaces/file';
-import { IDirectory } from '../../interfaces/directory';
+import { IFile } from '../../interfaces/IFile';
+import { IDirectory } from '../../interfaces/IDirectory';
 import { FileModel } from '../../models/file.model';
 import { FileUploadComponent } from '../../upload/file-upload/file-upload.component';
 
