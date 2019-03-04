@@ -4,13 +4,16 @@ import { LabelsSocket } from './labels.socket';
 import { Labels } from '../interfaces/ILabels';
 import { Range } from '../models/range';
 import { IdType } from 'vis';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
+import { tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LabelsService {
 
-  constructor(private socket: LabelsSocket) {
+  constructor(private socket: LabelsSocket, private http: HttpClient) {
 
     this.socket.on('connect', () => {
       console.log('Connected');
@@ -44,5 +47,14 @@ export class LabelsService {
   removeRange(projectId: string, labelId: string, rangeId: string) {
     const payload = {projectId, labelId, rangeId};
     this.socket.emit('removeRange', payload);
+  }
+
+  getLabelsCsv(projectId: string) {
+    const url = `${environment.apiUrl}/project/labels/csv/${projectId}`;
+    return this.http.get(url, {responseType: 'text'});
+    //   .pipe(tap(
+    //   data => console.log(data),
+    //   error => console.log(error)
+    // ));
   }
 }

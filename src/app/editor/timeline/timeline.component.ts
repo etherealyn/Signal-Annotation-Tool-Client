@@ -18,6 +18,7 @@ import { Hotkey, HotkeysService } from 'angular2-hotkeys';
 import { AuthService } from '../../auth/auth.service';
 import { LabelModel } from '../../models/label.model';
 import { ProjectModel } from '../../models/project.model';
+import * as FileSaver from 'file-saver';
 
 @Component({
   selector: 'app-timeline',
@@ -50,7 +51,6 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
   private playbackTimeId: IdType;
   private subscription: Subscription;
   private currentRange = new Map<string, Range>();
-
 
 
   constructor(private editorService: ProjectEditorService,
@@ -317,5 +317,14 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
     const newOptions: TimelineOptions = Object.assign({}, this.options);
     newOptions.max = duration;
     this.timeline.setOptions(newOptions);
+  }
+
+  onExportClick() {
+    this.labelService.getLabelsCsv(this.project.id)
+      .toPromise()
+      .then(value => {
+        const blob = new Blob([ value ], {type: 'text/csv'});
+        FileSaver.saveAs(blob, 'labels.csv');
+      });
   }
 }
