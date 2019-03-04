@@ -13,9 +13,9 @@ import { Subscription } from 'rxjs';
   styleUrls: [ './project-modal.component.scss' ]
 })
 export class ProjectModalComponent implements OnInit, OnDestroy {
-  private model;
+  model;
 
-  private modalOpen = false;
+  modalOpen = false;
   private submitted = false;
   private subscription: Subscription;
 

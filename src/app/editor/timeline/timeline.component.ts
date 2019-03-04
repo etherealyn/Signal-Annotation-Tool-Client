@@ -45,7 +45,7 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
   };
   private timeline: Timeline;
 
-  private classes: Classification[];
+  classes: Classification[];
   private groups = new vis.DataSet<DataGroup>();
   private items = new vis.DataSet<DataItem>();
   private playbackTimeId: IdType;
