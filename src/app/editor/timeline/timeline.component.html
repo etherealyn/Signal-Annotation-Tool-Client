@@ -1,7 +1,7 @@
 <div id="timeline"></div>
 <div class="btn-group">
   <div class="checkbox btn" *ngFor="let clazz of classes; let i = index">
-    <input type="checkbox" id="btn-demo-check-{{i}}" [checked]="clazz.buttonChecked" (change)='onCheckboxChange(clazz)'>
+    <input type="checkbox" id="btn-demo-check-{{i}}" [checked]="clazz.isLabellingStarted" (change)='onCheckboxChange(clazz)'>
     <label for="btn-demo-check-{{i}}" class="checkbox-button">{{clazz.name}}</label>
   </div>
 </div>

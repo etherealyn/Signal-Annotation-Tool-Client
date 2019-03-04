@@ -6,15 +6,16 @@ export class Classification {
   name: string;
   series: Range[] = [];
   buttonChecked = false;
-  isLabellingFinished = false;
 
-  constructor(id: string, name: string, authorId: string, series: Range[], buttonChecked: boolean = false, finished: boolean = false) {
+  isLabellingUpdating = false;
+  isLabellingStarted = false;
+
+  constructor(id: string, name: string, authorId: string, series: Range[], buttonChecked: boolean = false) {
     this.id = id;
     this.name = name;
     this.authorId = authorId;
     this.series = series;
     this.buttonChecked = buttonChecked;
-    this.isLabellingFinished = finished;
   }
 
 }

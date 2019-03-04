@@ -49,6 +49,8 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
   private items = new vis.DataSet<DataItem>();
   private playbackTimeId: IdType;
   private subscription: Subscription;
+  private currentRange = new Map<string, Range>();
+
 
 
   constructor(private editorService: ProjectEditorService,
@@ -82,14 +84,15 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
     }, undefined, `Export the labels`));
   }
 
-  private toggleRecording(cls: Classification) {
-    const prev = cls.buttonChecked;
-    cls.buttonChecked = !cls.buttonChecked;
-    /** if button's checked state switches from true to false, it means that the user wished to stop the recording*/
-    if (prev === true && cls.buttonChecked === false) {
-      cls.isLabellingFinished = true;
-      const range = cls.series[cls.series.length - 1];
-      this.recordingEvents.emit({eventType: RecordingEventType.Stop, labelId: cls.id, range: range});
+  private toggleRecording(clazz: Classification) {
+    const prev = clazz.isLabellingStarted;
+    clazz.isLabellingStarted = !clazz.isLabellingStarted;
+    if (prev === true && clazz.isLabellingStarted === false) {
+      clazz.isLabellingUpdating = false;
+      const range = this.currentRange.get(clazz.id);
+      this.recordingEvents.emit({eventType: RecordingEventType.Stop, labelId: clazz.id, range: range});
+      console.log('\'labelling finished\'', range);
+      this.currentRange.delete(clazz.id);
     }
   }
 
@@ -159,28 +162,27 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
           this.subscription.add(sub.timeUpdate.subscribe(() => {
             this.updateCurrentTime(api.currentTime);
 
-            this.classes.forEach((($class) => {
-              const series = $class.series;
+            this.classes.forEach(((clazz) => {
+              const series = clazz.series;
               const currentTime = api.currentTime;
-              const seriesCount = series.length;
-              const groupId = $class.id;
+              const groupId = clazz.id;
               const authorId = this.authService.currentUserValue.id;
 
-              if ($class.buttonChecked) {
-                /** if the range list is empty or the labelling is finished we need to add a new range element*/
-                if (seriesCount === 0 || $class.isLabellingFinished) {
-                  const rangeId = this.instance();
-                  const range = new Range(rangeId, authorId, currentTime, currentTime);
-                  series.push(range);
-                  $class.isLabellingFinished = false;
-                  this.addItemBox(rangeId, groupId, currentTime);
-                  this.recordingEvents.emit({eventType: RecordingEventType.Start, labelId: groupId, range: range});
-                } else {
-                  const lastRange: Range = series[seriesCount - 1];
-                  lastRange.endTime = currentTime;
-                  this.updateItem(lastRange.id, lastRange.endTime);
-                  this.recordingEvents.emit({eventType: RecordingEventType.Recording, labelId: groupId, range: lastRange});
+              if (clazz.isLabellingStarted && clazz.isLabellingUpdating) {
+                const currentRange = this.currentRange.get(groupId);
+                if (currentRange) {
+                  currentRange.endTime = currentTime;
+                  this.updateItem(currentRange.id, currentRange.endTime);
+                  this.recordingEvents.emit({eventType: RecordingEventType.Recording, labelId: groupId, range: currentRange});
                 }
+              }
+
+              if (clazz.isLabellingStarted && !clazz.isLabellingUpdating) {
+                clazz.isLabellingUpdating = true;
+                const range = new Range(this.instance(), authorId, currentTime, currentTime);
+                this.currentRange.set(groupId, range);
+                this.addItemBox(range.id, groupId, currentTime);
+                this.recordingEvents.emit({eventType: RecordingEventType.Start, labelId: groupId, range: range});
               }
             }));
           }));
@@ -200,7 +202,6 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
       .subscribe(value => {
         if (value) {
           this.classes = this.labelsToClasses(value.labels);
-          console.log('getCurrentProject', this.classes);
           this.classes.forEach(label => {
             if (label.series) {
               const ranges = label.series;
@@ -272,7 +273,9 @@ export class TimelineComponent implements OnInit, OnChanges, OnDestroy {
   private labelsToClasses(labels: LabelModel[]) {
     return labels.map(label => {
       const ranges: Range[] = label.series
-        ? label.series.map(range => new Range(range.id, range.authorId, range.startTime, range.endTime))
+        ? label.series.map(range => {
+          return new Range(range.id, range.authorId, range.startTime, range.endTime);
+        })
         : [];
       return new Classification(label.id, label.name, label.authorId, ranges);
     });
