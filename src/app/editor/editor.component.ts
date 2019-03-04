@@ -17,7 +17,7 @@ export class EditorComponent implements OnInit {
   }
 
   project: ProjectModel;
-  direction = 'horizontal';
+  direction = 'vertical';
   labelNames: string[] = [];
 
   ngOnInit() {
