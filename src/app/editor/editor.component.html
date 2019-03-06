@@ -1,8 +1,13 @@
 <!--&lt;!&ndash;<div class="vertical-line"></div>&ndash;&gt;-->
 <!--<hotkeys-cheatsheet></hotkeys-cheatsheet>-->
-<button class="btn btn-warning" (click)="direction = (direction === 'horizontal') ? 'vertical' : 'horizontal'">{{ 'Toggle direction: "' + direction + '"' }}</button>
+
 <as-split [direction]="direction">
   <as-split-area size="50">
+    <button
+      class="btn btn-warning btn-sm float"
+      (click)="direction = (direction === 'horizontal') ? 'vertical' : 'horizontal'">
+      {{ 'Toggle direction: "' + direction + '"' }}
+    </button>
     <app-videogrid></app-videogrid>
   </as-split-area>
   <as-split-area size="50">

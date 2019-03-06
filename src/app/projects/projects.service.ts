@@ -28,10 +28,6 @@ export class ProjectsService {
   private projectsSubject: BehaviorSubject<ProjectModel[]>;
   currentProjects$: Observable<ProjectModel[]>;
 
-  static deleteFile(id: string, filename: string) {
-    console.log(id, filename);
-  }
-
   getProjects(): Observable<ProjectModel[]> {
     const userId = this.authService.currentUserValue.id;
     return this.http.get<ProjectModel[]>(`${this.projectsUrl}/all/${userId}`)
@@ -83,5 +79,10 @@ export class ProjectsService {
     this.getProjects().toPromise().then((value => {
       this.projectsSubject.next(value);
     }));
+  }
+
+  deleteFile(id: string, filename: string): Observable<Object> {
+    const url = `${this.projectsUrl}/files/${id}/${filename}`;
+    return this.http.delete(url);
   }
 }

@@ -3,9 +3,12 @@
   {{project.description}}
 </div>
 <hr>
-
+<div style="display:table;margin:0 auto;" *ngIf="loading">
+  <span class="spinner spinner-md">
+      Loading...
+  </span>
+</div>
 <app-file-upload *ngIf="project" [currentProject]="project"></app-file-upload>
-
 <clr-tree-node *ngFor="let directory of rootDirectory">
   <div>
     <clr-icon [attr.shape]='directory.expanded ? "folder-open" : "folder"'></clr-icon>
@@ -33,3 +36,4 @@
     </clr-tree-node>
   </ng-template>
 </clr-tree-node>
+

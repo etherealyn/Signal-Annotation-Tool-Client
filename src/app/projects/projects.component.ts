@@ -27,6 +27,6 @@ export class ProjectsComponent implements OnInit {
   }
 
   onInvite() {
-    console.log('onInvite');
+    console.log('ProjectsComponent', 'onInvite');
   }
 }

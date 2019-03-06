@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ProjectEditorService } from '../../editor/project-editor.service';
+import { ProjectService } from '../../editor/project.service';
 import { ProjectModel } from '../../models/project.model';
 import { Subscription } from 'rxjs';
 import { DirectoryModel } from '../../models/directory.model';
@@ -24,15 +24,21 @@ export class FiletreeComponent implements OnInit, OnDestroy {
 
   @ViewChild(FileUploadComponent) uploadDialog: FileUploadComponent;
 
-  constructor(private editorService: ProjectEditorService) {
+  loading = true;
+
+  constructor(private editorService: ProjectService) {
   }
 
   ngOnInit() {
     this.subscription = this.editorService.getCurrentProject$()
-      .subscribe(value => {
-        if (value && value.fileTree) {
-          this.project = value;
-          this.rootDirectory = this.buildFileTree(this.project.fileTree);
+      .subscribe(project => {
+        if (project) {
+          this.loading = false;
+          this.project = project;
+
+          if (project.fileTree) {
+            this.rootDirectory = this.buildFileTree(this.project.fileTree);
+          }
         }
       });
   }
@@ -71,19 +77,10 @@ export class FiletreeComponent implements OnInit, OnDestroy {
   }
 
   openFile(file: IFile) {
-    // const fileModel = this.fileIndex.get(fileName);
-    // if (fileModel.mimetype.startsWith('video')) {
-    //   this.editorService.openFile(fileModel);
-    // }
     file.active = !file.active;
   }
 
   openUploadDialog() {
     this.uploadDialog.openDialog();
-  }
-
-  onFileDelete(filename: string) {
-    this.editorService.deleteFile(filename);
-    console.error('FileTree.onFileDelete', 'Not Implemented'); // fixme
   }
 }

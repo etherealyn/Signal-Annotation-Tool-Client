@@ -1,3 +1,4 @@
+<div class="progress loop progress-fade" *ngIf="loading" style="margin: 24px"><progress></progress></div>
 <div (mouseleave)="onGlobalMouseLeave()" *ngIf="videoSources && videoSources.length !== 0">
   <mat-grid-list cols="{{videoSources.length === 1 ? '1' : '2'}}" rowHeight="2:1">
     <mat-grid-tile *ngFor="let video of videoSources; let i = index" class="video-container">

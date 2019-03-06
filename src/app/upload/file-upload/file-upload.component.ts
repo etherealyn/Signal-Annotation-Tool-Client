@@ -3,7 +3,7 @@ import { UploadService } from '../upload.service';
 import { forkJoin, Observable } from 'rxjs';
 import { ProjectModel } from '../../models/project.model';
 import { ProjectsService } from '../../projects/projects.service';
-import { ProjectEditorService } from '../../editor/project-editor.service';
+import { ProjectService } from '../../editor/project.service';
 
 @Component({
   selector: 'app-file-upload',
@@ -24,7 +24,7 @@ export class FileUploadComponent implements OnInit {
   uploadSuccessful = false;
   rawFiles: any;
 
-  constructor(private editorService: ProjectEditorService,
+  constructor(private editorService: ProjectService,
               private uploadService: UploadService) {
   }
 

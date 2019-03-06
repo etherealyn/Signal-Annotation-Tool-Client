@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { VgAPI } from 'videogular2/core';
 import { IVideo } from '../video.interface';
-import { ProjectEditorService } from '../../editor/project-editor.service';
+import { ProjectService } from '../../editor/project.service';
 import { LinkedList } from 'typescript-collections';
 import { IMediaSubscriptions } from 'videogular2/src/core/vg-media/i-playable';
 import { VideoService } from '../video.service';
@@ -25,55 +25,36 @@ export class VideogridComponent implements OnInit, OnDestroy {
   private playbackIndex = 3;
   private playbackValues: string[] = [ '0.25', '0.5', '0.75', '1.0', '1.25', '1.50', '1.75', '2.0', '3.0' ];
   private subscription: Subscription;
-  private mainIndex = 0; // 'main' video index
+  private mainIndex = 0;
+  loading = true;
 
-  constructor(private videoService: VideoService, private editorService: ProjectEditorService, private hotkeysService: HotkeysService) {
+  // 'main' video index
+
+  constructor(private videoService: VideoService, private editorService: ProjectService, private hotkeysService: HotkeysService) {
     this.registerHotkeys();
   }
 
-  private registerHotkeys() {
-    const playVideoHotkey = new Hotkey('space', (): boolean => {
-      this.onPlayPause();
-      return false;
-    }, undefined, 'Play the video(s)');
-    const nextPlayback = new Hotkey('shift+period', (): boolean => {
-      this.nextPlaybackSpeed();
-      return false;
-    }, undefined, 'Next playback speed');
-    const prevPlayback = new Hotkey('shift+comma', (): boolean => {
-      this.nextPlaybackSpeed();
-      return false;
-    }, undefined, 'Previous playback speed');
-    const cursorSound = new Hotkey('alt+j', (): boolean => {
-      this.cursorSound = !this.cursorSound;
-      return false;
-    }, undefined, 'Enable/disable `Cursor Sound` mode: an audio source is selected on mouse hover (default On)');
+  ngOnInit() {
+    this.subscription = this.editorService.getCurrentProject$().subscribe(project => {
+      if (project) {
+        this.loading = false;
 
-    const back = new Hotkey('left', (): boolean => {
-      this.seekTime(this.getCurrentTime() - 5);
-      return false;
-    }, undefined, '5 seconds back');
+        /** Gather all videoSources */
+        const videos: IVideo[] = [];
+        project.fileTree.children.forEach((child => {
+          if (child.mimetype.startsWith('video')) {
+            videos.push({source: child.filename});
+          }
+        }));
 
-    const windback = new Hotkey('shift+left', (): boolean => {
-      this.seekTime(this.getCurrentTime() - 15);
-      return false;
-    }, undefined, '15 seconds back');
-
-    const forward = new Hotkey('right', (): boolean => {
-      this.seekTime(this.getCurrentTime() + 5);
-      return false;
-    }, undefined, '5 seconds forward');
-
-    const windforward = new Hotkey('shift+right', (): boolean => {
-      this.seekTime(this.getCurrentTime() + 15);
-      return false;
-    }, undefined, '15 seconds forward');
-
-    [ playVideoHotkey, nextPlayback, prevPlayback, cursorSound, back, windback, forward, windforward ]
-      .forEach(hotkey => this.hotkeysService.add(hotkey));
+        this._videoSources = videos;
+        this.durations = new Array<number>(videos.length);
+        this.currentTimes = new Array<number>(videos.length);
+      }
+    });
   }
 
-  private onPlayerReady(api: VgAPI, index: number) {
+  onPlayerReady(api: VgAPI, index: number) {
     this.apis.add(api);
     this.videoService.onPlayerReady(api);
 
@@ -90,24 +71,6 @@ export class VideogridComponent implements OnInit, OnDestroy {
     this.subscription.add(subscriptions.durationChange.subscribe(() => {
       this.durations[index] = api.duration;
     }));
-  }
-
-  ngOnInit() {
-    this.subscription = this.editorService.getCurrentProject$().subscribe(project => {
-      if (project) {
-        /** Gather all videoSources */
-        const videos: IVideo[] = [];
-        project.fileTree.children.forEach((child => {
-          if (child.mimetype.startsWith('video')) {
-            videos.push({source: child.filename});
-          }
-        }));
-
-        this._videoSources = videos;
-        this.durations = new Array<number>(videos.length);
-        this.currentTimes = new Array<number>(videos.length);
-      }
-    });
   }
 
   /** Mouse Event Reactions  START */
@@ -213,5 +176,47 @@ export class VideogridComponent implements OnInit, OnDestroy {
   getCurrentTime() {
     const currentTime: number = this.currentTimes[this.mainIndex];
     return currentTime ? Number.isNaN(currentTime) ? 0 : currentTime : 0;
+  }
+
+  registerHotkeys() {
+    const playVideoHotkey = new Hotkey('space', (): boolean => {
+      this.onPlayPause();
+      return false;
+    }, undefined, 'Play the video(s)');
+    const nextPlayback = new Hotkey('shift+period', (): boolean => {
+      this.nextPlaybackSpeed();
+      return false;
+    }, undefined, 'Next playback speed');
+    const prevPlayback = new Hotkey('shift+comma', (): boolean => {
+      this.nextPlaybackSpeed();
+      return false;
+    }, undefined, 'Previous playback speed');
+    const cursorSound = new Hotkey('alt+j', (): boolean => {
+      this.cursorSound = !this.cursorSound;
+      return false;
+    }, undefined, `Follow the mouse cursor to listen to the audio`);
+
+    const back = new Hotkey('left', (): boolean => {
+      this.seekTime(this.getCurrentTime() - 5);
+      return false;
+    }, undefined, '5 seconds back');
+
+    const windback = new Hotkey('shift+left', (): boolean => {
+      this.seekTime(this.getCurrentTime() - 15);
+      return false;
+    }, undefined, '15 seconds back');
+
+    const forward = new Hotkey('right', (): boolean => {
+      this.seekTime(this.getCurrentTime() + 5);
+      return false;
+    }, undefined, '5 seconds forward');
+
+    const windforward = new Hotkey('shift+right', (): boolean => {
+      this.seekTime(this.getCurrentTime() + 15);
+      return false;
+    }, undefined, '15 seconds forward');
+
+    [ playVideoHotkey, nextPlayback, prevPlayback, cursorSound, back, windback, forward, windforward ]
+      .forEach(hotkey => this.hotkeysService.add(hotkey));
   }
 }

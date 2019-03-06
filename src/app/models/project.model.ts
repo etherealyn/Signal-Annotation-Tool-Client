@@ -1,6 +1,4 @@
 import { DirectoryModel } from './directory.model';
-import { LabelModel } from './label.model';
-import { UserModel } from './user.model';
 
 export class ProjectModel {
   constructor(
@@ -11,6 +9,5 @@ export class ProjectModel {
     public memberIds?: string[],
     public description?: string,
     public fileTree?: DirectoryModel,
-    public labels?: LabelModel[],
   ) {}
 }
