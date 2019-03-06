@@ -1,10 +1,10 @@
-.video-container:hover {
-  border: 2px solid transparent;
-}
-
-.video-container:hover {
-  border: 2px solid aqua;
-}
+//.video-container:hover {
+//  border: 2px solid transparent;
+//}
+//
+//.video-container:hover {
+//  border: 2px solid aqua;
+//}
 
 .rounded-corners {
   border-radius: 3px;
@@ -72,6 +72,15 @@
   background: #00fffa;
   cursor: pointer;
 }
+
+.currentTime {
+  height: 48px;
+  span {
+    color: white;
+    line-height: 48px;
+  }
+}
+
 //
 //input[type=range]::-webkit-slider-runnable-track {
 //  background-position: right top;
