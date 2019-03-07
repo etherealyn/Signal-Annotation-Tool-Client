@@ -18,8 +18,8 @@
 
       <div class="clr-treenode-link">
         <!--<clr-icon [attr.shape]="label.icon"></clr-icon>-->
-        <!--<input type="text" [(ngModel)]="label.name" (change)="onLabelNameChange(i)"/>-->
-        {{label.name}}
+        <input type="text" [(ngModel)]="label.name" (change)="onLabelNameChange(label)"/>
+        <!--{{label.name}}-->
       </div>
       <div>
         <!--<button class="btn btn-link btn-icon" (click)="onLabelHide(i)">-->

@@ -23,13 +23,13 @@ interface ILabel {
 })
 export class LabelsService {
   constructor(private socket: LabelsSocket) {
-    // this.socket.on('connect', () => {
-    //   console.log('connect');
-    // });
-    //
-    // this.socket.on('disconnect', () => {
-    //   console.log('disconnect');
-    // });
+    this.socket.on('connect', () => {
+      console.log('connect');
+    });
+
+    this.socket.on('disconnect', () => {
+      console.log('disconnect');
+    });
   }
 
   join(id) {
@@ -44,6 +44,12 @@ export class LabelsService {
     });
   }
 
+  getLabels(): Promise<LabelModel[]> {
+    return new Promise((resolve) => {
+      this.socket.emit('all', undefined, (value) => resolve(value));
+    });
+  }
+
   addLabel(authorId: string = '') {
     return new Promise(resolve => {
       this.socket.emit('add', {aid: authorId}, (label: LabelModel) => {
@@ -53,23 +59,17 @@ export class LabelsService {
     });
   }
 
-  private doOnSubscribe<T>(onSubscribe: () => void): (source: Observable<T>) => Observable<T> {
-    return function inner(source: Observable<T>): Observable<T> {
-      return defer(() => {
-        onSubscribe();
-        return source;
+  async editLabelName(id: string, change: string) {
+    return await new Promise(((resolve, reject) => {
+      console.log('editLabelName');
+      this.socket.emit('edit', {id, change}, (err) => {
+        if (!err) {
+          resolve({id, change});
+        } else {
+          reject();
+        }
       });
-    };
-  }
-
-  getLabels(): Promise<LabelModel[]> {
-    return new Promise((resolve) => {
-      this.socket.emit('all', undefined, (value) => resolve(value));
-    });
-  }
-
-  newLabels$(): Observable<any> {
-    return this.socket.fromEvent('new');
+    }));
   }
 
   deleteLabel(id: string) {
@@ -84,7 +84,9 @@ export class LabelsService {
     });
   }
 
-  removedLabels$(): Observable<any> {
-    return this.socket.fromEvent('rem');
-  }
+  newLabels$ = (): Observable<any> => this.socket.fromEvent('new');
+
+  removedLabels$ = (): Observable<any> => this.socket.fromEvent('rem');
+
+  editedLabels$ = (): Observable<any> => this.socket.fromEvent('upd');
 }

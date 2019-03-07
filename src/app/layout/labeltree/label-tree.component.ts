@@ -40,19 +40,32 @@ export class LabelTreeComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.labelsService.newLabels$().subscribe(label => {
+    this.subscription.add(this.labelsService.newLabels$().subscribe(label => {
       if (label) {
         this.annotationsFolder.files.push({id: label.id, name: label.name, icon: 'tag', active: false});
       }
-    });
+    }));
 
-    this.labelsService.removedLabels$().subscribe(e => {
+    this.subscription.add(this.labelsService.removedLabels$().subscribe(e => {
       const len = this.annotationsFolder.files.length;
       const i = this.annotationsFolder.files.findIndex(x => x.id === e.id);
       if (0 <= i && i < len) {
         this.annotationsFolder.files.splice(i, 1);
       }
-    });
+    }));
+
+    this.subscription.add(this.labelsService.editedLabels$().subscribe(edit => {
+      console.log(edit);
+      if (edit) {
+        const labelId = edit.id;
+        const changeName = edit.change;
+        const i = this.annotationsFolder.files.findIndex(x => x.id === labelId);
+        const length = this.annotationsFolder.files.length;
+        if (0 <= i && i < length) {
+          this.annotationsFolder.files[i].name = changeName;
+        }
+      }
+    }));
   }
 
   addNewLabel() {
@@ -78,5 +91,12 @@ export class LabelTreeComponent implements OnInit, OnDestroy {
         this.annotationsFolder.files.splice(i, 1);
       }
     });
+  }
+
+  onLabelNameChange(label: IFile) {
+    this.labelsService.editLabelName(label.id, label.name)
+      .then((data) => {
+
+      });
   }
 }
