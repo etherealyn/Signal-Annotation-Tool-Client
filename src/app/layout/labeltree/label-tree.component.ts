@@ -1,19 +1,20 @@
-import { Component, OnInit } from '@angular/core';
-import { IDirectory } from '../../interfaces/IDirectory';
-import { LabelsService } from '../../labels/labels.service';
-import { AuthService } from '../../auth/auth.service';
-import { ProjectService } from '../../editor/project.service';
-import { LabelModel } from '../../models/label.model';
-import { Subscription } from 'rxjs';
-import { ProjectModel } from '../../models/project.model';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {IDirectory} from '../../interfaces/IDirectory';
+import {LabelsService} from '../../labels/labels.service';
+import {ProjectService} from '../../editor/project.service';
+import {Subscription} from 'rxjs';
+import {ProjectModel} from '../../models/project.model';
+import {filter, map} from 'rxjs/operators';
+import {IFile} from '../../interfaces/IFile';
+import * as Collections from 'typescript-collections';
+import {LabelModel} from '../../models/label.model';
 
 @Component({
   selector: 'app-label-tree',
   templateUrl: './label-tree.component.html',
-  styleUrls: [ './label-tree.component.scss' ]
+  styleUrls: ['./label-tree.component.scss']
 })
-export class LabelTreeComponent implements OnInit {
-
+export class LabelTreeComponent implements OnInit, OnDestroy {
   annotationsFolder: IDirectory = {
     name: 'Labels',
     icon: 'folder',
@@ -21,53 +22,83 @@ export class LabelTreeComponent implements OnInit {
     files: []
   };
 
-  constructor(private labelsService: LabelsService) {
+  private project: ProjectModel;
+  private subscription: Subscription;
+
+  constructor(
+    private projectService: ProjectService,
+    private labelsService: LabelsService) {
   }
 
   ngOnInit() {
-    console.log('LabelTreeComponent', 'onInit');
-    // this.subscription.add(this.labelService.getLabels$().subscribe(value => {
-    //   const projectId = value.projectId;
-    //   const labels = value.labels;
-    //   if (this.project.id === projectId) {
-    //     this.annotationsFolder = this.buildAnnotationsTree(labels);
-    //   }
-    // }));
+    this.subscription = this.projectService.getCurrentProject$()
+      .subscribe(project => {
+        if (project) {
+          this.project = project;
+          this.onProjectReady(project);
+        }
+      });
   }
 
-  initFolder(labelGroups: LabelModel[]) {
-    if (labelGroups) {
-      labelGroups.forEach(model => {
-        this.annotationsFolder.files.push({
-          id: model.id,
-          name: model.name,
-          icon: 'tag',
-          active: false
-        });
-      });
-    }
+  private onProjectReady(project: ProjectModel) {
+    this.labelsService.getLabels(project.id, xs => {
+      this.annotationsFolder.files = xs.map(label => ({
+        id: label.id,
+        name: label.name,
+        icon: 'tag',
+        active: false,
+      }));
+    });
+
+    this.subscription.add(
+      this.labelsService.newLabels$(project.id)
+        .subscribe(label => {
+          if (label) {
+            this.annotationsFolder.files.push({
+              id: label.id,
+              name: label.name,
+              icon: 'tag',
+              active: false,
+            });
+          }
+        })
+    );
+
+    this.subscription.add(
+      this.labelsService.removedLabels$()
+        .subscribe(data => {
+          console.log('rem', data.id);
+          const len = this.annotationsFolder.files.length;
+          const i = this.annotationsFolder.files.findIndex(x => x.id === data.id);
+          if (0 <= i && i < len) {
+            this.annotationsFolder.files.splice(i, 1);
+          }
+        })
+    );
   }
 
   addNewLabel() {
-    console.log('LabelTreeComponent', 'add new label');
-    // const name = `Label ${this.annotationsFolder.files.length + 1}`;
-
-    // const projectId = this.project.id;
-    // const authorId = this.authService.currentUserValue.id;
-    //
-    // this.labelService.addLabel({ projectId, authorId, name });
+    this.labelsService.addLabel(this.project.id, '', label => {
+      this.annotationsFolder.files.push({
+        id: label.id,
+        name: label.name,
+        icon: 'tag',
+        active: false,
+      });
+    });
   }
 
-  onLabelDelete(labelId: string, index: number) {
-    console.log('LabelTreeComponent', 'label delete', labelId, index);
-    //   this.labelService.deleteLabel(this.project.id, labelId);
-    //   this.annotationsFolder.files.splice(index, 1);
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 
-  onLabelNameChange(i: number) {
-    console.log('LabelTreeComponent', 'label edit');
-    //   const label = this.annotationsFolder.files[i];
-    //   if (label) {
-    //     this.labelService.editLabelName(this.project.id, label.id, label.name);
+  onLabelDelete(i: number, id: string) {
+    this.labelsService.deleteLabel(id, result => {
+      if (result) {
+        this.annotationsFolder.files.splice(i, 1);
+      }
+    });
   }
 }

@@ -4,6 +4,6 @@ import { Socket } from 'ngx-socket-io';
 @Injectable()
 export class LabelsSocket extends Socket {
   constructor() {
-    super({url: 'http://localhost:8080/labels', options: {}});
+    super({url: 'http://localhost:3000/labels', options: {}});
   }
 }
