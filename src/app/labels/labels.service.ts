@@ -9,6 +9,7 @@ import {ProjectModel} from '../models/project.model';
 import {defer, Observable, Subscription} from 'rxjs';
 import {filter} from 'rxjs/operators';
 import {validate} from 'codelyzer/walkerFactory/walkerFn';
+import {LabelModel} from '../models/label.model';
 
 interface ILabel {
   id: string;
@@ -22,18 +23,34 @@ interface ILabel {
 })
 export class LabelsService {
   constructor(private socket: LabelsSocket) {
+    // this.socket.on('connect', () => {
+    //   console.log('connect');
+    // });
+    //
+    // this.socket.on('disconnect', () => {
+    //   console.log('disconnect');
+    // });
+  }
 
-    this.socket.on('connect', () => {
-      console.log('connect');
-    });
-
-    this.socket.on('disconnect', () => {
-      console.log('disconnect');
+  join(id) {
+    this.socket.emit('join', {id}, (data) => {
+      console.log(`join:${id}`, data);
     });
   }
 
-  addLabel(projectId: string, authorId: string = '', callback?: Function) {
-    this.socket.emit('add', {pid: projectId, aid: authorId}, callback);
+  leave(id) {
+    this.socket.emit('leave', {id}, (data) => {
+      console.log(`leave:${id}`, data);
+    });
+  }
+
+  addLabel(authorId: string = '') {
+    return new Promise(resolve => {
+      this.socket.emit('add', {aid: authorId}, (label: LabelModel) => {
+        console.log('add new label', label);
+        resolve(label);
+      });
+    });
   }
 
   private doOnSubscribe<T>(onSubscribe: () => void): (source: Observable<T>) => Observable<T> {
@@ -45,16 +62,26 @@ export class LabelsService {
     };
   }
 
-  getLabels(projectId: string, callback?: Function) {
-    this.socket.emit('all', {pid: projectId}, callback);
+  getLabels(): Promise<LabelModel[]> {
+    return new Promise((resolve) => {
+      this.socket.emit('all', undefined, (value) => resolve(value));
+    });
   }
 
-  newLabels$(projectId: string): Observable<any> {
+  newLabels$(): Observable<any> {
     return this.socket.fromEvent('new');
   }
 
-  deleteLabel(id: string, callback?: Function) {
-    this.socket.emit('del', {id}, callback);
+  deleteLabel(id: string) {
+    return new Promise((resolve, reject) => {
+      this.socket.emit('del', {id}, (err) => {
+        if (!err) {
+          resolve();
+        } else {
+          reject();
+        }
+      });
+    });
   }
 
   removedLabels$(): Observable<any> {

@@ -29,7 +29,7 @@ export class ProjectService {
     return this.currentProject$;
   }
 
-  private getCurrentProjectValue(): ProjectModel {
+  getCurrentProjectValue(): ProjectModel {
     return this.currentProjectSubject.getValue();
   }
 
