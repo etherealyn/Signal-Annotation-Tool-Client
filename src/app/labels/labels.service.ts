@@ -1,30 +1,36 @@
-import {Injectable} from '@angular/core';
-import {LabelPayload} from './label.payload';
-import {LabelsSocket} from './labels.socket';
-import {Labels} from '../interfaces/ILabels';
-import {Range} from '../models/range';
-import {IdType} from 'vis';
-import {ProjectService} from '../editor/project.service';
-import {ProjectModel} from '../models/project.model';
-import {defer, Observable, Subscription} from 'rxjs';
-import {filter} from 'rxjs/operators';
-import {validate} from 'codelyzer/walkerFactory/walkerFn';
-import {LabelModel} from '../models/label.model';
+import { EventEmitter, Injectable } from '@angular/core';
+import { LabelsSocket } from './labels.socket';
+import { merge, Observable, Subject } from 'rxjs';
+import { LabelModel } from '../models/label.model';
+import { joinTestLogs } from "protractor/built/util";
 
-interface ILabel {
+interface ILabelRemoved {
   id: string;
-  name: string;
-  projectId: string;
-  authorId: string;
+}
+
+interface ILabelEditName {
+  id: string;
+  change: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class LabelsService {
+
+  private newLabelSubject = new Subject<LabelModel>();
+  private deleteLabelSubject = new Subject<ILabelRemoved>();
+  private editedLabelsSubject = new Subject<ILabelEditName>();
+
+  private lastProjectId;
+
+
   constructor(private socket: LabelsSocket) {
     this.socket.on('connect', () => {
       console.log('connect');
+      if (this.lastProjectId) {
+        this.joinProject(this.lastProjectId);
+      }
     });
 
     this.socket.on('disconnect', () => {
@@ -32,51 +38,79 @@ export class LabelsService {
     });
   }
 
-  join(id) {
-    this.socket.emit('join', {id}, (data) => {
+  /**
+   * Join a comm room associated with the project
+   * @param id of the project to be joined into
+   */
+  joinProject(id) {
+    this.socket.emit('joinProject', {id}, (data) => {
       console.log(`join:${id}`, data);
+      this.lastProjectId = id;
     });
   }
 
-  leave(id) {
-    this.socket.emit('leave', {id}, (data) => {
+  /**
+   * Leave a comm room associated with the project
+   * @param id of the project to be left from
+   */
+  leaveProject(id) {
+    this.socket.emit('leaveProject', {id}, (data) => {
       console.log(`leave:${id}`, data);
     });
   }
 
+  // region Unicast
+
+  /**
+   * Get all labels in this project
+   */
   getLabels(): Promise<LabelModel[]> {
     return new Promise((resolve) => {
-      this.socket.emit('all', undefined, (value) => resolve(value));
+      this.socket.emit('getLabels', undefined, (value) => resolve(value));
     });
   }
 
+  /**
+   * Add a label to this project
+   * @param authorId - the ID of the author
+   */
   addLabel(authorId: string = '') {
     return new Promise(resolve => {
-      this.socket.emit('add', {aid: authorId}, (label: LabelModel) => {
-        console.log('add new label', label);
+      this.socket.emit('addLabel', {aid: authorId}, (label: LabelModel) => {
         resolve(label);
+        this.newLabelSubject.next(label);
       });
     });
   }
 
-  async editLabelName(id: string, change: string) {
+  /**
+   * Update the name of a label
+   * @param id of this label
+   * @param newName - a new name to be assigned to this label
+   */
+  async editLabel(id: string, newName: string) {
     return await new Promise(((resolve, reject) => {
-      console.log('editLabelName');
-      this.socket.emit('edit', {id, change}, (err) => {
-        if (!err) {
-          resolve({id, change});
-        } else {
+      this.socket.emit('editLabel', {id, change: newName}, (err) => {
+        if (err) {
           reject();
+        } else {
+          resolve({id, change: newName});
+          this.editedLabelsSubject.next({id, change: newName});
         }
       });
     }));
   }
 
+  /**
+   * Delete the label by id
+   * @param id of this label
+   */
   deleteLabel(id: string) {
     return new Promise((resolve, reject) => {
-      this.socket.emit('del', {id}, (err) => {
+      this.socket.emit('deleteLabel', {id}, (err) => {
         if (!err) {
           resolve();
+          this.deleteLabelSubject.next({id});
         } else {
           reject();
         }
@@ -84,9 +118,27 @@ export class LabelsService {
     });
   }
 
-  newLabels$ = (): Observable<any> => this.socket.fromEvent('new');
+  // endregion
 
-  removedLabels$ = (): Observable<any> => this.socket.fromEvent('rem');
+  // region Broadcast
+  newLabels$(): Observable<LabelModel> {
+    return merge(
+      this.socket.fromEvent<LabelModel>('newLabels'),
+      this.newLabelSubject.asObservable()
+    );
+  }
 
-  editedLabels$ = (): Observable<any> => this.socket.fromEvent('upd');
+  removedLabels$(): Observable<ILabelRemoved> {
+    return merge(
+      this.socket.fromEvent<ILabelRemoved>('removedLabels'),
+      this.deleteLabelSubject.asObservable()
+    );
+  }
+
+  editedLabels$(onlyExternalChanges: boolean = false) {
+    const ws = this.socket.fromEvent<ILabelEditName>('updatedLabels');
+    return onlyExternalChanges ? ws : merge(ws, this.editedLabelsSubject.asObservable());
+  }
+
+  // endregion
 }

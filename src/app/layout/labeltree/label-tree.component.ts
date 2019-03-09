@@ -4,11 +4,7 @@ import {LabelsService} from '../../labels/labels.service';
 import {ProjectService} from '../../editor/project.service';
 import {Subscription} from 'rxjs';
 import {ProjectModel} from '../../models/project.model';
-import {filter, map} from 'rxjs/operators';
 import {IFile} from '../../interfaces/IFile';
-import * as Collections from 'typescript-collections';
-import {LabelModel} from '../../models/label.model';
-import {remove} from 'typescript-collections/dist/lib/arrays';
 
 @Component({
   selector: 'app-label-tree',
@@ -17,7 +13,7 @@ import {remove} from 'typescript-collections/dist/lib/arrays';
 })
 export class LabelTreeComponent implements OnInit, OnDestroy {
   annotationsFolder: IDirectory = {
-    name: 'Labels',
+    name: 'Dictionary',
     icon: 'folder',
     expanded: true,
     files: []
@@ -54,8 +50,7 @@ export class LabelTreeComponent implements OnInit, OnDestroy {
       }
     }));
 
-    this.subscription.add(this.labelsService.editedLabels$().subscribe(edit => {
-      console.log(edit);
+    this.subscription.add(this.labelsService.editedLabels$(true).subscribe(edit => {
       if (edit) {
         const labelId = edit.id;
         const changeName = edit.change;
@@ -69,12 +64,7 @@ export class LabelTreeComponent implements OnInit, OnDestroy {
   }
 
   addNewLabel() {
-    this.labelsService.addLabel('').then(
-      (label: LabelModel) => {
-        if (label) {
-          this.annotationsFolder.files.push({id: label.id, name: label.name, icon: 'tag', active: false});
-        }
-      });
+    this.labelsService.addLabel('');
   }
 
   ngOnDestroy() {
@@ -84,19 +74,10 @@ export class LabelTreeComponent implements OnInit, OnDestroy {
   }
 
   onLabelDelete(id: string) {
-    this.labelsService.deleteLabel(id).then(() => {
-      const len = this.annotationsFolder.files.length;
-      const i = this.annotationsFolder.files.findIndex(x => x.id === id);
-      if (0 <= i && i < len) {
-        this.annotationsFolder.files.splice(i, 1);
-      }
-    });
+    this.labelsService.deleteLabel(id);
   }
 
   onLabelNameChange(label: IFile) {
-    this.labelsService.editLabelName(label.id, label.name)
-      .then((data) => {
-
-      });
+    this.labelsService.editLabel(label.id, label.name);
   }
 }

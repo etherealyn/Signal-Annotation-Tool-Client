@@ -23,10 +23,10 @@ export class EditorComponent implements OnInit, OnDestroy {
     /** Get project id from the current route */
     this.projectId = this.route.snapshot.paramMap.get('id');
     this.projectService.loadProject(this.projectId);
-    this.labelService.join(this.projectId);
+    this.labelService.joinProject(this.projectId);
   }
 
   ngOnDestroy(): void {
-    this.labelService.leave(this.projectId);
+    this.labelService.leaveProject(this.projectId);
   }
 }
