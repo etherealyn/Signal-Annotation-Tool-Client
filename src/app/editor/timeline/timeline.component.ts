@@ -1,9 +1,17 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  OnDestroy,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import * as vis from 'vis';
 import { DataGroup, DataItem, DataSet, DateType, IdType, Timeline, TimelineOptions } from 'vis';
 import * as hyperid from 'hyperid';
 import { LabelsService } from 'src/app/labels/labels.service';
-import { first } from 'rxjs/operators';
 import { ProjectService } from '../project.service';
 import { VideoService } from '../../video/video.service';
 import { Subscription } from 'rxjs';
@@ -12,6 +20,10 @@ import { HotkeysService } from 'angular2-hotkeys';
 import { ProjectModel } from '../../models/project.model';
 import * as moment from 'moment';
 import { Time } from './time';
+
+interface LabelGroup extends DataGroup {
+  recording: boolean;
+}
 
 @Component({
   selector: 'app-timeline',
@@ -34,63 +46,53 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
   private instance = hyperid();
 
   private timeline: Timeline;
-  private options: TimelineOptions = {
-    groupOrder: 'content',  // groupOrder can be a property name or a sorting function,
-    width: '100%',
-    // height: '256px',
-    // margin: {
-    //   item: 20
-    // },
-    min: Time.seconds(0),
-    start: Time.seconds(0),
-    end: Time.seconds(15),
-    max: Time.seconds(98), // todo
-    moment: function (date) {
-      return moment(date).utc();
-    },
-    // max: 1000,
-    editable: true,
-    // zoomMin: 10000,
-    format: {
-      minorLabels: {
-        millisecond: 'ss.SSS',
-        second: 'HH:mm:ss',
-        minute: 'HH:mm:ss',
-        hour: 'HH:mm',
-        weekday: 'HH:mm',
-        day: 'HH:mm',
-        week: 'HH:mm',
-        month: 'HH:mm',
-        year: 'HH:mm'
-      },
-      majorLabels: {
-        // millisecond: 'HH:mm:ss',
-        // second: 'D MMMM HH:mm',
-        // minute: 'ddd D MMMM',
-        // hour: 'ddd D MMMM',
-        // weekday: 'MMMM YYYY',
-        // day: 'MMMM YYYY',
-        // week: 'MMMM YYYY',
-        // month: 'YYYY',
-        // year: '',
-        // millisecond: 'HH:mm:ss',
-        second: 'HH:mm:ss',
-        minute: 'HH:mm:ss',
-        hour: '',
-        weekday: '',
-        day: '',
-        week: '',
-        month: '',
-        year: ''
-      }
-    }
-  };
 
-  private groups: DataSet<DataGroup> = new vis.DataSet<DataGroup>();
+  private options: TimelineOptions;
+
+  private groups = new vis.DataSet<LabelGroup>();
   private items: DataSet<DataItem> = new vis.DataSet<DataItem>();
   private customTimeId: IdType;
 
   private subscription: Subscription;
+  private eventEmitter = new EventEmitter();
+
+  private groupTemplate = (group: LabelGroup) => {
+    if (group) {
+      const container = document.createElement('div');
+      container.className = 'checkbox btn';
+
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.id = `${group.id}`;
+      input.addEventListener('change', () => {
+        this.eventEmitter.emit({id: group.id, checked: input.checked});
+      });
+
+      const label = document.createElement('label');
+      label.setAttribute('for', `${group.id}`);
+      label.innerHTML = group.content;
+
+
+      // const container = document.createElement('div');
+      // const groupButton = document.createElement('button');
+      // groupButton.innerHTML = ` ${group.content}`;
+      // groupButton.className = 'btn btn-primary';
+      // groupButton.addEventListener('click', () => {
+      //   this.groups.update({id: group.id, content: group.content, recording: !group.recording});
+      //   console.log(this.groups.get(group.id));
+      // });
+      // const icon = document.createElement('clr-icon');
+      // icon.setAttribute('shape', 'cog');
+      // groupButton.prepend(icon);
+      // container.insertAdjacentElement('afterbegin', groupButton);
+
+      container.prepend(input);
+      container.append(label);
+      return container;
+    } else {
+      return undefined;
+    }
+  };
 
 
   ngOnInit(): void {
@@ -103,7 +105,7 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
               this.groups.clear();
               this.items.clear();
 
-              this.groups.add(labels.map(x => ({id: x.id, content: x.name})));
+              this.groups.add(labels.map(x => ({id: x.id, content: x.name, recording: false})));
               this.items.add({id: '-1', content: `stub`, start: 0, end: 100});
             });
         }
@@ -128,12 +130,14 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
           }));
         }
       }));
+
+    this.subscription.add(this.eventEmitter.subscribe(x => console.log(x)));
   }
 
   private observeLabels() {
     this.subscription.add(this.labelsService.newLabels$().subscribe(newLabel => {
       if (newLabel) {
-        this.groups.add({id: newLabel.id, content: newLabel.name});
+        this.groups.add({id: newLabel.id, content: newLabel.name, recording: false});
       }
     }));
 
@@ -145,12 +149,59 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.subscription.add(this.labelsService.editedLabels$().subscribe(changed => {
       if (changed) {
-        this.groups.update({id: changed.id, content: changed.change});
+        this.groups.update({id: changed.id, content: changed.change, recording: false});
       }
     }));
   }
 
   ngAfterViewInit() {
+    this.options = {
+      groupOrder: 'content',  // groupOrder can be a property name or a sorting function,
+      width: '100%',
+      min: Time.seconds(0),
+      start: Time.seconds(0),
+      end: Time.seconds(15),
+      max: Time.seconds(98), // todo
+      moment: function (date) {
+        return moment(date).utc();
+      },
+      editable: true,
+      format: {
+        minorLabels: {
+          millisecond: 'ss.SSS',
+          second: 'HH:mm:ss',
+          minute: 'HH:mm:ss',
+          hour: 'HH:mm',
+          weekday: 'HH:mm',
+          day: 'HH:mm',
+          week: 'HH:mm',
+          month: 'HH:mm',
+          year: 'HH:mm'
+        },
+        majorLabels: {
+          // millisecond: 'HH:mm:ss',
+          // second: 'D MMMM HH:mm',
+          // minute: 'ddd D MMMM',
+          // hour: 'ddd D MMMM',
+          // weekday: 'MMMM YYYY',
+          // day: 'MMMM YYYY',
+          // week: 'MMMM YYYY',
+          // month: 'YYYY',
+          // year: '',
+          // millisecond: 'HH:mm:ss',
+          second: 'HH:mm:ss',
+          minute: 'HH:mm:ss',
+          hour: '',
+          weekday: '',
+          day: '',
+          week: '',
+          month: '',
+          year: ''
+        }
+      },
+      // groupTemplate: this.groupTemplate
+    };
+
     const labels = [
       {
         id: this.instance(),
@@ -168,7 +219,7 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
 
     for (let i = 0; i < labels.length; ++i) {
       const group = labels[i];
-      this.groups.add({id: group.id, content: group.name});
+      this.groups.add({id: group.id, content: group.name, recording: false});
       for (let j = 0; j < labels[i].series.length; ++j) {
         const item = group.series[j];
         this.items.add({id: item.id, group: group.id, content: `Loading...`, start: item.start, end: item.end});
