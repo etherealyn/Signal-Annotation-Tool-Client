@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { VgAPI } from 'videogular2/core';
 import { IVideo } from '../video.interface';
 import { ProjectService } from '../../editor/project.service';
@@ -7,11 +7,12 @@ import { IMediaSubscriptions } from 'videogular2/src/core/vg-media/i-playable';
 import { VideoService } from '../video.service';
 import { Hotkey, HotkeysService } from 'angular2-hotkeys';
 import { Subscription } from 'rxjs';
+import { VideoComponent } from '../video/video.component';
 
 @Component({
   selector: 'app-videogrid',
   templateUrl: './videogrid.component.html',
-  styleUrls: [ './videogrid.component.scss' ]
+  styleUrls: ['./videogrid.component.scss']
 })
 export class VideogridComponent implements OnInit, OnDestroy {
   private _videoSources: IVideo[] = [];
@@ -23,12 +24,13 @@ export class VideogridComponent implements OnInit, OnDestroy {
   private isPlaying = false;
   private lastMouseLeft = 0;
   private playbackIndex = 3;
-  private playbackValues: string[] = [ '0.25', '0.5', '0.75', '1.0', '1.25', '1.50', '1.75', '2.0', '3.0' ];
+  private playbackValues: string[] = ['0.25', '0.5', '0.75', '1.0', '1.25', '1.50', '1.75', '2.0', '3.0'];
   private subscription: Subscription;
   private mainIndex = 0;
   loading = true;
 
   // 'main' video index
+  @ViewChildren(VideoComponent) videos: QueryList<VideoComponent>;
 
   constructor(private videoService: VideoService, private editorService: ProjectService, private hotkeysService: HotkeysService) {
     this.registerHotkeys();
@@ -56,7 +58,7 @@ export class VideogridComponent implements OnInit, OnDestroy {
 
   onPlayerReady(api: VgAPI, index: number) {
     this.apis.add(api);
-    this.videoService.onPlayerReady(api);
+    this.videoService.onPlayerReady(api, index);
 
     const subscriptions: IMediaSubscriptions = api.subscriptions;
 
@@ -73,7 +75,8 @@ export class VideogridComponent implements OnInit, OnDestroy {
     }));
   }
 
-  /** Mouse Event Reactions  START */
+
+  // region Mouse
   onMouseEnter(i: number) {
     if (this.cursorSound) {
       this.apis.elementAtIndex(i).volume = 1;
@@ -94,11 +97,9 @@ export class VideogridComponent implements OnInit, OnDestroy {
     }
   }
 
-  /** Mouse Event Reactions END */
+  // endregion
 
-
-  /** Video Controls START */
-
+  // region Video Controls
   seekTime(value) {
     if (this.guard % 2 === 0) {
       /** This funny logic is due to a bug on Webkit-based browsers, leading to change firing twice */
@@ -156,7 +157,8 @@ export class VideogridComponent implements OnInit, OnDestroy {
     return this.playbackValues[this.playbackIndex];
   }
 
-  /** Video Controls END*/
+  // endregion
+
 
   get videoSources(): IVideo[] {
     return this._videoSources;
@@ -216,7 +218,7 @@ export class VideogridComponent implements OnInit, OnDestroy {
       return false;
     }, undefined, '15 seconds forward');
 
-    [ playVideoHotkey, nextPlayback, prevPlayback, cursorSound, back, windback, forward, windforward ]
+    [playVideoHotkey, nextPlayback, prevPlayback, cursorSound, back, windback, forward, windforward]
       .forEach(hotkey => this.hotkeysService.add(hotkey));
   }
 }

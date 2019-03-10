@@ -43,10 +43,7 @@ export class LabelsService {
    * @param id of the project to be joined into
    */
   joinProject(id) {
-    this.socket.emit('joinProject', {id}, (data) => {
-      console.log(`join:${id}`, data);
-      this.lastProjectId = id;
-    });
+    this.socket.emit('joinProject', {id});
   }
 
   /**
@@ -54,9 +51,7 @@ export class LabelsService {
    * @param id of the project to be left from
    */
   leaveProject(id) {
-    this.socket.emit('leaveProject', {id}, (data) => {
-      console.log(`leave:${id}`, data);
-    });
+    this.socket.emit('leaveProject', {id});
   }
 
   // region Unicast

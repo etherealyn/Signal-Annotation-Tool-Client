@@ -1,35 +1,17 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  EventEmitter,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  SimpleChanges,
-  ViewChild
-} from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import * as vis from 'vis';
 import { DataGroup, DataItem, DataSet, DateType, IdType, Timeline, TimelineOptions } from 'vis';
 import * as hyperid from 'hyperid';
 import { LabelsService } from 'src/app/labels/labels.service';
-import { pairwise, throttleTime } from 'rxjs/operators';
+import { first } from 'rxjs/operators';
 import { ProjectService } from '../project.service';
-import { Classification } from '../../models/classification';
 import { VideoService } from '../../video/video.service';
-import { VgAPI } from 'videogular2/core';
-import { LinkedList } from 'typescript-collections';
 import { Subscription } from 'rxjs';
 import { IMediaSubscriptions } from 'videogular2/src/core/vg-media/i-playable';
-import { Range } from '../../models/range';
-import { RecordingEvent } from '../../models/recording.event';
-import { RecordingEventType } from '../../models/recording.event.type';
-import { Hotkey, HotkeysService } from 'angular2-hotkeys';
-import { AuthService } from '../../auth/auth.service';
-import { LabelModel } from '../../models/label.model';
+import { HotkeysService } from 'angular2-hotkeys';
 import { ProjectModel } from '../../models/project.model';
 import * as moment from 'moment';
-import { lab } from 'd3-color';
+import { Time } from './time';
 
 @Component({
   selector: 'app-timeline',
@@ -37,6 +19,14 @@ import { lab } from 'd3-color';
   styleUrls: ['./timeline.component.scss']
 })
 export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
+
+  constructor(private projectService: ProjectService,
+              private labelsService: LabelsService,
+              private videoService: VideoService,
+              private hotkeyService: HotkeysService,
+              private changeDetectorRef: ChangeDetectorRef) {
+  }
+
   @ViewChild('timeline_visualization') timelineVisualization: ElementRef;
   loading = true;
 
@@ -51,50 +41,56 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     // margin: {
     //   item: 20
     // },
-    start: 0,
-    end: 30,
+    min: Time.seconds(0),
+    start: Time.seconds(0),
+    end: Time.seconds(15),
+    max: Time.seconds(98), // todo
     moment: function (date) {
       return moment(date).utc();
     },
     // max: 1000,
     editable: true,
     // zoomMin: 10000,
-    // format: {
-    //   minorLabels: {
-    //     millisecond: 'SSS',
-    //     second: 'mm:ss',
-    //     minute: 'HH:mm:ss',
-    //     hour: 'HH:mm:ss',
-    //     weekday: 'ddd D',
-    //     day: 'D',
-    //     week: 'w',
-    //     month: 'MMM',
-    //     year: 'YYYY'
-    //   },
-    //   majorLabels: {
-    //     millisecond: 'HH:mm:ss',
-    //     second: 'D MMMM HH:mm',
-    //     minute: 'ddd D MMMM',
-    //     hour: 'ddd D MMMM',
-    //     weekday: 'MMMM YYYY',
-    //     day: 'MMMM YYYY',
-    //     week: 'MMMM YYYY',
-    //     month: 'YYYY',
-    //     year: ''
-    //   }
-    // }
+    format: {
+      minorLabels: {
+        millisecond: 'ss.SSS',
+        second: 'HH:mm:ss',
+        minute: 'HH:mm:ss',
+        hour: 'HH:mm',
+        weekday: 'HH:mm',
+        day: 'HH:mm',
+        week: 'HH:mm',
+        month: 'HH:mm',
+        year: 'HH:mm'
+      },
+      majorLabels: {
+        // millisecond: 'HH:mm:ss',
+        // second: 'D MMMM HH:mm',
+        // minute: 'ddd D MMMM',
+        // hour: 'ddd D MMMM',
+        // weekday: 'MMMM YYYY',
+        // day: 'MMMM YYYY',
+        // week: 'MMMM YYYY',
+        // month: 'YYYY',
+        // year: '',
+        // millisecond: 'HH:mm:ss',
+        second: 'HH:mm:ss',
+        minute: 'HH:mm:ss',
+        hour: '',
+        weekday: '',
+        day: '',
+        week: '',
+        month: '',
+        year: ''
+      }
+    }
   };
+
   private groups: DataSet<DataGroup> = new vis.DataSet<DataGroup>();
   private items: DataSet<DataItem> = new vis.DataSet<DataItem>();
   private customTimeId: IdType;
 
   private subscription: Subscription;
-
-  constructor(private projectService: ProjectService,
-              private labelsService: LabelsService,
-              private videoService: VideoService,
-              private hotkeyService: HotkeysService) {
-  }
 
 
   ngOnInit(): void {
@@ -104,7 +100,6 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
           this.project = project;
           this.labelsService.getLabels()
             .then(labels => {
-              console.log(labels);
               this.groups.clear();
               this.items.clear();
 
@@ -113,7 +108,29 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
             });
         }
       });
+    this.observeLabels();
 
+    this.subscription.add(this.videoService.playerReady
+      .subscribe(event => {
+        const api = event.api;
+        const index = event.index;
+        if (api && index === 0) {
+          const subscriptions: IMediaSubscriptions = api.subscriptions;
+          this.subscription.add(subscriptions.canPlay.subscribe(() => {
+            this.updateCurrentTime(Time.seconds(api.currentTime));
+          }));
+          this.subscription.add(subscriptions.timeUpdate.subscribe(() => {
+            this.updateCurrentTime(Time.seconds(api.currentTime));
+          }));
+
+          this.subscription.add(subscriptions.durationChange.subscribe(() => {
+            this.setMax(Time.seconds(api.duration));
+          }));
+        }
+      }));
+  }
+
+  private observeLabels() {
     this.subscription.add(this.labelsService.newLabels$().subscribe(newLabel => {
       if (newLabel) {
         this.groups.add({id: newLabel.id, content: newLabel.name});
@@ -142,7 +159,7 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
           {
             id: this.instance(),
             start: 0,
-            end: 10,
+            end: Time.seconds(10),
             authorId: this.instance()
           },
         ]
@@ -160,43 +177,36 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const container = this.timelineVisualization.nativeElement;
     this.timeline = new vis.Timeline(container, this.items, this.groups, this.options);
-    this.customTimeId = this.timeline.addCustomTime(moment(0).utc().toDate(), 'currentPlayingTime');
+    this.customTimeId = this.timeline.addCustomTime(Time.seconds(1), 'currentPlayingTime');
 
     this.loading = false;
-
-    // setTimeout(() => {
-
-    // this.timelineInit(labels);
-    // }, 2000);
-  }
-
-  timelineInit(labels: any) {
-    for (let i = 0; i < labels.length; ++i) {
-      const group = labels[i];
-      this.groups.add({id: group.id, content: group.name});
-      for (let j = 0; j < labels[i].series.length; ++j) {
-        const item = group.series[j];
-        this.items.add({id: item.id, group: group.id, content: `item ${j}`, start: item.start, end: item.end});
-      }
-    }
-
-    const container = this.timelineVisualization.nativeElement;
-    this.timeline = new vis.Timeline(container, this.items, this.groups, this.options);
-    this.customTimeId = this.timeline.addCustomTime(moment(0).utc().toDate(), 'currentPlayingTime');
-
-    this.loading = false;
+    this.changeDetectorRef.detectChanges();
   }
 
   ngOnDestroy(): void {
     if (this.timeline) {
       this.timeline.destroy();
-      this.timeline = null;
     }
-
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
+  }
 
+  updateCurrentTime(millis: number) {
+    this.timeline.setCustomTime(millis, this.customTimeId);
+    const start = this.timeline.getWindow().start.getTime();
+    const end = this.timeline.getWindow().end.getTime();
+
+    const delta = (end - start) / 2; // center
+    if (millis < start || end < millis + delta) {
+      this.timeline.moveTo(millis, {animation: false});
+    }
+  }
+
+  private setMax(duration: DateType) {
+    const newOptions: TimelineOptions = Object.assign({}, this.options);
+    newOptions.max = duration;
+    this.timeline.setOptions(newOptions);
   }
 
 }

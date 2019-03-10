@@ -10,7 +10,7 @@ import { ProjectsService } from '../../projects/projects.service';
 })
 export class VideoComponent implements OnDestroy {
   @Input() source: String;
-  @Output() playerReady: EventEmitter<any> = new EventEmitter();
+  @Output() playerReady: EventEmitter<VgAPI> = new EventEmitter();
 
   api: VgAPI;
   url: String;

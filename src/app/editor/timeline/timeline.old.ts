@@ -96,40 +96,6 @@ import { VgAPI } from 'videogular2/core';
 //   }
 // }
 //
-// ngOnInit(): void {
-
-// const now = moment().startOf().minutes(0).seconds(0).milliseconds(0);
-
-// create a data set with groups
-// setTimeout(() => {
-//   console.log(this.groups.length);
-//   const names = [ 'John', 'Alston', 'Lee', 'Grant' ];
-//   for (let g = 0; g < names.length; g++) {
-//     this.groups.add({id: g, content: names[g]});
-//   }
-//   // create a dataset with items
-//   for (let i = 0; i < 1; i++) {
-//     // const start = now.clone().add(Math.random() * 200, 'hours');
-//     const start = (i + 1) * 10;
-//     const group = Math.floor(Math.random() * names.length);
-//     this.items.add({
-//       id: i,
-//       group: group,
-//       content: 'item ' + i + ' <span style="color:#97B0F8;">(' + names[group] + ')</span>',
-//       start: start,
-//       type: 'box'
-//     });
-//   }
-//
-//   const container = document.getElementById('visualization');
-//   this.timeline = new vis.Timeline(container, this.items, this.groups, this.options);
-//   this.customTimeId = this.timeline.addCustomTime(moment(0).utc().toDate(), 'currentPlayingTime');
-//
-//   this.loading = false;
-//
-// }, 2000);
-
-// create visualization
 
 // setTimeout(() => this.timeline.focus(0), 1000);
 
@@ -190,46 +156,46 @@ import { VgAPI } from 'videogular2/core';
 //       }
 //     }));
 //
-// this.subscription = this.videoService.playerReady.subscribe((api: VgAPI) => {
-//   console.log('playerReady');
-//   this.apis.add(api);
-//   const sub: IMediaSubscriptions = api.subscriptions;
-//   if (this.apis.size() === 1) {
-// console.log('duration', api.duration);
-// const timeUpdateSub = sub.timeUpdate.subscribe(() => {
-// this.updateCurrentTime(api.currentTime);
-//   this.classes.forEach((($class) => {
-//     const series = $class.series;
-//     const currentTime = api.currentTime;
-//     const seriesCount = series.length;
-//     const groupId = $class.id;
-//     const authorId = this.authService.currentUserValue.id;
-//
-//     if ($class.buttonChecked) {
-//       /** if the range list is empty or the labelling is finished we need to add a new range element*/
-//       if (seriesCount === 0 || $class.isLabellingFinished) {
-//         const rangeId = this.instance();
-//         const range = new Range(rangeId, authorId, currentTime, currentTime);
-//         series.push(range);
-//         $class.isLabellingFinished = false;
-//         this.addItemBox(rangeId, groupId, currentTime);
-//         this.recordingEvents.emit({eventType: RecordingEventType.Start, labelId: groupId, range: range});
-//       } else {
-//         const lastRange: Range = series[seriesCount - 1];
-//         lastRange.endTime = currentTime;
-//         this.updateItem(lastRange.id, lastRange.endTime);
-//         this.recordingEvents.emit({eventType: RecordingEventType.Recording, labelId: groupId, range: lastRange});
-//       }
-//     }
-//   }));
-// }));
+this.subscription = this.videoService.playerReady.subscribe((api: VgAPI) => {
+  console.log('playerReady');
+  this.apis.add(api);
+  const sub: IMediaSubscriptions = api.subscriptions;
+  if (this.apis.size() === 1) {
+console.log('duration', api.duration);
+const timeUpdateSub = sub.timeUpdate.subscribe(() => {
+this.updateCurrentTime(api.currentTime);
+  this.classes.forEach((($class) => {
+    const series = $class.series;
+    const currentTime = api.currentTime;
+    const seriesCount = series.length;
+    const groupId = $class.id;
+    const authorId = this.authService.currentUserValue.id;
+
+    if ($class.buttonChecked) {
+      /** if the range list is empty or the labelling is finished we need to add a new range element*/
+      if (seriesCount === 0 || $class.isLabellingFinished) {
+        const rangeId = this.instance();
+        const range = new Range(rangeId, authorId, currentTime, currentTime);
+        series.push(range);
+        $class.isLabellingFinished = false;
+        this.addItemBox(rangeId, groupId, currentTime);
+        this.recordingEvents.emit({eventType: RecordingEventType.Start, labelId: groupId, range: range});
+      } else {
+        const lastRange: Range = series[seriesCount - 1];
+        lastRange.endTime = currentTime;
+        this.updateItem(lastRange.id, lastRange.endTime);
+        this.recordingEvents.emit({eventType: RecordingEventType.Recording, labelId: groupId, range: lastRange});
+      }
+    }
+  }));
+}));
 
 // });
 
-// const durationChangeSub = sub.durationChange.subscribe(() => { // todo setmax is only possible when the visualisation is loaded
-//   console.log('durationChange', api.duration);
-//   this.setMax(api.duration * 1000);
-// });
+const durationChangeSub = sub.durationChange.subscribe(() => { // todo setmax is only possible when the visualisation is loaded
+  console.log('durationChange', api.duration);
+  this.setMax(api.duration * 1000);
+});
 
 // this.subscription.add(timeUpdateSub);
 // this.subscription.add(durationChangeSub);
@@ -321,32 +287,32 @@ import { VgAPI } from 'videogular2/core';
 //   }
 // }
 //
-// updateCurrentTime(seconds: number) {
-//   const millis = seconds * 1000;
-//   this.timeline.setCustomTime(millis, this.customTimeId);
-//   const start = this.timeline.getWindow().start.getTime();
-//   const end = this.timeline.getWindow().end.getTime();
-//
-//   const delta = 3 * (end - start) / 4; // center
-//   // console.log(millis, start + delta);
-//   if (end < millis || millis < start) {
-//     this.timeline.moveTo(millis, {animation: false});
-//   }
-// if (millis > start + delta) {
-//   this.timeline.moveTo(start + delta + 5000);
-// }
+updateCurrentTime(seconds: number) {
+  const millis = seconds * 1000;
+  this.timeline.setCustomTime(millis, this.customTimeId);
+  const start = this.timeline.getWindow().start.getTime();
+  const end = this.timeline.getWindow().end.getTime();
 
-// if (millis < start) {
-//   this.timeline.moveTo(millis, {animation: false});
-// }
-//
-// if (millis > end) {
-//   this.timeline.moveTo(end, {animation: false});
-// }
+  const delta = 3 * (end - start) / 4; // center
+  // console.log(millis, start + delta);
+  if (end < millis || millis < start) {
+    this.timeline.moveTo(millis, {animation: false});
+  }
+if (millis > start + delta) {
+  this.timeline.moveTo(start + delta + 5000);
+}
 
-// if (seconds * 1000 > start + delta) {
-//   this.timeline.moveTo(, {animation: false});
-// }
+if (millis < start) {
+  this.timeline.moveTo(millis, {animation: false});
+}
+
+if (millis > end) {
+  this.timeline.moveTo(end, {animation: false});
+}
+
+if (seconds * 1000 > start + delta) {
+  this.timeline.moveTo(, {animation: false});
+}
 
 
 // this.timeline.moveTo(seconds);
@@ -365,10 +331,10 @@ import { VgAPI } from 'videogular2/core';
 //   this.toggleRecording(clazz);
 // }
 //
-// private setMax(duration: DateType) {
-//   const newOptions: TimelineOptions = Object.assign({}, this.options);
-//   newOptions.max = duration;
-//   this.timeline.setOptions(newOptions);
-// }
+private setMax(duration: DateType) {
+  const newOptions: TimelineOptions = Object.assign({}, this.options);
+  newOptions.max = duration;
+  this.timeline.setOptions(newOptions);
+}
 
 // }
