@@ -11,11 +11,16 @@ interface PlayerReadyEvent {
 })
 export class VideoService {
   playerReady = new EventEmitter<PlayerReadyEvent>();
+  videoSeek = new EventEmitter<number>();
 
   constructor() {
   }
 
   onPlayerReady(api: VgAPI, index: number) {
     this.playerReady.emit({api, index});
+  }
+
+  seekTo(time: number) {
+    this.videoSeek.emit(time);
   }
 }

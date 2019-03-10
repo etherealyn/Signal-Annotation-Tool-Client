@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { Component, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { VgAPI } from 'videogular2/core';
 import { IVideo } from '../video.interface';
 import { ProjectService } from '../../editor/project.service';
@@ -20,7 +20,7 @@ export class VideogridComponent implements OnInit, OnDestroy {
   private currentTimes: number[] = [];
   private durations: number[] = [];
   private cursorSound = false;
-  private guard = 0;
+  // private guard = 0;
   private isPlaying = false;
   private lastMouseLeft = 0;
   private playbackIndex = 3;
@@ -32,7 +32,9 @@ export class VideogridComponent implements OnInit, OnDestroy {
   // 'main' video index
   @ViewChildren(VideoComponent) videos: QueryList<VideoComponent>;
 
-  constructor(private videoService: VideoService, private editorService: ProjectService, private hotkeysService: HotkeysService) {
+  constructor(private videoService: VideoService,
+              private editorService: ProjectService,
+              private hotkeysService: HotkeysService) {
     this.registerHotkeys();
   }
 
@@ -54,6 +56,8 @@ export class VideogridComponent implements OnInit, OnDestroy {
         this.currentTimes = new Array<number>(videos.length);
       }
     });
+
+    this.subscription.add(this.videoService.videoSeek.subscribe(x => this.seekTime(x)));
   }
 
   onPlayerReady(api: VgAPI, index: number) {
@@ -101,15 +105,15 @@ export class VideogridComponent implements OnInit, OnDestroy {
 
   // region Video Controls
   seekTime(value) {
-    if (this.guard % 2 === 0) {
-      /** This funny logic is due to a bug on Webkit-based browsers, leading to change firing twice */
-      this.guard += 1;
-      this.apis.forEach((api: VgAPI) => {
-        api.seekTime(value);
-      });
-    } else {
-      this.guard = 0;
-    }
+    // if (this.guard % 2 === 0) {
+    //   /** This funny logic is due to a bug on Webkit-based browsers, leading to change firing twice */
+    //   this.guard += 1;
+    this.apis.forEach((api: VgAPI) => {
+      api.seekTime(value);
+    });
+    // } else {
+    //   this.guard = 0;
+    // }
   }
 
   onPlayPause() {

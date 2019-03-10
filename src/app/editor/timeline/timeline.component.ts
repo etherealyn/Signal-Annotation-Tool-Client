@@ -1,24 +1,15 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  EventEmitter,
-  OnDestroy,
-  OnInit,
-  ViewChild
-} from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import * as vis from 'vis';
-import { DataGroup, DataItem, DataSet, DateType, IdType, Timeline, TimelineOptions } from 'vis';
 import * as hyperid from 'hyperid';
+import * as moment from 'moment';
+import { DataGroup, DataItem, DataSet, DateType, IdType, Timeline, TimelineOptions } from 'vis';
 import { LabelsService } from 'src/app/labels/labels.service';
 import { ProjectService } from '../project.service';
 import { VideoService } from '../../video/video.service';
 import { Subscription } from 'rxjs';
 import { IMediaSubscriptions } from 'videogular2/src/core/vg-media/i-playable';
-import { HotkeysService } from 'angular2-hotkeys';
+import { Hotkey, HotkeysService } from 'angular2-hotkeys';
 import { ProjectModel } from '../../models/project.model';
-import * as moment from 'moment';
 import { Time } from './time';
 
 interface LabelGroup extends DataGroup {
@@ -32,68 +23,29 @@ interface LabelGroup extends DataGroup {
 })
 export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
 
+  @ViewChild('timeline_visualization') timelineVisualization: ElementRef;
+
+  loading = true;
+  private project: ProjectModel;
+
+  private instance = hyperid();
+  private timeline: Timeline;
+
+  private options;
+
+  private groups = new vis.DataSet<LabelGroup>();
+  private items: DataSet<DataItem> = new vis.DataSet<DataItem>();
+  private customTimeId: IdType;
+  private subscription: Subscription;
+
+  private eventEmitter = new EventEmitter();
+
   constructor(private projectService: ProjectService,
               private labelsService: LabelsService,
               private videoService: VideoService,
               private hotkeyService: HotkeysService,
               private changeDetectorRef: ChangeDetectorRef) {
   }
-
-  @ViewChild('timeline_visualization') timelineVisualization: ElementRef;
-  loading = true;
-
-  private project: ProjectModel;
-  private instance = hyperid();
-
-  private timeline: Timeline;
-
-  private options: TimelineOptions;
-
-  private groups = new vis.DataSet<LabelGroup>();
-  private items: DataSet<DataItem> = new vis.DataSet<DataItem>();
-  private customTimeId: IdType;
-
-  private subscription: Subscription;
-  private eventEmitter = new EventEmitter();
-
-  private groupTemplate = (group: LabelGroup) => {
-    if (group) {
-      const container = document.createElement('div');
-      container.className = 'checkbox btn';
-
-      const input = document.createElement('input');
-      input.type = 'checkbox';
-      input.id = `${group.id}`;
-      input.addEventListener('change', () => {
-        this.eventEmitter.emit({id: group.id, checked: input.checked});
-      });
-
-      const label = document.createElement('label');
-      label.setAttribute('for', `${group.id}`);
-      label.innerHTML = group.content;
-
-
-      // const container = document.createElement('div');
-      // const groupButton = document.createElement('button');
-      // groupButton.innerHTML = ` ${group.content}`;
-      // groupButton.className = 'btn btn-primary';
-      // groupButton.addEventListener('click', () => {
-      //   this.groups.update({id: group.id, content: group.content, recording: !group.recording});
-      //   console.log(this.groups.get(group.id));
-      // });
-      // const icon = document.createElement('clr-icon');
-      // icon.setAttribute('shape', 'cog');
-      // groupButton.prepend(icon);
-      // container.insertAdjacentElement('afterbegin', groupButton);
-
-      container.prepend(input);
-      container.append(label);
-      return container;
-    } else {
-      return undefined;
-    }
-  };
-
 
   ngOnInit(): void {
     this.subscription = this.projectService.getCurrentProject$()
@@ -134,6 +86,29 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscription.add(this.eventEmitter.subscribe(x => console.log(x)));
   }
 
+  private groupTemplate = (group: LabelGroup) => {
+    if (group) {
+      const container = document.createElement('div');
+      container.className = 'checkbox btn';
+
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.id = `checkbox_${group.id}`;
+      input.addEventListener('change', () => {
+        this.eventEmitter.emit({id: group.id, checked: input.checked});
+      });
+
+      const label = document.createElement('label');
+      label.setAttribute('for', `checkbox_${group.id}`);
+      label.innerHTML = group.content;
+
+      container.prepend(input);
+      container.append(label);
+      return container;
+    }
+    return undefined;
+  };
+
   private observeLabels() {
     this.subscription.add(this.labelsService.newLabels$().subscribe(newLabel => {
       if (newLabel) {
@@ -152,6 +127,26 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
         this.groups.update({id: changed.id, content: changed.change, recording: false});
       }
     }));
+  }
+
+  private registerHotkeys() {
+    const hotkeys = [];
+    for (let i = 0; i < 9; ++i) {
+      const hotkey = new Hotkey(
+        `${i + 1}`,
+        (): boolean => {
+          const id = this.groups.getIds()[i];
+          const checkbox = document.getElementById(`checkbox_${id}`);
+          if (checkbox) {
+            checkbox.click();
+          }
+          return false;
+        },
+        undefined,
+        `Toggle recording of the ${i + 1} label`);
+      hotkeys.push(hotkey);
+    }
+    this.hotkeyService.add(hotkeys);
   }
 
   ngAfterViewInit() {
@@ -199,7 +194,7 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
           year: ''
         }
       },
-      // groupTemplate: this.groupTemplate
+      groupTemplate: this.groupTemplate
     };
 
     const labels = [
@@ -229,18 +224,26 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     const container = this.timelineVisualization.nativeElement;
     this.timeline = new vis.Timeline(container, this.items, this.groups, this.options);
     this.customTimeId = this.timeline.addCustomTime(Time.seconds(1), 'currentPlayingTime');
+    this.timeline.setCustomTimeTitle('', this.customTimeId);
+
+    // this.timeline.on('timechange', function (properties) {
+    //   const id = properties.id;
+    //   const time = properties.time;
+    //   console.log({id, time});
+    // });
+    this.timeline.on('timechanged', properties => {
+      // const id = properties.id; todo
+      const time = moment(properties.time).utc();
+
+      const videoSeek = time.seconds() + time.minutes() * 60 + time.hours() * 360 + time.milliseconds() / 1000;
+      this.videoService.seekTo(videoSeek);
+      // this.timeline.setCustomTimeTitle(time.format('H:mm:ss'), id); todo
+    });
 
     this.loading = false;
     this.changeDetectorRef.detectChanges();
-  }
 
-  ngOnDestroy(): void {
-    if (this.timeline) {
-      this.timeline.destroy();
-    }
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
+    this.registerHotkeys();
   }
 
   updateCurrentTime(millis: number) {
@@ -258,6 +261,15 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     const newOptions: TimelineOptions = Object.assign({}, this.options);
     newOptions.max = duration;
     this.timeline.setOptions(newOptions);
+  }
+
+  ngOnDestroy(): void {
+    if (this.timeline) {
+      this.timeline.destroy();
+    }
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 
 }

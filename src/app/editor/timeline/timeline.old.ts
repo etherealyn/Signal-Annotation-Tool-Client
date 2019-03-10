@@ -1,9 +1,9 @@
 
 // private project: ProjectModel;
 // private recordingEvents = new EventEmitter<RecordingEvent>();
-import * as hyperid from './timeline.component';
-import { LinkedList } from 'typescript-collections';
-import { VgAPI } from 'videogular2/core';
+// import * as hyperid from './timeline.component';
+// import { LinkedList } from 'typescript-collections';
+// import { VgAPI } from 'videogular2/core';
 // import { IdType, Timeline } from 'vis';
 // import * as vis from 'vis';
 // import { Subscription } from 'rxjs';
@@ -156,46 +156,46 @@ import { VgAPI } from 'videogular2/core';
 //       }
 //     }));
 //
-this.subscription = this.videoService.playerReady.subscribe((api: VgAPI) => {
-  console.log('playerReady');
-  this.apis.add(api);
-  const sub: IMediaSubscriptions = api.subscriptions;
-  if (this.apis.size() === 1) {
-console.log('duration', api.duration);
-const timeUpdateSub = sub.timeUpdate.subscribe(() => {
-this.updateCurrentTime(api.currentTime);
-  this.classes.forEach((($class) => {
-    const series = $class.series;
-    const currentTime = api.currentTime;
-    const seriesCount = series.length;
-    const groupId = $class.id;
-    const authorId = this.authService.currentUserValue.id;
-
-    if ($class.buttonChecked) {
-      /** if the range list is empty or the labelling is finished we need to add a new range element*/
-      if (seriesCount === 0 || $class.isLabellingFinished) {
-        const rangeId = this.instance();
-        const range = new Range(rangeId, authorId, currentTime, currentTime);
-        series.push(range);
-        $class.isLabellingFinished = false;
-        this.addItemBox(rangeId, groupId, currentTime);
-        this.recordingEvents.emit({eventType: RecordingEventType.Start, labelId: groupId, range: range});
-      } else {
-        const lastRange: Range = series[seriesCount - 1];
-        lastRange.endTime = currentTime;
-        this.updateItem(lastRange.id, lastRange.endTime);
-        this.recordingEvents.emit({eventType: RecordingEventType.Recording, labelId: groupId, range: lastRange});
-      }
-    }
-  }));
-}));
-
+// this.subscription = this.videoService.playerReady.subscribe((api: VgAPI) => {
+//   console.log('playerReady');
+//   this.apis.add(api);
+//   const sub: IMediaSubscriptions = api.subscriptions;
+//   if (this.apis.size() === 1) {
+// console.log('duration', api.duration);
+// const timeUpdateSub = sub.timeUpdate.subscribe(() => {
+// this.updateCurrentTime(api.currentTime);
+//   this.classes.forEach((($class) => {
+//     const series = $class.series;
+//     const currentTime = api.currentTime;
+//     const seriesCount = series.length;
+//     const groupId = $class.id;
+//     const authorId = this.authService.currentUserValue.id;
+//
+//     if ($class.buttonChecked) {
+//       /** if the range list is empty or the labelling is finished we need to add a new range element*/
+//       if (seriesCount === 0 || $class.isLabellingFinished) {
+//         const rangeId = this.instance();
+//         const range = new Range(rangeId, authorId, currentTime, currentTime);
+//         series.push(range);
+//         $class.isLabellingFinished = false;
+//         this.addItemBox(rangeId, groupId, currentTime);
+//         this.recordingEvents.emit({eventType: RecordingEventType.Start, labelId: groupId, range: range});
+//       } else {
+//         const lastRange: Range = series[seriesCount - 1];
+//         lastRange.endTime = currentTime;
+//         this.updateItem(lastRange.id, lastRange.endTime);
+//         this.recordingEvents.emit({eventType: RecordingEventType.Recording, labelId: groupId, range: lastRange});
+//       }
+//     }
+//   }));
+// }));
+//
 // });
 
-const durationChangeSub = sub.durationChange.subscribe(() => { // todo setmax is only possible when the visualisation is loaded
-  console.log('durationChange', api.duration);
-  this.setMax(api.duration * 1000);
-});
+// const durationChangeSub = sub.durationChange.subscribe(() => { // todo setmax is only possible when the visualisation is loaded
+//   console.log('durationChange', api.duration);
+//   this.setMax(api.duration * 1000);
+// });
 
 // this.subscription.add(timeUpdateSub);
 // this.subscription.add(durationChangeSub);
@@ -287,32 +287,32 @@ const durationChangeSub = sub.durationChange.subscribe(() => { // todo setmax is
 //   }
 // }
 //
-updateCurrentTime(seconds: number) {
-  const millis = seconds * 1000;
-  this.timeline.setCustomTime(millis, this.customTimeId);
-  const start = this.timeline.getWindow().start.getTime();
-  const end = this.timeline.getWindow().end.getTime();
-
-  const delta = 3 * (end - start) / 4; // center
-  // console.log(millis, start + delta);
-  if (end < millis || millis < start) {
-    this.timeline.moveTo(millis, {animation: false});
-  }
-if (millis > start + delta) {
-  this.timeline.moveTo(start + delta + 5000);
-}
-
-if (millis < start) {
-  this.timeline.moveTo(millis, {animation: false});
-}
-
-if (millis > end) {
-  this.timeline.moveTo(end, {animation: false});
-}
-
-if (seconds * 1000 > start + delta) {
-  this.timeline.moveTo(, {animation: false});
-}
+// updateCurrentTime(seconds: number) {
+//   const millis = seconds * 1000;
+//   this.timeline.setCustomTime(millis, this.customTimeId);
+//   const start = this.timeline.getWindow().start.getTime();
+//   const end = this.timeline.getWindow().end.getTime();
+//
+//   const delta = 3 * (end - start) / 4; // center
+//   console.log(millis, start + delta);
+  // if (end < millis || millis < start) {
+  //   this.timeline.moveTo(millis, {animation: false});
+  // }
+// if (millis > start + delta) {
+//   this.timeline.moveTo(start + delta + 5000);
+// }
+//
+// if (millis < start) {
+//   this.timeline.moveTo(millis, {animation: false});
+// }
+//
+// if (millis > end) {
+//   this.timeline.moveTo(end, {animation: false});
+// }
+//
+// if (seconds * 1000 > start + delta) {
+//   this.timeline.moveTo(, {animation: false});
+// }
 
 
 // this.timeline.moveTo(seconds);
@@ -331,10 +331,10 @@ if (seconds * 1000 > start + delta) {
 //   this.toggleRecording(clazz);
 // }
 //
-private setMax(duration: DateType) {
-  const newOptions: TimelineOptions = Object.assign({}, this.options);
-  newOptions.max = duration;
-  this.timeline.setOptions(newOptions);
-}
+// private setMax(duration: DateType) {
+//   const newOptions: TimelineOptions = Object.assign({}, this.options);
+//   newOptions.max = duration;
+//   this.timeline.setOptions(newOptions);
+// }
 
 // }
