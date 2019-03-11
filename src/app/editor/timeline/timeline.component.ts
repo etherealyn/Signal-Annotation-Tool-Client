@@ -1,8 +1,17 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  OnDestroy,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import * as vis from 'vis';
+import { DataItem, DataSet, DateType, IdType, Timeline, TimelineOptions } from 'vis';
 import * as hyperid from 'hyperid';
 import * as moment from 'moment';
-import { DataGroup, DataItem, DataSet, DateType, IdType, Timeline, TimelineOptions } from 'vis';
 import { LabelsService } from 'src/app/labels/labels.service';
 import { ProjectService } from '../project.service';
 import { VideoService } from '../../video/video.service';
@@ -11,10 +20,9 @@ import { IMediaSubscriptions } from 'videogular2/src/core/vg-media/i-playable';
 import { Hotkey, HotkeysService } from 'angular2-hotkeys';
 import { ProjectModel } from '../../models/project.model';
 import { Time } from './time';
-
-interface LabelGroup extends DataGroup {
-  recording: boolean;
-}
+import { LabelGroup } from './label.group';
+import { TimelineData } from './timeline.data';
+import { LabelModel } from '../../models/label.model';
 
 @Component({
   selector: 'app-timeline',
@@ -33,8 +41,7 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private options;
 
-  private groups = new vis.DataSet<LabelGroup>();
-  private items: DataSet<DataItem> = new vis.DataSet<DataItem>();
+  private timelineData: TimelineData = new TimelineData();
   private customTimeId: IdType;
   private subscription: Subscription;
 
@@ -53,12 +60,10 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
         if (project) {
           this.project = project;
           this.labelsService.getLabels()
-            .then(labels => {
-              this.groups.clear();
-              this.items.clear();
-
-              this.groups.add(labels.map(x => ({id: x.id, content: x.name, recording: false})));
-              this.items.add({id: '-1', content: `stub`, start: 0, end: 100});
+            .then((labels: LabelModel[]) => {
+              this.timelineData.clear();
+              this.timelineData.addGroups(labels.map(x => ({ id: x.id, content: x.name, recording: false })));
+              this.timelineData.addItem({id: '-1', content: `stub`, start: 0, end: 100});
             });
         }
       });
@@ -107,24 +112,25 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
       return container;
     }
     return undefined;
-  };
+  }
 
   private observeLabels() {
     this.subscription.add(this.labelsService.newLabels$().subscribe(newLabel => {
       if (newLabel) {
-        this.groups.add({id: newLabel.id, content: newLabel.name, recording: false});
+        const group: LabelGroup = {id: newLabel.id, content: newLabel.name, recording: false};
+        this.timelineData.addGroup(group);
       }
     }));
 
     this.subscription.add(this.labelsService.removedLabels$().subscribe(removed => {
       if (removed) {
-        this.groups.remove(removed.id);
+        this.timelineData.removeGroup(removed.id);
       }
     }));
 
     this.subscription.add(this.labelsService.editedLabels$().subscribe(changed => {
       if (changed) {
-        this.groups.update({id: changed.id, content: changed.change, recording: false});
+        this.timelineData.updateGroup({id: changed.id, content: changed.change, recording: false});
       }
     }));
   }
@@ -135,7 +141,8 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
       const hotkey = new Hotkey(
         `${i + 1}`,
         (): boolean => {
-          const id = this.groups.getIds()[i];
+          const ids: IdType[] = this.timelineData.getGroupIds();
+          const id = ids[i];
           const checkbox = document.getElementById(`checkbox_${id}`);
           if (checkbox) {
             checkbox.click();
@@ -151,7 +158,7 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     this.options = {
-      groupOrder: 'content',  // groupOrder can be a property name or a sorting function,
+      // groupOrder: 'content',  // groupOrder can be a property name or a sorting function,
       width: '100%',
       min: Time.seconds(0),
       start: Time.seconds(0),
@@ -197,32 +204,8 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
       groupTemplate: this.groupTemplate
     };
 
-    const labels = [
-      {
-        id: this.instance(),
-        name: 'Loading...',
-        series: [
-          {
-            id: this.instance(),
-            start: 0,
-            end: Time.seconds(10),
-            authorId: this.instance()
-          },
-        ]
-      }
-    ];
-
-    for (let i = 0; i < labels.length; ++i) {
-      const group = labels[i];
-      this.groups.add({id: group.id, content: group.name, recording: false});
-      for (let j = 0; j < labels[i].series.length; ++j) {
-        const item = group.series[j];
-        this.items.add({id: item.id, group: group.id, content: `Loading...`, start: item.start, end: item.end});
-      }
-    }
-
     const container = this.timelineVisualization.nativeElement;
-    this.timeline = new vis.Timeline(container, this.items, this.groups, this.options);
+    this.timeline = new vis.Timeline(container, this.timelineData.items, this.timelineData.groups, this.options);
     this.customTimeId = this.timeline.addCustomTime(Time.seconds(1), 'currentPlayingTime');
     this.timeline.setCustomTimeTitle('', this.customTimeId);
 
@@ -244,6 +227,9 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     this.changeDetectorRef.detectChanges();
 
     this.registerHotkeys();
+
+    // force a timeline redraw, because sometimes it does not detect changes
+    setTimeout(() => this.timeline.redraw(), 250);
   }
 
   updateCurrentTime(millis: number) {
