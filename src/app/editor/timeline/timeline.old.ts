@@ -70,7 +70,7 @@
 //         this.toggleRecording(clazz);
 //       }
 //       return false;
-//     }, undefined, `Toggle recording of the ${i + 1} label`);
+//     }, undefined, `Toggle startRecording of the ${i + 1} label`);
 //     this.hotkeyService.add(hotkey);
 //   }
 //
@@ -88,7 +88,7 @@
 // private toggleRecording(cls: Classification) {
 //   const prev = cls.buttonChecked;
 //   cls.buttonChecked = !cls.buttonChecked;
-//   /** if button's checked state switches from true to false, it means that the user wished to stop the recording*/
+//   /** if button's checked state switches from true to false, it means that the user wished to stop the startRecording*/
 //   if (prev === true && cls.buttonChecked === false) {
 //     cls.isLabellingFinished = true;
 //     const range = cls.series[cls.series.length - 1];
@@ -236,16 +236,16 @@
 //   this.subscription.add(this.recordingEvents.subscribe((event: RecordingEvent) => {
 //     switch (event.eventType) {
 //       case RecordingEventType.Start:
-//         // console.log('recording started');
+//         // console.log('startRecording started');
 //         break;
 //       case RecordingEventType.Stop:
-//         console.log('recording stopped', JSON.stringify(event.range));
+//         console.log('startRecording stopped', JSON.stringify(event.range));
 //         if (this.project) {
 //           this.labelService.addRange(this.project.id, event.labelId, event.range);
 //         }
 //         break;
 //       case RecordingEventType.Recording:
-//         // console.log('recording ...');
+//         // console.log('startRecording ...');
 //         break;
 //       default:
 //         break;

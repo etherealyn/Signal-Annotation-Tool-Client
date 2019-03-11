@@ -9,7 +9,7 @@ import {
   ViewChild
 } from '@angular/core';
 import * as vis from 'vis';
-import { DataItem, DataSet, DateType, IdType, Timeline, TimelineOptions } from 'vis';
+import { DataGroup, DataItem, DataSet, DateType, IdType, Timeline, TimelineOptions } from 'vis';
 import * as hyperid from 'hyperid';
 import * as moment from 'moment';
 import { LabelsService } from 'src/app/labels/labels.service';
@@ -20,9 +20,9 @@ import { IMediaSubscriptions } from 'videogular2/src/core/vg-media/i-playable';
 import { Hotkey, HotkeysService } from 'angular2-hotkeys';
 import { ProjectModel } from '../../models/project.model';
 import { Time } from './time';
-import { LabelGroup } from './label.group';
 import { TimelineData } from './timeline.data';
 import { LabelModel } from '../../models/label.model';
+import { distinct, first, groupBy, pairwise, startWith, throttle, throttleTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-timeline',
@@ -36,7 +36,7 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
   loading = true;
   private project: ProjectModel;
 
-  private instance = hyperid();
+
   private timeline: Timeline;
 
   private options;
@@ -44,8 +44,9 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
   private timelineData: TimelineData = new TimelineData();
   private customTimeId: IdType;
   private subscription: Subscription;
+  private currentTime = 0;
 
-  private eventEmitter = new EventEmitter();
+  private checkboxChange = new EventEmitter<{ id: IdType, checked: boolean }>();
 
   constructor(private projectService: ProjectService,
               private labelsService: LabelsService,
@@ -62,7 +63,7 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
           this.labelsService.getLabels()
             .then((labels: LabelModel[]) => {
               this.timelineData.clear();
-              this.timelineData.addGroups(labels.map(x => ({ id: x.id, content: x.name, recording: false })));
+              this.timelineData.addGroups(labels.map(x => ({id: x.id, content: x.name})));
               this.timelineData.addItem({id: '-1', content: `stub`, start: 0, end: 100});
             });
         }
@@ -75,9 +76,11 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
         const index = event.index;
         if (api && index === 0) {
           const subscriptions: IMediaSubscriptions = api.subscriptions;
+
           this.subscription.add(subscriptions.canPlay.subscribe(() => {
             this.updateCurrentTime(Time.seconds(api.currentTime));
           }));
+
           this.subscription.add(subscriptions.timeUpdate.subscribe(() => {
             this.updateCurrentTime(Time.seconds(api.currentTime));
           }));
@@ -88,72 +91,23 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }));
 
-    this.subscription.add(this.eventEmitter.subscribe(x => console.log(x)));
-  }
+    this.subscription.add(this.checkboxChange
+      .pipe(
+        startWith({id: undefined, checked: false}),
+        pairwise()
+      )
+      .subscribe(e => {
+        const prev = e[0];
+        const curr = e[1];
 
-  private groupTemplate = (group: LabelGroup) => {
-    if (group) {
-      const container = document.createElement('div');
-      container.className = 'checkbox btn';
-
-      const input = document.createElement('input');
-      input.type = 'checkbox';
-      input.id = `checkbox_${group.id}`;
-      input.addEventListener('change', () => {
-        this.eventEmitter.emit({id: group.id, checked: input.checked});
-      });
-
-      const label = document.createElement('label');
-      label.setAttribute('for', `checkbox_${group.id}`);
-      label.innerHTML = group.content;
-
-      container.prepend(input);
-      container.append(label);
-      return container;
-    }
-    return undefined;
-  }
-
-  private observeLabels() {
-    this.subscription.add(this.labelsService.newLabels$().subscribe(newLabel => {
-      if (newLabel) {
-        const group: LabelGroup = {id: newLabel.id, content: newLabel.name, recording: false};
-        this.timelineData.addGroup(group);
-      }
-    }));
-
-    this.subscription.add(this.labelsService.removedLabels$().subscribe(removed => {
-      if (removed) {
-        this.timelineData.removeGroup(removed.id);
-      }
-    }));
-
-    this.subscription.add(this.labelsService.editedLabels$().subscribe(changed => {
-      if (changed) {
-        this.timelineData.updateGroup({id: changed.id, content: changed.change, recording: false});
-      }
-    }));
-  }
-
-  private registerHotkeys() {
-    const hotkeys = [];
-    for (let i = 0; i < 9; ++i) {
-      const hotkey = new Hotkey(
-        `${i + 1}`,
-        (): boolean => {
-          const ids: IdType[] = this.timelineData.getGroupIds();
-          const id = ids[i];
-          const checkbox = document.getElementById(`checkbox_${id}`);
-          if (checkbox) {
-            checkbox.click();
-          }
-          return false;
-        },
-        undefined,
-        `Toggle recording of the ${i + 1} label`);
-      hotkeys.push(hotkey);
-    }
-    this.hotkeyService.add(hotkeys);
+        if (prev && prev.id === undefined) {
+          this.timelineData.startRecording(curr.id, this.currentTime);
+        } else if (curr.checked) {
+          this.timelineData.startRecording(curr.id, this.currentTime);
+        } else if (!curr.checked) {
+          this.timelineData.stopRecording(curr.id);
+        }
+      }));
   }
 
   ngAfterViewInit() {
@@ -233,20 +187,20 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   updateCurrentTime(millis: number) {
+    // console.log(millis);
+    this.currentTime = millis;
+
     this.timeline.setCustomTime(millis, this.customTimeId);
     const start = this.timeline.getWindow().start.getTime();
     const end = this.timeline.getWindow().end.getTime();
 
-    const delta = (end - start) / 2; // center
+    const delta = 3 * (end - start) / 4; // center
     if (millis < start || end < millis + delta) {
       this.timeline.moveTo(millis, {animation: false});
+      // this.timeline.moveTo(millis + (end - start) - (end - start) / 6);
     }
-  }
 
-  private setMax(duration: DateType) {
-    const newOptions: TimelineOptions = Object.assign({}, this.options);
-    newOptions.max = duration;
-    this.timeline.setOptions(newOptions);
+    this.timelineData.updateRecordings(millis);
   }
 
   ngOnDestroy(): void {
@@ -256,6 +210,77 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
+  }
+
+  private groupTemplate = (group: DataGroup) => {
+    if (group) {
+      const container = document.createElement('div');
+      container.className = 'checkbox btn';
+
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.id = `checkbox_${group.id}`;
+      input.addEventListener('change', () => {
+        this.checkboxChange.emit({id: group.id, checked: input.checked});
+      });
+
+      const label = document.createElement('label');
+      label.setAttribute('for', `checkbox_${group.id}`);
+      label.innerHTML = group.content;
+
+      container.prepend(input);
+      container.append(label);
+      return container;
+    }
+  };
+
+  private observeLabels() {
+    this.subscription.add(this.labelsService.newLabels$().subscribe(newLabel => {
+      if (newLabel) {
+        const group = {id: newLabel.id, content: newLabel.name};
+        this.timelineData.addGroup(group);
+      }
+    }));
+
+    this.subscription.add(this.labelsService.removedLabels$().subscribe(removed => {
+      if (removed) {
+        this.timelineData.removeGroup(removed.id);
+      }
+    }));
+
+    this.subscription.add(this.labelsService.editedLabels$().subscribe(changed => {
+        if (changed) {
+          this.timelineData.updateGroup({id: changed.id, content: changed.change});
+        }
+      })
+    );
+  }
+
+  private registerHotkeys() {
+    const hotkeys = [];
+    for (let i = 0; i < 9; ++i) {
+      const hotkey = new Hotkey(
+        `${i + 1}`,
+        (): boolean => {
+          const ids: IdType[] = this.timelineData.getGroupIds();
+          const id = ids[i];
+          const checkbox = document.getElementById(`checkbox_${id}`);
+          if (checkbox) {
+            checkbox.click();
+          }
+          return false;
+        },
+        undefined,
+        `Toggle recording of the ${i + 1} label`);
+      hotkeys.push(hotkey);
+    }
+    this.hotkeyService.add(hotkeys);
+  }
+
+  private setMax(duration: DateType) {
+    const newOptions: TimelineOptions = Object.assign({}, this.options);
+    newOptions.max = duration;
+    this.timeline.setOptions(newOptions);
   }
 
 }
