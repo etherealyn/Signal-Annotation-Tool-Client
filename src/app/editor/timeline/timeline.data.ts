@@ -92,21 +92,21 @@ export class TimelineData {
     });
   }
 
-  stopRecording(id: IdType) {
-    if (this._map.has(id)) {
-
-      if (this.deleteWrongRecords) {
+  async stopRecording(id: IdType) {
+    return await new Promise((resolve, reject) => {
+      if (this._map.has(id)) {
         const status = this._map.get(id);
-        if (status && status.id) {
+        if (this.deleteWrongRecords && status.id && status) {
           const item = this._items.get(status.id);
           if (item.start > item.end) {
             this._items.remove(item.id);
+            reject();
           }
         }
+
+        this._map.delete(id);
+        resolve(status.id);
       }
-
-
-      this._map.delete(id);
-    }
+    });
   }
 }

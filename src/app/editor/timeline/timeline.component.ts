@@ -1,16 +1,6 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  EventEmitter,
-  OnDestroy,
-  OnInit,
-  ViewChild
-} from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import * as vis from 'vis';
-import { DataGroup, DataItem, DataSet, DateType, IdType, Timeline, TimelineOptions } from 'vis';
-import * as hyperid from 'hyperid';
+import { DataGroup, DataItem, DateType, IdType, Timeline, TimelineOptions } from 'vis';
 import * as moment from 'moment';
 import { LabelsService } from 'src/app/labels/labels.service';
 import { ProjectService } from '../project.service';
@@ -22,7 +12,7 @@ import { ProjectModel } from '../../models/project.model';
 import { Time } from './time';
 import { TimelineData } from './timeline.data';
 import { LabelModel } from '../../models/label.model';
-import { distinct, first, groupBy, pairwise, startWith, throttle, throttleTime } from 'rxjs/operators';
+import { pairwise, startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'app-timeline',
@@ -39,7 +29,93 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private timeline: Timeline;
 
-  private options;
+  private options: TimelineOptions = {
+    width: '100%',
+    min: Time.seconds(0),
+    start: Time.seconds(0),
+    end: Time.seconds(15),
+    max: Time.seconds(98), // todo
+    moment: function (date) {
+      return moment(date).utc();
+    },
+    format: {
+      minorLabels: {
+        millisecond: 'ss.SSS',
+        second: 'HH:mm:ss',
+        minute: 'HH:mm:ss',
+        hour: 'HH:mm',
+        weekday: 'HH:mm',
+        day: 'HH:mm',
+        week: 'HH:mm',
+        month: 'HH:mm',
+        year: 'HH:mm'
+      },
+      majorLabels: {
+        // millisecond: 'HH:mm:ss',
+        // second: 'D MMMM HH:mm',
+        // minute: 'ddd D MMMM',
+        // hour: 'ddd D MMMM',
+        // weekday: 'MMMM YYYY',
+        // day: 'MMMM YYYY',
+        // week: 'MMMM YYYY',
+        // month: 'YYYY',
+        // year: '',
+        // millisecond: 'HH:mm:ss',
+        second: 'HH:mm:ss',
+        minute: 'HH:mm:ss',
+        hour: '',
+        weekday: '',
+        day: '',
+        week: '',
+        month: '',
+        year: ''
+      }
+    },
+    groupTemplate: (group: DataGroup) => {
+      if (group) {
+        const container = document.createElement('div');
+        container.className = 'checkbox btn';
+
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.id = `checkbox_${group.id}`;
+        input.addEventListener('change', () => {
+          this.checkboxChange.emit({id: group.id, checked: input.checked});
+        });
+
+        const label = document.createElement('label');
+        label.setAttribute('for', `checkbox_${group.id}`);
+        label.innerHTML = group.content;
+
+        container.prepend(input);
+        container.append(label);
+        return container;
+      }
+    },
+    multiselect: true,
+    editable: true,
+    onAdd: (item, callback) => {
+      console.log('onAdd', item);
+      callback(item); // send back adjusted new item
+      // callback(null) // cancel item creation
+    },
+    onMove: (item, callback) => {
+      console.log('onMove', item);
+      callback(item);
+    },
+    onMoving: (item, callback) => {
+      console.log('onMoving', item);
+      callback(item);
+    },
+    onUpdate: (item, callback) => {
+      console.log('onUpdate', item);
+      callback(item);
+    },
+    onRemove: (item, callback) => {
+      console.log('onRemove', item);
+      callback(item);
+    }
+  };
 
   private timelineData: TimelineData = new TimelineData();
   private customTimeId: IdType;
@@ -62,13 +138,15 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
           this.project = project;
           this.labelsService.getLabels()
             .then((labels: LabelModel[]) => {
-              this.timelineData.clear();
+              this.labelsService.getSegments(labels.map(x => x.id));
+              // this.timelineData.clear();
               this.timelineData.addGroups(labels.map(x => ({id: x.id, content: x.name})));
-              this.timelineData.addItem({id: '-1', content: `stub`, start: 0, end: 100});
+              // this.timelineData.addItem({id: '-1', content: `stub`, start: 0, end: 100});
             });
         }
       });
     this.observeLabels();
+    this.observeSegments();
 
     this.subscription.add(this.videoService.playerReady
       .subscribe(event => {
@@ -105,60 +183,27 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
         } else if (curr.checked) {
           this.timelineData.startRecording(curr.id, this.currentTime);
         } else if (!curr.checked) {
-          this.timelineData.stopRecording(curr.id);
+          this.timelineData.stopRecording(curr.id)
+            .then((id: IdType) => {
+              if (id) {
+                const segment = this.timelineData.items.get(id);
+                this.labelsService.addSegment({
+                  hyperid: segment.id,
+                  group: segment.group,
+                  start: segment.start,
+                  end: segment.end
+                }).then(() => {
+                  console.log('segment added');
+                }, () => {
+                  console.error('an error occured while adding a segment');
+                });
+              }
+            });
         }
       }));
   }
 
   ngAfterViewInit() {
-    this.options = {
-      // groupOrder: 'content',  // groupOrder can be a property name or a sorting function,
-      width: '100%',
-      min: Time.seconds(0),
-      start: Time.seconds(0),
-      end: Time.seconds(15),
-      max: Time.seconds(98), // todo
-      moment: function (date) {
-        return moment(date).utc();
-      },
-      editable: true,
-      format: {
-        minorLabels: {
-          millisecond: 'ss.SSS',
-          second: 'HH:mm:ss',
-          minute: 'HH:mm:ss',
-          hour: 'HH:mm',
-          weekday: 'HH:mm',
-          day: 'HH:mm',
-          week: 'HH:mm',
-          month: 'HH:mm',
-          year: 'HH:mm'
-        },
-        majorLabels: {
-          // millisecond: 'HH:mm:ss',
-          // second: 'D MMMM HH:mm',
-          // minute: 'ddd D MMMM',
-          // hour: 'ddd D MMMM',
-          // weekday: 'MMMM YYYY',
-          // day: 'MMMM YYYY',
-          // week: 'MMMM YYYY',
-          // month: 'YYYY',
-          // year: '',
-          // millisecond: 'HH:mm:ss',
-          second: 'HH:mm:ss',
-          minute: 'HH:mm:ss',
-          hour: '',
-          weekday: '',
-          day: '',
-          week: '',
-          month: '',
-          year: ''
-        }
-      },
-      groupTemplate: this.groupTemplate,
-
-    };
-
     const container = this.timelineVisualization.nativeElement;
     this.timeline = new vis.Timeline(container, this.timelineData.items, this.timelineData.groups, this.options);
     this.customTimeId = this.timeline.addCustomTime(Time.seconds(1), 'currentPlayingTime');
@@ -169,6 +214,14 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
       const videoSeek = Time.dateToSeconds(properties.time);
       this.videoService.seekTo(videoSeek);
       // this.timeline.setCustomTimeTitle(time.format('H:mm:ss'), id); todo
+    });
+
+    this.timelineData.items.on('remove', (event, properties) => {
+      if (event === 'remove') {
+        const ids = properties.items;
+        console.log(ids);
+        this.labelsService.deleteSegments(ids);
+      }
     });
 
     this.loading = false;
@@ -206,28 +259,6 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private groupTemplate = (group: DataGroup) => {
-    if (group) {
-      const container = document.createElement('div');
-      container.className = 'checkbox btn';
-
-      const input = document.createElement('input');
-      input.type = 'checkbox';
-      input.id = `checkbox_${group.id}`;
-      input.addEventListener('change', () => {
-        this.checkboxChange.emit({id: group.id, checked: input.checked});
-      });
-
-      const label = document.createElement('label');
-      label.setAttribute('for', `checkbox_${group.id}`);
-      label.innerHTML = group.content;
-
-      container.prepend(input);
-      container.append(label);
-      return container;
-    }
-  };
-
   private observeLabels() {
     this.subscription.add(this.labelsService.newLabels$().subscribe(newLabel => {
       if (newLabel) {
@@ -250,6 +281,15 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
+  private observeSegments() {
+    this.subscription.add(
+      this.labelsService.getSegments$()
+        .subscribe(
+          xs => this.timelineData.items.add(xs.map(x => ({id: x.id, content: '', group: x.labelId, start: x.start, end: x.end})))
+        )
+    );
+  }
+
   private registerHotkeys() {
     const hotkeys = [];
     for (let i = 0; i < 9; ++i) {
@@ -269,12 +309,24 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
       hotkeys.push(hotkey);
     }
     this.hotkeyService.add(hotkeys);
+    this.hotkeyService.add(new Hotkey('del', (): boolean => {
+      setTimeout(this.deleteSelecion(), 0);
+      return false;
+    }), undefined, 'Delete selected items');
   }
 
-  private setMax(duration: DateType) {
+  private setMax(duration: number) {
     const newOptions: TimelineOptions = Object.assign({}, this.options);
     newOptions.max = duration;
     this.timeline.setOptions(newOptions);
   }
 
+  private deleteSelecion() {
+    const selection = this.timeline.getSelection();
+    if (selection && selection.length > 0) {
+      if (confirm('Are you sure you want to delete selected segments?')) {
+        this.timelineData.items.remove(selection);
+      }
+    }
+  }
 }
