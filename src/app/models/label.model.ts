@@ -1,8 +1,9 @@
-import { RangeModel } from './range.model';
+import { SegmentModel } from './segmentModel';
 
 export class LabelModel {
   id: string;
-  authorId: string;
   name: string;
-  series: RangeModel[];
+  projectId: string;
+  authorId: string;
+  series: SegmentModel[];
 }
