@@ -155,7 +155,8 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
           year: ''
         }
       },
-      groupTemplate: this.groupTemplate
+      groupTemplate: this.groupTemplate,
+
     };
 
     const container = this.timelineVisualization.nativeElement;
@@ -163,16 +164,9 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
     this.customTimeId = this.timeline.addCustomTime(Time.seconds(1), 'currentPlayingTime');
     this.timeline.setCustomTimeTitle('', this.customTimeId);
 
-    // this.timeline.on('timechange', function (properties) {
-    //   const id = properties.id;
-    //   const time = properties.time;
-    //   console.log({id, time});
-    // });
-    this.timeline.on('timechanged', properties => {
-      // const id = properties.id; todo
-      const time = moment(properties.time).utc();
 
-      const videoSeek = time.seconds() + time.minutes() * 60 + time.hours() * 360 + time.milliseconds() / 1000;
+    this.timeline.on('timechanged', properties => {
+      const videoSeek = Time.dateToSeconds(properties.time);
       this.videoService.seekTo(videoSeek);
       // this.timeline.setCustomTimeTitle(time.format('H:mm:ss'), id); todo
     });

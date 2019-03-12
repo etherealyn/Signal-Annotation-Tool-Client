@@ -9,6 +9,8 @@ export class TimelineData {
 
   private instance = hyperid();
 
+  private deleteWrongRecords = true;
+
   constructor() {
     this._groups = new vis.DataSet<DataGroup>();
     this._items = new vis.DataSet<DataItem>();
@@ -71,7 +73,7 @@ export class TimelineData {
 
   startRecording(groupId: IdType, start: number) {
     const item = {id: this.instance(), group: groupId, content: '', start};
-    this.items.add(item);
+    this._items.add(item);
     this._map.set(groupId, {id: item.id, recording: true});
   }
 
@@ -92,6 +94,18 @@ export class TimelineData {
 
   stopRecording(id: IdType) {
     if (this._map.has(id)) {
+
+      if (this.deleteWrongRecords) {
+        const status = this._map.get(id);
+        if (status && status.id) {
+          const item = this._items.get(status.id);
+          if (item.start > item.end) {
+            this._items.remove(item.id);
+          }
+        }
+      }
+
+
       this._map.delete(id);
     }
   }
