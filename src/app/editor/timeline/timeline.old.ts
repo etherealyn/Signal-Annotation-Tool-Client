@@ -31,7 +31,7 @@
 //   // max: 1000,
 //   editable: true,
 //   zoomMin: 10000,
-//   format: {
+//   formatDatetime: {
 //     minorLabels: {
 //       millisecond: 'SSS',
 //       second: 'mm:ss',
