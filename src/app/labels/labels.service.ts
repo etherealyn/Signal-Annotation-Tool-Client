@@ -2,7 +2,9 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { LabelsSocket } from './labels.socket';
 import { merge, Observable, Subject } from 'rxjs';
 import { LabelModel } from '../models/label.model';
-import { joinTestLogs } from "protractor/built/util";
+import { joinTestLogs } from 'protractor/built/util';
+import { DateType, IdType } from 'vis';
+import { SegmentModel } from '../models/segmentModel';
 
 interface ILabelRemoved {
   id: string;
@@ -54,7 +56,7 @@ export class LabelsService {
     this.socket.emit('leaveProject', {id});
   }
 
-  // region Unicast
+  // region Unicast Labels
 
   /**
    * Get all labels in this project
@@ -115,6 +117,36 @@ export class LabelsService {
 
   // endregion
 
+  // region Unicast Segments
+  getSegments(ids: IdType[]) {
+    this.socket.emit('getSegments', {ids});
+  }
+
+  getSegments$(): Observable<SegmentModel[]> {
+    return this.socket.fromEvent('getSegments');
+  }
+
+  addSegment(p: { hyperid: IdType; group: string; start: DateType; end: DateType }) {
+    console.log(p);
+    return new Promise(((resolve, reject) => {
+      this.socket.emit('addSegment', p, (err) => {
+        if (!err) {
+          resolve();
+        } else {
+          reject();
+        }
+      });
+    }));
+  }
+
+  deleteSegments(ids: IdType[]) {
+    this.socket.emit('deleteSegments', {items: ids}, (response) => {
+      console.log(response);
+    });
+  }
+
+  // endregion
+
   // region Broadcast
   newLabels$(): Observable<LabelModel> {
     return merge(
@@ -136,4 +168,6 @@ export class LabelsService {
   }
 
   // endregion
+
+
 }

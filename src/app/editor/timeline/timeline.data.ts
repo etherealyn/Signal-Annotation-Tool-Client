@@ -114,7 +114,7 @@ export class TimelineData {
         }
         const segmentId: IdType = this._map.get(groupId).id;
         this._map.delete(groupId);
-        resolve(this._items.get(segmentId));
+        resolve(segmentId);
       } else {
         reject();
       }

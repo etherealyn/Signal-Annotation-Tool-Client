@@ -1,7 +1,7 @@
 import * as moment from 'moment';
 
 export class Time {
-  static seconds(second: number) {
+  static seconds(second: number): number {
     return second * 1000;
   }
 
