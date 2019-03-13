@@ -64,7 +64,7 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
             .then((labels: LabelModel[]) => {
               this.timelineData.clear();
               this.timelineData.addGroups(labels.map(x => ({id: x.id, content: x.name})));
-              this.timelineData.addItem({id: '-1', content: `stub`, start: 0, end: 100});
+              this.timelineData.addItem({id: '-1', content: `stub`, start: 0, end: 100, type: 'range'});
             });
         }
       });
@@ -105,9 +105,12 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
         } else if (curr.checked) {
           this.timelineData.startRecording(curr.id, this.currentTime);
         } else if (!curr.checked) {
-          this.timelineData.stopRecording(curr.id);
+          this.timelineData.stopRecording(curr.id).then((segment: DataItem) => {
+            console.log('record stopped', segment);
+          });
         }
       }));
+
   }
 
   ngAfterViewInit() {
@@ -156,7 +159,18 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       },
       groupTemplate: this.groupTemplate,
-
+      orientation: 'top',
+      tooltipOnItemUpdateTime: {
+        template: function(item) {
+          const fstart = Time.formatDatetime(item.start);
+          const fend = Time.formatDatetime(item.end);
+          return `Start: ${fstart}<br>End:${fend}`;
+        }
+      },
+      tooltip: {
+        followMouse: true,
+        overflowMethod: 'cap'
+      }
     };
 
     const container = this.timelineVisualization.nativeElement;
@@ -166,9 +180,9 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
     this.timeline.on('timechanged', properties => {
-      const videoSeek = Time.dateToSeconds(properties.time);
+      const videoSeek = Time.dateToTotalCentiSeconds(properties.time);
       this.videoService.seekTo(videoSeek);
-      // this.timeline.setCustomTimeTitle(time.format('H:mm:ss'), id); todo
+      // this.timeline.setCustomTimeTitle(time.formatDatetime('H:mm:ss'), id); todo
     });
 
     this.loading = false;

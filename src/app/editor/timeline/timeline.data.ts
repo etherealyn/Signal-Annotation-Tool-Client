@@ -1,6 +1,7 @@
 import * as vis from 'vis';
 import { DataGroup, DataItem, DataSet, IdType } from 'vis';
 import * as hyperid from 'hyperid';
+import { Time } from './time';
 
 export class TimelineData {
   private readonly _groups: vis.DataSet<DataGroup>;
@@ -8,7 +9,6 @@ export class TimelineData {
   private readonly _map: Map<IdType, { id: IdType, recording: boolean }>;
 
   private instance = hyperid();
-
   private deleteWrongRecords = true;
 
   constructor() {
@@ -67,14 +67,16 @@ export class TimelineData {
     return this._map;
   }
 
-  get diagostic() {
-    return JSON.stringify(this._map);
-  }
-
   startRecording(groupId: IdType, start: number) {
-    const item = {id: this.instance(), group: groupId, content: '', start};
+    const fstart = Time.formatMilliseconds(start);
+    const item = {
+      id: this.instance(), group: groupId, content: '', start: start, end: start, type: 'range', title: `Start: ${fstart}`
+    };
     this._items.add(item);
-    this._map.set(groupId, {id: item.id, recording: true});
+    this._map.set(groupId, {
+      id: item.id,
+      recording: true
+    });
   }
 
   isRecording(id: IdType) {
@@ -86,27 +88,36 @@ export class TimelineData {
       const status = this._map.get(id);
       if (status && status.recording) {
         const item = this._items.get(status.id);
+
+        // const fstart = Time.formatDatetime(item.start);
+        // const fend = Time.formatDatetime(item.end);
+
         item.end = millis;
+
         this._items.update(item);
       }
     });
   }
 
-  stopRecording(id: IdType) {
-    if (this._map.has(id)) {
-
-      if (this.deleteWrongRecords) {
-        const status = this._map.get(id);
-        if (status && status.id) {
-          const item = this._items.get(status.id);
-          if (item.start > item.end) {
-            this._items.remove(item.id);
+  async stopRecording(groupId: IdType) {
+    return await new Promise((resolve, reject) => {
+      if (this._map.has(groupId)) {
+        if (this.deleteWrongRecords) {
+          const status = this._map.get(groupId);
+          if (status && status.id) {
+            const item = this._items.get(status.id);
+            if (item.start > item.end) {
+              this._items.remove(item.id);
+              reject();
+            }
           }
         }
+        const segmentId: IdType = this._map.get(groupId).id;
+        this._map.delete(groupId);
+        resolve(this._items.get(segmentId));
+      } else {
+        reject();
       }
-
-
-      this._map.delete(id);
-    }
+    });
   }
 }
