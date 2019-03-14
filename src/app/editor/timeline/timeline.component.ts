@@ -209,8 +209,8 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
         } else if (!curr.checked) {
           this.timelineData.stopRecording(curr.id)
             .then((id: IdType) => {
-              if (id) {
-                const item = this.timelineData.items.get(id);
+              const item = this.timelineData.items.get(id);
+              if (item) {
                 const segment = {
                   hyperid: item.id,
                   group: item.group,
