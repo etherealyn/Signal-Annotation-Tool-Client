@@ -85,4 +85,8 @@ export class ProjectsService {
     const url = `${this.projectsUrl}/files/${id}/${filename}`;
     return this.http.delete(url);
   }
+
+  exportCsv(projectId: string): Observable<any> {
+    return this.http.get(`${this.projectsUrl}/${projectId}/segments/csv`, {responseType: 'text'});
+  }
 }

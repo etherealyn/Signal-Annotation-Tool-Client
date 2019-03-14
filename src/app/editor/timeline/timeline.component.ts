@@ -9,10 +9,10 @@ import {
   ViewChild
 } from '@angular/core';
 import * as vis from 'vis';
-import { DataGroup, DataItem, DateType, IdType, Timeline, TimelineOptions } from 'vis';
+import { DataGroup, IdType, Timeline, TimelineOptions } from 'vis';
 import * as moment from 'moment';
 import { LabelsService } from 'src/app/labels/labels.service';
-import { ProjectService } from '../project.service';
+import { CurrentProjectService } from '../current-project.service';
 import { VideoService } from '../../video/video.service';
 import { Subscription } from 'rxjs';
 import { IMediaSubscriptions } from 'videogular2/src/core/vg-media/i-playable';
@@ -146,7 +146,7 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private checkboxChange = new EventEmitter<{ id: IdType, checked: boolean }>();
 
-  constructor(private projectService: ProjectService,
+  constructor(private projectService: CurrentProjectService,
               private labelsService: LabelsService,
               private videoService: VideoService,
               private hotkeyService: HotkeysService,

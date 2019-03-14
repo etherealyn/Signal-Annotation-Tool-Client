@@ -1,21 +1,21 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-
-import { ProjectModel } from '../models/project.model';
-import { ProjectService } from './project.service';
-import { VgAPI } from 'videogular2/core';
-import {LabelsService} from '../labels/labels.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { CurrentProjectService } from './current-project.service';
+import { LabelsService } from '../labels/labels.service';
+import * as FileSaver from 'file-saver';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-editor',
   templateUrl: './editor.component.html',
-  styleUrls: [ './editor.component.scss' ]
+  styleUrls: ['./editor.component.scss']
 })
 export class EditorComponent implements OnInit, OnDestroy {
   direction = 'horizontal';
   projectId: string;
+
   constructor(private route: ActivatedRoute,
-              private projectService: ProjectService,
+              private projectService: CurrentProjectService,
               private labelService: LabelsService) {
   }
 
@@ -28,5 +28,19 @@ export class EditorComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.labelService.leaveProject(this.projectId);
+  }
+
+  onExport() {
+    this.projectService.exportCsv(this.projectId)
+      .toPromise()
+      .then(
+        value => {
+          const blob = new Blob([value], {type: 'text/csv'});
+          FileSaver.saveAs(blob, `labels-${this.projectId}-${moment().toISOString()}.csv`);
+        },
+        reason => {
+          console.error('onExport', reason);
+        }
+      );
   }
 }

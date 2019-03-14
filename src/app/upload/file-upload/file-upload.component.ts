@@ -2,8 +2,7 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { UploadService } from '../upload.service';
 import { forkJoin, Observable } from 'rxjs';
 import { ProjectModel } from '../../models/project.model';
-import { ProjectsService } from '../../projects/projects.service';
-import { ProjectService } from '../../editor/project.service';
+import { CurrentProjectService } from '../../editor/current-project.service';
 
 @Component({
   selector: 'app-file-upload',
@@ -24,7 +23,7 @@ export class FileUploadComponent implements OnInit {
   uploadSuccessful = false;
   rawFiles: any;
 
-  constructor(private editorService: ProjectService,
+  constructor(private editorService: CurrentProjectService,
               private uploadService: UploadService) {
   }
 

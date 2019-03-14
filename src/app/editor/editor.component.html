@@ -3,11 +3,21 @@
 
 <as-split [direction]="direction">
   <as-split-area size="50">
+    <div class="float">
     <button
-      class="btn btn-warning btn-sm float"
+      class="btn btn-warning btn-sm"
       (click)="direction = (direction === 'horizontal') ? 'vertical' : 'horizontal'">
       {{ 'Toggle direction: "' + direction + '"' }}
     </button>
+
+      <button
+        class="btn btn-primary btn-sm"
+        title="Download labelled segments as CSV"
+        (click)="onExport()">
+        CSV
+      </button>
+
+    </div>
     <app-videogrid></app-videogrid>
   </as-split-area>
   <as-split-area size="50">

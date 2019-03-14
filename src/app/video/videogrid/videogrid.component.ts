@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { VgAPI } from 'videogular2/core';
 import { IVideo } from '../video.interface';
-import { ProjectService } from '../../editor/project.service';
+import { CurrentProjectService } from '../../editor/current-project.service';
 import { LinkedList } from 'typescript-collections';
 import { IMediaSubscriptions } from 'videogular2/src/core/vg-media/i-playable';
 import { VideoService } from '../video.service';
@@ -33,7 +33,7 @@ export class VideogridComponent implements OnInit, OnDestroy {
   @ViewChildren(VideoComponent) videos: QueryList<VideoComponent>;
 
   constructor(private videoService: VideoService,
-              private editorService: ProjectService,
+              private editorService: CurrentProjectService,
               private hotkeysService: HotkeysService) {
     this.registerHotkeys();
   }

@@ -1,5 +1,5 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ProjectService } from '../../editor/project.service';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { CurrentProjectService } from '../../editor/current-project.service';
 import { ProjectModel } from '../../models/project.model';
 import { Subscription } from 'rxjs';
 import { DirectoryModel } from '../../models/directory.model';
@@ -26,7 +26,7 @@ export class FiletreeComponent implements OnInit, OnDestroy {
 
   loading = true;
 
-  constructor(private editorService: ProjectService) {
+  constructor(private editorService: CurrentProjectService) {
   }
 
   ngOnInit() {

@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {IDirectory} from '../../interfaces/IDirectory';
 import {LabelsService} from '../../labels/labels.service';
-import {ProjectService} from '../../editor/project.service';
+import {CurrentProjectService} from '../../editor/current-project.service';
 import {Subscription} from 'rxjs';
 import {ProjectModel} from '../../models/project.model';
 import {IFile} from '../../interfaces/IFile';
@@ -22,7 +22,7 @@ export class LabelTreeComponent implements OnInit, OnDestroy {
   private project: ProjectModel;
   private subscription: Subscription;
 
-  constructor(private projectService: ProjectService, private labelsService: LabelsService) {
+  constructor(private projectService: CurrentProjectService, private labelsService: LabelsService) {
   }
 
   ngOnInit() {
