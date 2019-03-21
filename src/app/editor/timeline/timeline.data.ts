@@ -68,10 +68,8 @@ export class TimelineData {
   }
 
   startRecording(groupId: IdType, start: number) {
-    const fstart = Time.formatMilliseconds(start);
-    const item = {
-      id: this.instance(), group: groupId, content: '', start: start, end: start, type: 'range', title: `Start: ${fstart}`
-    };
+    // const fstart = Time.formatMilliseconds(start);
+    const item = {id: this.instance(), group: groupId, content: '', start: start, end: start, type: 'range'};
     this._items.add(item);
     this._map.set(groupId, {
       id: item.id,
@@ -88,13 +86,14 @@ export class TimelineData {
       const status = this._map.get(id);
       if (status && status.recording) {
         const item = this._items.get(status.id);
+        if (item) {
+          // const fstart = Time.formatDatetime(item.start);
+          // const fend = Time.formatDatetime(item.end);
 
-        // const fstart = Time.formatDatetime(item.start);
-        // const fend = Time.formatDatetime(item.end);
+          item.end = millis;
 
-        item.end = millis;
-
-        this._items.update(item);
+          this._items.update(item);
+        }
       }
     });
   }
@@ -102,11 +101,11 @@ export class TimelineData {
   async stopRecording(groupId: IdType) {
     return await new Promise((resolve, reject) => {
       if (this._map.has(groupId)) {
-        if (this.deleteWrongRecords) {
-          const status = this._map.get(groupId);
-          if (status && status.id) {
-            const item = this._items.get(status.id);
-            if (item.start > item.end) {
+        const status = this._map.get(groupId);
+        if (status && status.id) {
+          const item = this._items.get(status.id);
+          if (item) {
+            if (this.deleteWrongRecords && item.start > item.end) {
               this._items.remove(item.id);
               reject();
             }
