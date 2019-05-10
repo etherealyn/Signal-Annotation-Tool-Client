@@ -31,6 +31,7 @@ export class VideogridComponent implements OnInit, OnDestroy {
 
   // 'main' video index
   @ViewChildren(VideoComponent) videos: QueryList<VideoComponent>;
+  ratio = '2:1';
 
   constructor(private videoService: VideoService,
               private editorService: CurrentProjectService,
@@ -76,6 +77,15 @@ export class VideogridComponent implements OnInit, OnDestroy {
 
     this.subscription.add(subscriptions.durationChange.subscribe(() => {
       this.durations[index] = api.duration;
+    }));
+
+    this.subscription.add(subscriptions.loadedMetadata.subscribe((x) => {
+      const width = x.target.videoWidth;
+      const height = x.target.videoHeight;
+
+      if (height > width) {
+        this.ratio = '1:2';
+      }
     }));
   }
 
