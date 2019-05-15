@@ -199,12 +199,12 @@ export class VideogridComponent implements OnInit, OnDestroy {
       this.onPlayPause();
       return false;
     }, undefined, 'Play the video(s)');
-    const nextPlayback = new Hotkey('shift+period', (): boolean => {
+    const nextPlayback = new Hotkey('>', (): boolean => {
       this.nextPlaybackSpeed();
       return false;
     }, undefined, 'Next playback speed');
-    const prevPlayback = new Hotkey('shift+comma', (): boolean => {
-      this.nextPlaybackSpeed();
+    const prevPlayback = new Hotkey('<', (): boolean => {
+      this.previousPlaybackSpeed();
       return false;
     }, undefined, 'Previous playback speed');
     const cursorSound = new Hotkey('alt+j', (): boolean => {
