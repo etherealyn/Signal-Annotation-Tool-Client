@@ -215,17 +215,26 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
             .then((id: IdType) => {
               const item = this.timelineData.items.get(id);
               if (item) {
-                const segment = {
-                  hyperid: item.id,
-                  group: item.group,
-                  start: item.start,
-                  end: item.end
-                };
-                this.labelsService.addSegment(segment).then(() => {
-                  console.log('segment added');
-                }, () => {
-                  console.error('an error occured while adding a segment');
-                });
+                // typically item.start and item.end MUST be numbers, because we're not using strings or DateType anywhere (as of now)
+                if (typeof item.start === 'number' && typeof item.end === 'number') {
+                  if (Math.abs(item.end - item.start) > 250) {
+                    const segment = {
+                      hyperid: item.id,
+                      group: item.group,
+                      start: item.start,
+                      end: item.end
+                    };
+                    this.labelsService.addSegment(segment).then(() => {
+                      console.log('segment added');
+                    }, () => {
+                      console.error('an error occured while adding a segment');
+                    });
+                  } else {
+                    this.timelineData.items.remove(id);
+                  }
+                }
+
+
               }
             });
         }
