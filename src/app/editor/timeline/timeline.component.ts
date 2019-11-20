@@ -37,6 +37,7 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   private timeline: Timeline;
+  private checkboxes: HTMLInputElement[] = [];
 
   // noinspection SpellCheckingInspection
   // noinspection JSUnusedGlobalSymbols
@@ -100,6 +101,8 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
 
         container.prepend(input);
         container.append(label);
+
+        this.checkboxes.push(input);
         return container;
       }
     },
@@ -202,11 +205,12 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
         const prev = e[0];
         const curr = e[1];
 
-        if (prev && prev.id === undefined) {
-          this.timelineData.startRecording(curr.id, this.currentTime);
-        } else if (curr.checked) {
+        if (prev && prev.id === undefined || curr.checked) {
+          console.log(curr.id);
+          this.disableCheckboxesExcept(`checkbox_${curr.id}`);
           this.timelineData.startRecording(curr.id, this.currentTime);
         } else if (!curr.checked) {
+          this.enableCheckboxes();
           this.timelineData.stopRecording(curr.id)
             .then((id: IdType) => {
               const item = this.timelineData.items.get(id);
@@ -368,5 +372,21 @@ export class TimelineComponent implements OnInit, AfterViewInit, OnDestroy {
         this.timelineData.items.remove(selection);
       }
     }
+  }
+
+  private enableCheckboxes() {
+    console.log('enable');
+    this.checkboxes.forEach(x => {
+      x.removeAttribute('disabled');
+    });
+  }
+
+  private disableCheckboxesExcept(id: string) {
+    console.log('disable');
+    this.checkboxes.forEach(x => {
+      if (x.id !== id) {
+        x.setAttribute('disabled', 'true');
+      }
+    });
   }
 }
