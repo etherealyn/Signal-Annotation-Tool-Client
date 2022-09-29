@@ -34,7 +34,7 @@
     "angular-split": "^2.0.1",
     "angular2-hotkeys": "^2.1.4",
     "core-js": "^2.6.5",
-    "d3": "^5.9.1",
+    "d3": "^7.6.1",
     "file-saver": "^2.0.1",
     "hyperid": "^2.0.2",
     "moment": "^2.24.0",
